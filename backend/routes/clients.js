@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const Client = require('../models/client');
+const Collaborator = require('../models/collaborator');
 const { authenticateToken } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticateToken);
 
-// GET /api/clients - Get all clients for logged in user
+// GET /api/clients - Get all clients for logged in user (owned + collaborated)
 router.get('/', async (req, res) => {
   try {
-    const clients = await Client.findByUserId(req.user.userId);
+    const clients = await Collaborator.getAccessibleClients(req.user.userId);
     res.json({ clients });
   } catch (error) {
     console.error('Get clients error:', error);

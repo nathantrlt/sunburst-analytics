@@ -78,6 +78,24 @@ const initDatabase = async () => {
       )
     `);
 
+    // Create collaborators table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS collaborators (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        client_id INT NOT NULL,
+        user_id INT NOT NULL,
+        role ENUM('viewer', 'editor') DEFAULT 'viewer',
+        invited_by INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (invited_by) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_collaboration (client_id, user_id),
+        INDEX idx_client_id (client_id),
+        INDEX idx_user_id (user_id)
+      )
+    `);
+
     console.log('✓ Database tables initialized');
     connection.release();
   } catch (error) {

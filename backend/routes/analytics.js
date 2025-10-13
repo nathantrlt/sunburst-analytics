@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Pageview = require('../models/pageview');
 const Client = require('../models/client');
+const Collaborator = require('../models/collaborator');
 const { authenticateToken } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticateToken);
 
-// Verify client ownership middleware
-const verifyClientOwnership = async (req, res, next) => {
+// Verify client access middleware (owner or collaborator)
+const verifyClientAccess = async (req, res, next) => {
   try {
     const clientId = parseInt(req.params.clientId);
 
@@ -16,21 +17,21 @@ const verifyClientOwnership = async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid client ID' });
     }
 
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
+    const hasAccess = await Collaborator.hasAccess(clientId, req.user.userId);
+    if (!hasAccess) {
       return res.status(404).json({ error: 'Client not found' });
     }
 
     req.clientId = clientId;
     next();
   } catch (error) {
-    console.error('Client ownership verification error:', error);
+    console.error('Client access verification error:', error);
     res.status(500).json({ error: 'Verification failed' });
   }
 };
 
 // GET /api/analytics/stats/:clientId - Get general statistics
-router.get('/stats/:clientId', verifyClientOwnership, async (req, res) => {
+router.get('/stats/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
@@ -56,7 +57,7 @@ router.get('/stats/:clientId', verifyClientOwnership, async (req, res) => {
 });
 
 // GET /api/analytics/sunburst/:clientId - Get data for sunburst visualization
-router.get('/sunburst/:clientId', verifyClientOwnership, async (req, res) => {
+router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const { startDate, endDate, depth } = req.query;
     const maxDepth = parseInt(depth) || 5;
@@ -83,7 +84,7 @@ router.get('/sunburst/:clientId', verifyClientOwnership, async (req, res) => {
 });
 
 // GET /api/analytics/page-positions/:clientId - Get page position statistics
-router.get('/page-positions/:clientId', verifyClientOwnership, async (req, res) => {
+router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 

@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
 const analyticsRoutes = require('./routes/analytics');
+const collaboratorRoutes = require('./routes/collaborators');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +47,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/track', trackingRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/collaborators', collaboratorRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

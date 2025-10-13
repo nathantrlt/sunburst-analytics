@@ -44,7 +44,10 @@
                         <h2 id="siteName">Site Name</h2>
                         <p id="siteUrl">https://example.com</p>
                     </div>
-                    <button id="deleteSiteBtn" class="btn btn-danger btn-small">Delete Site</button>
+                    <div>
+                        <button id="manageCollaboratorsBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Manage Collaborators</button>
+                        <button id="deleteSiteBtn" class="btn btn-danger btn-small">Delete Site</button>
+                    </div>
                 </div>
 
                 <!-- Statistics Cards -->
@@ -192,6 +195,48 @@
                     </div>
 
                     <button id="doneSnippetBtn" class="btn btn-primary btn-block">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Collaborators Modal -->
+    <div id="collaboratorsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Collaborators</h2>
+                <button class="modal-close" id="closeCollaboratorsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Collaborator Form -->
+                <div class="add-collaborator-section">
+                    <h3>Add Collaborator</h3>
+                    <div id="collaboratorError" class="error-message" style="display: none;"></div>
+                    <div id="collaboratorSuccess" class="success-message" style="display: none;"></div>
+
+                    <form id="addCollaboratorForm" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <div class="form-group" style="flex: 2; margin: 0;">
+                            <input type="email" id="collaboratorEmail" required placeholder="collaborator@example.com">
+                        </div>
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <select id="collaboratorRole">
+                                <option value="viewer">Viewer</option>
+                                <option value="editor">Editor</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="addCollaboratorBtn">
+                            <span class="btn-text">Add</span>
+                            <span class="btn-loader" style="display: none;">Adding...</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Collaborators List -->
+                <div class="collaborators-list-section">
+                    <h3>Current Collaborators</h3>
+                    <div id="collaboratorsList" class="collaborators-list">
+                        <div class="loading-spinner">Loading collaborators...</div>
+                    </div>
                 </div>
             </div>
         </div>

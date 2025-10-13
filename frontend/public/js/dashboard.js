@@ -128,6 +128,11 @@ async function selectClient(clientId) {
     document.getElementById('siteName').textContent = currentClient.site_name;
     document.getElementById('siteUrl').textContent = currentClient.site_url;
 
+    // Show/hide management buttons based on access type
+    const isOwner = currentClient.access_type === 'owner';
+    document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
+
     // Load analytics data
     await loadAnalytics();
 }
@@ -252,6 +257,116 @@ function truncate(str, length) {
     return str.substring(0, length) + '...';
 }
 
+// Load collaborators for current client
+async function loadCollaborators() {
+    if (!currentClient) return;
+
+    try {
+        const data = await apiRequest(`/collaborators/${currentClient.id}`);
+        renderCollaboratorsList(data.collaborators);
+    } catch (error) {
+        console.error('Failed to load collaborators:', error);
+        document.getElementById('collaboratorsList').innerHTML =
+            '<p class="empty-state">Failed to load collaborators</p>';
+    }
+}
+
+// Render collaborators list
+function renderCollaboratorsList(collaborators) {
+    const container = document.getElementById('collaboratorsList');
+
+    if (collaborators.length === 0) {
+        container.innerHTML = '<p class="empty-state">No collaborators yet.</p>';
+        return;
+    }
+
+    container.innerHTML = collaborators.map(collab => `
+        <div class="collaborator-item" data-collaborator-id="${collab.id}">
+            <div class="collaborator-info">
+                <strong>${collab.name || collab.email}</strong>
+                <span class="collaborator-email">${collab.email}</span>
+                <span class="collaborator-role badge">${collab.role}</span>
+            </div>
+            <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
+                Remove
+            </button>
+        </div>
+    `).join('');
+
+    // Add click handlers for remove buttons
+    document.querySelectorAll('.remove-collaborator-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const collaboratorId = parseInt(btn.dataset.collaboratorId);
+            await handleRemoveCollaborator(collaboratorId);
+        });
+    });
+}
+
+// Handle add collaborator
+async function handleAddCollaborator(e) {
+    e.preventDefault();
+    if (!currentClient) return;
+
+    const email = document.getElementById('collaboratorEmail').value.trim();
+    const role = document.getElementById('collaboratorRole').value;
+
+    document.getElementById('collaboratorError').style.display = 'none';
+    document.getElementById('collaboratorSuccess').style.display = 'none';
+
+    try {
+        const btn = document.getElementById('addCollaboratorBtn');
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loader').style.display = 'inline';
+        btn.disabled = true;
+
+        await apiRequest(`/collaborators/${currentClient.id}`, {
+            method: 'POST',
+            body: JSON.stringify({ email, role })
+        });
+
+        // Show success
+        const successDiv = document.getElementById('collaboratorSuccess');
+        successDiv.textContent = 'Collaborator added successfully!';
+        successDiv.style.display = 'block';
+
+        // Reset form
+        document.getElementById('addCollaboratorForm').reset();
+
+        // Reload collaborators list
+        await loadCollaborators();
+    } catch (error) {
+        const errorDiv = document.getElementById('collaboratorError');
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+    } finally {
+        const btn = document.getElementById('addCollaboratorBtn');
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loader').style.display = 'none';
+        btn.disabled = false;
+    }
+}
+
+// Handle remove collaborator
+async function handleRemoveCollaborator(collaboratorId) {
+    if (!currentClient) return;
+
+    if (!confirm('Are you sure you want to remove this collaborator?')) {
+        return;
+    }
+
+    try {
+        await apiRequest(`/collaborators/${currentClient.id}/${collaboratorId}`, {
+            method: 'DELETE'
+        });
+
+        // Reload collaborators list
+        await loadCollaborators();
+    } catch (error) {
+        alert('Failed to remove collaborator: ' + error.message);
+    }
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Logout
@@ -292,6 +407,23 @@ function setupEventListeners() {
 
     // Delete site
     document.getElementById('deleteSiteBtn').addEventListener('click', handleDeleteSite);
+
+    // Manage collaborators
+    document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {
+        document.getElementById('collaboratorsModal').style.display = 'flex';
+        document.getElementById('collaboratorError').style.display = 'none';
+        document.getElementById('collaboratorSuccess').style.display = 'none';
+        document.getElementById('addCollaboratorForm').reset();
+        loadCollaborators();
+    });
+
+    // Close collaborators modal
+    document.getElementById('closeCollaboratorsModal').addEventListener('click', () => {
+        document.getElementById('collaboratorsModal').style.display = 'none';
+    });
+
+    // Add collaborator form
+    document.getElementById('addCollaboratorForm').addEventListener('submit', handleAddCollaborator);
 
     // Apply filters
     document.getElementById('applyFiltersBtn').addEventListener('click', () => {
