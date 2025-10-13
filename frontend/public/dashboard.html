@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sunburst Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>📊 Sunburst Analytics</h1>
+            <div class="header-user">
+                <span id="userName">Loading...</span>
+                <button id="logoutBtn" class="btn btn-secondary btn-small">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <h3>Your Sites</h3>
+            <div id="clientsList" class="clients-list">
+                <div class="loading-spinner">Loading sites...</div>
+            </div>
+            <button id="addClientBtn" class="btn btn-primary btn-block">+ Add New Site</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Welcome Message (shown when no site selected) -->
+            <div id="welcomeMessage" class="welcome-message">
+                <h2>Welcome to Sunburst Analytics</h2>
+                <p>Select a site from the sidebar or add a new one to get started.</p>
+            </div>
+
+            <!-- Dashboard Content (shown when site selected) -->
+            <div id="dashboardContent" style="display: none;">
+                <!-- Site Info -->
+                <div class="site-header">
+                    <div>
+                        <h2 id="siteName">Site Name</h2>
+                        <p id="siteUrl">https://example.com</p>
+                    </div>
+                    <button id="deleteSiteBtn" class="btn btn-danger btn-small">Delete Site</button>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-content">
+                            <h3>Total Pageviews</h3>
+                            <p class="stat-value" id="statPageviews">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3>Unique Users</h3>
+                            <p class="stat-value" id="statUsers">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-content">
+                            <h3>Avg Pages/Session</h3>
+                            <p class="stat-value" id="statAvgPages">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <h3>Avg Time (seconds)</h3>
+                            <p class="stat-value" id="statAvgTime">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-section">
+                    <h3>Filters</h3>
+                    <div class="filters-grid">
+                        <div class="form-group">
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">End Date</label>
+                            <input type="date" id="endDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="depthSelect">Journey Depth</label>
+                            <select id="depthSelect">
+                                <option value="3">3 pages</option>
+                                <option value="5" selected>5 pages</option>
+                                <option value="7">7 pages</option>
+                                <option value="10">10 pages</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button id="applyFiltersBtn" class="btn btn-primary btn-block">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sunburst Visualization -->
+                <div class="visualization-section">
+                    <h3>User Journey Visualization</h3>
+                    <div id="sunburstContainer" class="sunburst-container">
+                        <div id="sunburstChart"></div>
+                        <div id="sunburstTooltip" class="sunburst-tooltip" style="display: none;"></div>
+                    </div>
+                    <div id="sunburstLoading" class="loading-message" style="display: none;">
+                        Loading visualization...
+                    </div>
+                    <div id="sunburstEmpty" class="empty-message" style="display: none;">
+                        No journey data available. Start tracking to see user journeys!
+                    </div>
+                </div>
+
+                <!-- Pages Table -->
+                <div class="table-section">
+                    <h3>Page Analytics</h3>
+                    <div class="table-container">
+                        <table id="pagesTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="url">URL</th>
+                                    <th class="sortable" data-sort="title">Title</th>
+                                    <th class="sortable" data-sort="views">Total Views</th>
+                                    <th class="sortable" data-sort="position">Avg Position</th>
+                                    <th class="sortable" data-sort="time">Avg Time (s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pagesTableBody">
+                                <tr>
+                                    <td colspan="5" class="table-loading">Loading pages...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="paginationControls" class="pagination-controls" style="display: none;">
+                        <button id="prevPageBtn" class="btn btn-secondary btn-small">Previous</button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextPageBtn" class="btn btn-secondary btn-small">Next</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Site Modal -->
+    <div id="addSiteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Site</h2>
+                <button class="modal-close" id="closeAddSiteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addSiteForm">
+                    <div id="addSiteError" class="error-message" style="display: none;"></div>
+
+                    <div class="form-group">
+                        <label for="newSiteName">Site Name</label>
+                        <input type="text" id="newSiteName" required placeholder="My Awesome Website">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newSiteUrl">Site URL</label>
+                        <input type="url" id="newSiteUrl" required placeholder="https://example.com">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="submitSiteBtn">
+                        <span class="btn-text">Create Site</span>
+                        <span class="btn-loader" style="display: none;">Creating...</span>
+                    </button>
+                </form>
+
+                <!-- Snippet Display (after creation) -->
+                <div id="snippetDisplay" style="display: none;">
+                    <div class="success-message">Site created successfully!</div>
+
+                    <h3>Tracking Snippet</h3>
+                    <p>Copy and paste this code into your website, or add it via Google Tag Manager:</p>
+
+                    <div class="code-block">
+                        <pre id="trackingSnippet"></pre>
+                        <button id="copySnippetBtn" class="btn btn-secondary btn-small">Copy to Clipboard</button>
+                    </div>
+
+                    <button id="doneSnippetBtn" class="btn btn-primary btn-block">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/sunburst.js"></script>
+</body>
+</html>

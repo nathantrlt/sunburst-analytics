@@ -1,0 +1,261 @@
+/**
+ * Sunburst Visualization using D3.js
+ * Creates an interactive sunburst chart for visualizing user journey data
+ */
+
+let currentSunburstData = null;
+
+function createSunburst(data) {
+    // Store data globally for zoom/reset functionality
+    currentSunburstData = data;
+
+    // Clear existing chart
+    const container = document.getElementById('sunburstChart');
+    container.innerHTML = '';
+
+    // Dimensions
+    const width = Math.min(container.clientWidth, 800);
+    const height = Math.min(container.clientHeight, 600);
+    const radius = Math.min(width, height) / 2;
+
+    // Color scale
+    const color = d3.scaleOrdinal()
+        .domain(['root'])
+        .range(d3.schemeCategory10);
+
+    // Create SVG
+    const svg = d3.select('#sunburstChart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    // Create hierarchy
+    const root = d3.hierarchy(data)
+        .sum(d => d.value || 0)
+        .sort((a, b) => b.value - a.value);
+
+    // Create partition layout
+    const partition = d3.partition()
+        .size([2 * Math.PI, radius]);
+
+    partition(root);
+
+    // Arc generator
+    const arc = d3.arc()
+        .startAngle(d => d.x0)
+        .endAngle(d => d.x1)
+        .innerRadius(d => d.y0)
+        .outerRadius(d => d.y1);
+
+    // Create path elements
+    const paths = svg.selectAll('path')
+        .data(root.descendants().filter(d => d.depth > 0))
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', d => {
+            // Assign colors based on top-level parent
+            while (d.depth > 1) d = d.parent;
+            return color(d.data.name);
+        })
+        .attr('fill-opacity', d => 0.6 + (d.depth * 0.1))
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2)
+        .style('cursor', 'pointer')
+        .on('mouseover', handleMouseOver)
+        .on('mouseout', handleMouseOut)
+        .on('click', handleClick);
+
+    // Add center text
+    const centerText = svg.append('text')
+        .attr('class', 'sunburst-center-text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '0.35em')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .text('User Journeys');
+
+    // Add center circle for reset
+    svg.append('circle')
+        .attr('r', 60)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', () => resetZoom());
+
+    // Mouse over handler
+    function handleMouseOver(event, d) {
+        // Highlight path
+        d3.select(event.currentTarget)
+            .attr('fill-opacity', 1)
+            .attr('stroke-width', 3);
+
+        // Show tooltip
+        showTooltip(event, d);
+
+        // Update center text
+        centerText.text(truncateText(d.data.name, 20));
+    }
+
+    // Mouse out handler
+    function handleMouseOut(event, d) {
+        d3.select(event.currentTarget)
+            .attr('fill-opacity', 0.6 + (d.depth * 0.1))
+            .attr('stroke-width', 2);
+
+        hideTooltip();
+        centerText.text('User Journeys');
+    }
+
+    // Click handler for zooming
+    function handleClick(event, d) {
+        event.stopPropagation();
+
+        // Calculate new domain
+        const transition = svg.transition()
+            .duration(750)
+            .tween('scale', () => {
+                const xd = d3.interpolate([d.x0, d.x1], [0, 2 * Math.PI]);
+                const yd = d3.interpolate([d.y0, 1], [0, 1]);
+                return t => {
+                    const x = xd(t);
+                    const y = yd(t);
+
+                    // Update arc
+                    const newArc = d3.arc()
+                        .startAngle(n => Math.max(0, Math.min(2 * Math.PI, (n.x0 - x[0]) / (x[1] - x[0]) * 2 * Math.PI)))
+                        .endAngle(n => Math.max(0, Math.min(2 * Math.PI, (n.x1 - x[0]) / (x[1] - x[0]) * 2 * Math.PI)))
+                        .innerRadius(n => Math.max(0, (n.y0 - y[0]) / (y[1] - y[0]) * radius))
+                        .outerRadius(n => Math.max(0, (n.y1 - y[0]) / (y[1] - y[0]) * radius));
+
+                    paths.attr('d', newArc);
+                };
+            });
+
+        // Update center text
+        centerText.text(truncateText(d.data.name, 20));
+    }
+
+    // Reset zoom
+    function resetZoom() {
+        const transition = svg.transition()
+            .duration(750)
+            .tween('scale', () => {
+                const xd = d3.interpolate([0, 2 * Math.PI], [0, 2 * Math.PI]);
+                const yd = d3.interpolate([0, 1], [0, 1]);
+                return t => {
+                    paths.attr('d', arc);
+                };
+            });
+
+        centerText.text('User Journeys');
+    }
+
+    // Show tooltip
+    function showTooltip(event, d) {
+        const tooltip = document.getElementById('sunburstTooltip');
+
+        const total = root.value;
+        const percentage = ((d.value / total) * 100).toFixed(1);
+
+        // Build path string
+        const pathParts = [];
+        let current = d;
+        while (current.parent) {
+            pathParts.unshift(current.data.name);
+            current = current.parent;
+        }
+
+        tooltip.innerHTML = `
+            <div class="tooltip-title">${d.data.name}</div>
+            <div class="tooltip-content">
+                <div><strong>Views:</strong> ${d.value.toLocaleString()}</div>
+                <div><strong>Percentage:</strong> ${percentage}%</div>
+                <div><strong>Depth:</strong> ${d.depth}</div>
+                ${d.data.url ? `<div><strong>URL:</strong> ${truncateText(d.data.url, 40)}</div>` : ''}
+            </div>
+            <div class="tooltip-path">
+                <strong>Path:</strong> ${pathParts.join(' → ')}
+            </div>
+        `;
+
+        tooltip.style.display = 'block';
+        tooltip.style.left = event.pageX + 10 + 'px';
+        tooltip.style.top = event.pageY + 10 + 'px';
+    }
+
+    // Hide tooltip
+    function hideTooltip() {
+        const tooltip = document.getElementById('sunburstTooltip');
+        tooltip.style.display = 'none';
+    }
+
+    // Truncate text helper
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    // Add legend
+    addLegend(svg, root, color, radius);
+
+    // Make it responsive
+    window.addEventListener('resize', debounce(() => {
+        if (currentSunburstData) {
+            createSunburst(currentSunburstData);
+        }
+    }, 250));
+}
+
+// Add legend to sunburst
+function addLegend(svg, root, color, radius) {
+    const topLevelNodes = root.children || [];
+    if (topLevelNodes.length === 0) return;
+
+    const legend = svg.append('g')
+        .attr('class', 'sunburst-legend')
+        .attr('transform', `translate(${radius + 20}, ${-radius})`);
+
+    const legendItems = legend.selectAll('.legend-item')
+        .data(topLevelNodes.slice(0, 10)) // Show max 10 items
+        .enter()
+        .append('g')
+        .attr('class', 'legend-item')
+        .attr('transform', (d, i) => `translate(0, ${i * 25})`);
+
+    legendItems.append('rect')
+        .attr('width', 18)
+        .attr('height', 18)
+        .attr('fill', d => color(d.data.name))
+        .attr('fill-opacity', 0.7);
+
+    legendItems.append('text')
+        .attr('x', 24)
+        .attr('y', 9)
+        .attr('dy', '0.35em')
+        .style('font-size', '12px')
+        .style('fill', '#333')
+        .text(d => {
+            const name = d.data.name;
+            return name.length > 20 ? name.substring(0, 20) + '...' : name;
+        });
+}
+
+// Debounce helper
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Export for global access
+window.createSunburst = createSunburst;
