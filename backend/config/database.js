@@ -2,15 +2,31 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 // Database connection pool configuration
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'sunburst_analytics',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+// Support both DATABASE_URL and individual credentials
+let poolConfig;
+
+if (process.env.DATABASE_URL) {
+  // Parse DATABASE_URL for Railway/production
+  poolConfig = {
+    uri: process.env.DATABASE_URL,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  };
+} else {
+  // Use individual credentials for local development
+  poolConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'sunburst_analytics',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  };
+}
+
+const pool = mysql.createPool(poolConfig);
 
 // Test database connection
 const testConnection = async () => {
