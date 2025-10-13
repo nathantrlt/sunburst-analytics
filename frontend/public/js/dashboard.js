@@ -366,13 +366,17 @@ async function handleAddSite(e) {
 
 // Generate tracking snippet
 function generateSnippet(apiKey) {
+    const baseUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://sunburst-analytics-production.up.railway.app';
+
     return `<script>
 (function() {
   window.SUNBURST_API_KEY = '${apiKey}';
-  window.SUNBURST_ENDPOINT = 'http://localhost:3000/api/track';
+  window.SUNBURST_ENDPOINT = '${baseUrl}/api/track';
 
   var script = document.createElement('script');
-  script.src = 'http://localhost:3000/tracker.js';
+  script.src = '${baseUrl}/tracker.js';
   script.async = true;
   document.head.appendChild(script);
 })();
