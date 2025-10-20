@@ -133,6 +133,7 @@ async function selectClient(clientId) {
     const isEditor = currentClient.access_type === 'editor';
     const canManageCategories = isOwner || isEditor;
 
+    document.getElementById('viewSnippetBtn').style.display = 'inline-block'; // Always visible
     document.getElementById('manageCategoriesBtn').style.display = canManageCategories ? 'inline-block' : 'none';
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
