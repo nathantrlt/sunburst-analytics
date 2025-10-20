@@ -571,6 +571,26 @@ function setupEventListeners() {
     // Delete site
     document.getElementById('deleteSiteBtn').addEventListener('click', handleDeleteSite);
 
+    // View snippet
+    document.getElementById('viewSnippetBtn').addEventListener('click', () => {
+        if (!currentClient) return;
+        const snippet = generateSnippet(currentClient.api_key);
+        document.getElementById('viewTrackingSnippet').textContent = snippet;
+        document.getElementById('viewSnippetModal').style.display = 'flex';
+    });
+
+    // Close view snippet modal
+    document.getElementById('closeViewSnippetModal').addEventListener('click', () => {
+        document.getElementById('viewSnippetModal').style.display = 'none';
+    });
+
+    // Copy view snippet
+    document.getElementById('copyViewSnippetBtn').addEventListener('click', () => {
+        const snippet = document.getElementById('viewTrackingSnippet').textContent;
+        navigator.clipboard.writeText(snippet);
+        alert('Code de suivi copié dans le presse-papiers !');
+    });
+
     // Manage categories
     document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
         document.getElementById('categoriesModal').style.display = 'flex';

@@ -45,6 +45,7 @@
                         <p id="siteUrl">https://example.com</p>
                     </div>
                     <div>
+                        <button id="viewSnippetBtn" class="btn btn-primary btn-small" style="margin-right: 10px;">Voir le Code de Suivi</button>
                         <button id="manageCategoriesBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Gérer les Catégories</button>
                         <button id="manageCollaboratorsBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Gérer les Collaborateurs</button>
                         <button id="deleteSiteBtn" class="btn btn-danger btn-small">Supprimer le Site</button>
@@ -308,6 +309,24 @@
                     <div id="collaboratorsList" class="collaborators-list">
                         <div class="loading-spinner">Chargement des collaborateurs...</div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Snippet Modal -->
+    <div id="viewSnippetModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Code de Suivi</h2>
+                <button class="modal-close" id="closeViewSnippetModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Copiez et collez ce code dans votre site web, ou ajoutez-le via Google Tag Manager :</p>
+
+                <div class="code-block">
+                    <pre id="viewTrackingSnippet"></pre>
+                    <button id="copyViewSnippetBtn" class="btn btn-secondary btn-small">Copier dans le Presse-papiers</button>
                 </div>
             </div>
         </div>
