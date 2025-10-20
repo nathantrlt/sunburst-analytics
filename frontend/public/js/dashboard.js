@@ -130,6 +130,7 @@ async function selectClient(clientId) {
 
     // Show/hide management buttons based on access type
     const isOwner = currentClient.access_type === 'owner';
+    document.getElementById('manageCategoriesBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
 
@@ -144,7 +145,8 @@ async function loadAnalytics() {
     await Promise.all([
         loadStats(),
         loadSunburstData(),
-        loadPagesData()
+        loadPagesData(),
+        loadCategoryStats()
     ]);
 }
 
@@ -255,6 +257,164 @@ function renderPagesTable() {
 function truncate(str, length) {
     if (str.length <= length) return str;
     return str.substring(0, length) + '...';
+}
+
+// Load category statistics
+async function loadCategoryStats() {
+    if (!currentClient) return;
+
+    try {
+        const params = new URLSearchParams();
+        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
+        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+
+        const data = await apiRequest(`/analytics/category-stats/${currentClient.id}?${params}`);
+        renderCategoryStats(data.categories);
+    } catch (error) {
+        console.error('Failed to load category stats:', error);
+        document.getElementById('categoryStatsContainer').innerHTML = '<p class="empty-state">Failed to load categories</p>';
+    }
+}
+
+// Render category statistics
+function renderCategoryStats(categories) {
+    const container = document.getElementById('categoryStatsContainer');
+
+    if (categories.length === 0) {
+        container.innerHTML = '<p class="empty-state">No categories configured yet. Click "Manage Categories" to add rules.</p>';
+        return;
+    }
+
+    container.innerHTML = categories.map(cat => `
+        <div class="category-stat-card">
+            <div class="category-name">${cat.category}</div>
+            <div class="category-count">${cat.count.toLocaleString()} views</div>
+        </div>
+    `).join('');
+}
+
+// Load categories for management modal
+async function loadCategories() {
+    if (!currentClient) return;
+
+    try {
+        const data = await apiRequest(`/page-categories/${currentClient.id}`);
+        renderCategoriesList(data.categories);
+    } catch (error) {
+        console.error('Failed to load categories:', error);
+        document.getElementById('categoriesList').innerHTML =
+            '<p class="empty-state">Failed to load categories</p>';
+    }
+}
+
+// Render categories list in modal
+function renderCategoriesList(categories) {
+    const container = document.getElementById('categoriesList');
+
+    if (categories.length === 0) {
+        container.innerHTML = '<p class="empty-state">No category rules yet.</p>';
+        return;
+    }
+
+    container.innerHTML = categories.map(cat => {
+        const conditionLabel = {
+            'contains': 'Contains',
+            'starts_with': 'Starts with',
+            'ends_with': 'Ends with',
+            'equals': 'Equals',
+            'regex': 'Regex'
+        }[cat.condition_type] || cat.condition_type;
+
+        return `
+            <div class="category-item" data-category-id="${cat.id}">
+                <div class="category-info">
+                    <strong>${cat.name}</strong>
+                    <span class="category-rule">${conditionLabel}: "${cat.condition_value}"</span>
+                    <span class="category-priority">Priority: ${cat.priority}</span>
+                </div>
+                <button class="btn btn-danger btn-small remove-category-btn" data-category-id="${cat.id}">
+                    Remove
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // Add click handlers for remove buttons
+    document.querySelectorAll('.remove-category-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const categoryId = parseInt(btn.dataset.categoryId);
+            await handleRemoveCategory(categoryId);
+        });
+    });
+}
+
+// Handle add category
+async function handleAddCategory(e) {
+    e.preventDefault();
+    if (!currentClient) return;
+
+    const name = document.getElementById('categoryName').value.trim();
+    const conditionType = document.getElementById('conditionType').value;
+    const conditionValue = document.getElementById('conditionValue').value.trim();
+    const priority = parseInt(document.getElementById('categoryPriority').value) || 0;
+
+    document.getElementById('categoryError').style.display = 'none';
+    document.getElementById('categorySuccess').style.display = 'none';
+
+    try {
+        const btn = document.getElementById('addCategoryBtn');
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loader').style.display = 'inline';
+        btn.disabled = true;
+
+        await apiRequest(`/page-categories/${currentClient.id}`, {
+            method: 'POST',
+            body: JSON.stringify({ name, conditionType, conditionValue, priority })
+        });
+
+        // Show success
+        const successDiv = document.getElementById('categorySuccess');
+        successDiv.textContent = 'Category added successfully!';
+        successDiv.style.display = 'block';
+
+        // Reset form
+        document.getElementById('addCategoryForm').reset();
+
+        // Reload categories
+        await loadCategories();
+        await loadCategoryStats();
+    } catch (error) {
+        const errorDiv = document.getElementById('categoryError');
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+    } finally {
+        const btn = document.getElementById('addCategoryBtn');
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loader').style.display = 'none';
+        btn.disabled = false;
+    }
+}
+
+// Handle remove category
+async function handleRemoveCategory(categoryId) {
+    if (!currentClient) return;
+
+    if (!confirm('Are you sure you want to remove this category rule?')) {
+        return;
+    }
+
+    try {
+        await apiRequest(`/page-categories/${currentClient.id}/${categoryId}`, {
+            method: 'DELETE'
+        });
+
+        // Reload categories
+        await loadCategories();
+        await loadCategoryStats();
+    } catch (error) {
+        alert('Failed to remove category: ' + error.message);
+    }
 }
 
 // Load collaborators for current client
@@ -407,6 +567,23 @@ function setupEventListeners() {
 
     // Delete site
     document.getElementById('deleteSiteBtn').addEventListener('click', handleDeleteSite);
+
+    // Manage categories
+    document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
+        document.getElementById('categoriesModal').style.display = 'flex';
+        document.getElementById('categoryError').style.display = 'none';
+        document.getElementById('categorySuccess').style.display = 'none';
+        document.getElementById('addCategoryForm').reset();
+        loadCategories();
+    });
+
+    // Close categories modal
+    document.getElementById('closeCategoriesModal').addEventListener('click', () => {
+        document.getElementById('categoriesModal').style.display = 'none';
+    });
+
+    // Add category form
+    document.getElementById('addCategoryForm').addEventListener('submit', handleAddCategory);
 
     // Manage collaborators
     document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {

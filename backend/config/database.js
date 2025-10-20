@@ -96,6 +96,22 @@ const initDatabase = async () => {
       )
     `);
 
+    // Create page_categories table
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS page_categories (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        client_id INT NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        condition_type ENUM('contains', 'starts_with', 'ends_with', 'equals', 'regex') NOT NULL,
+        condition_value VARCHAR(500) NOT NULL,
+        priority INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+        INDEX idx_client_id (client_id),
+        INDEX idx_priority (priority)
+      )
+    `);
+
     console.log('✓ Database tables initialized');
     connection.release();
   } catch (error) {

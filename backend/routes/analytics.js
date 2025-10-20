@@ -3,6 +3,7 @@ const router = express.Router();
 const Pageview = require('../models/pageview');
 const Client = require('../models/client');
 const Collaborator = require('../models/collaborator');
+const PageCategory = require('../models/pageCategory');
 const { authenticateToken } = require('../middleware/auth');
 
 // All routes require authentication
@@ -106,6 +107,24 @@ router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => 
   } catch (error) {
     console.error('Get page positions error:', error);
     res.status(500).json({ error: 'Failed to fetch page positions' });
+  }
+});
+
+// GET /api/analytics/category-stats/:clientId - Get statistics by category
+router.get('/category-stats/:clientId', verifyClientAccess, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    const categoryStats = await PageCategory.getCategoryStats(
+      req.clientId,
+      startDate || null,
+      endDate || null
+    );
+
+    res.json({ categories: categoryStats });
+  } catch (error) {
+    console.error('Get category stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch category statistics' });
   }
 });
 
