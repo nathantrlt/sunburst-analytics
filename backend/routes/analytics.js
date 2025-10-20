@@ -99,7 +99,7 @@ router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => 
       url: page.page_url,
       title: page.page_title || page.page_url,
       totalViews: parseInt(page.total_views) || 0,
-      avgPosition: parseFloat((parseFloat(page.avg_position) || 0).toFixed(2)),
+      avgPosition: Math.round(parseFloat(page.avg_position) || 0),
       avgTimeSpent: Math.round(parseFloat(page.avg_time_spent) || 0)
     }));
 
