@@ -21,10 +21,43 @@
   var API_KEY = window.SUNBURST_API_KEY || 'YOUR_API_KEY';
   var API_ENDPOINT = window.SUNBURST_ENDPOINT || 'http://localhost:3000/api/track';
 
+  // Get the actual page URL (handles GTM iframe)
+  function getActualUrl() {
+    try {
+      // Try to get parent URL (for GTM iframe)
+      return (window.top && window.top.location && window.top.location.href) || window.location.href;
+    } catch (e) {
+      // Fallback if cross-origin
+      return window.location.href;
+    }
+  }
+
+  // Get the actual page title (handles GTM iframe)
+  function getActualTitle() {
+    try {
+      // Try to get parent title (for GTM iframe)
+      return (window.top && window.top.document && window.top.document.title) || document.title;
+    } catch (e) {
+      // Fallback if cross-origin
+      return document.title;
+    }
+  }
+
+  // Get the actual referrer (handles GTM iframe)
+  function getActualReferrer() {
+    try {
+      // Try to get parent referrer (for GTM iframe)
+      return (window.top && window.top.document && window.top.document.referrer) || document.referrer;
+    } catch (e) {
+      // Fallback if cross-origin
+      return document.referrer;
+    }
+  }
+
   // Session and state management
   var sessionId = getOrCreateSessionId();
   var sequenceNumber = 0;
-  var currentPageUrl = window.location.href;
+  var currentPageUrl = getActualUrl();
   var pageStartTime = Date.now();
   var lastUrl = currentPageUrl;
   var heartbeatInterval = null;
@@ -98,7 +131,7 @@
       timeSpent: data.timeSpent || 0,
       deviceType: getDeviceType(),
       userLocation: getUserLocation(),
-      referrer: data.referrer || document.referrer || null,
+      referrer: data.referrer || getActualReferrer() || null,
       apiKey: API_KEY
     };
 
@@ -175,8 +208,8 @@
    * Track a new pageview
    */
   function trackPageview(url, title) {
-    url = url || window.location.href;
-    title = title || document.title;
+    url = url || getActualUrl();
+    title = title || getActualTitle();
 
     // Update time spent on previous page
     if (sequenceNumber > 0) {
@@ -254,11 +287,11 @@
    * Handle URL change in SPA
    */
   function handleUrlChange() {
-    var newUrl = window.location.href;
+    var newUrl = getActualUrl();
     if (newUrl !== currentPageUrl) {
       // Small delay to allow page title to update
       setTimeout(function() {
-        trackPageview(newUrl, document.title);
+        trackPageview(newUrl, getActualTitle());
       }, 100);
     }
   }
