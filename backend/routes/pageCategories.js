@@ -2,10 +2,20 @@ const express = require('express');
 const router = express.Router();
 const PageCategory = require('../models/pageCategory');
 const Client = require('../models/client');
+const Collaborator = require('../models/collaborator');
 const { authenticateToken } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(authenticateToken);
+
+// Helper function to check if user is owner or editor
+async function isOwnerOrEditor(clientId, userId) {
+  const isOwner = await Client.verifyOwnership(clientId, userId);
+  if (isOwner) return true;
+
+  const role = await Collaborator.getRole(clientId, userId);
+  return role === 'editor';
+}
 
 // GET /api/page-categories/:clientId - Get all category rules for a client
 router.get('/:clientId', async (req, res) => {
@@ -16,10 +26,10 @@ router.get('/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid client ID' });
     }
 
-    // Verify user is owner (only owners can manage categories)
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can manage categories' });
+    // Verify user is owner or editor
+    const canManage = await isOwnerOrEditor(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and editors can manage categories' });
     }
 
     const categories = await PageCategory.findByClientId(clientId);
@@ -50,10 +60,10 @@ router.post('/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid condition type' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can create categories' });
+    // Verify user is owner or editor
+    const canManage = await isOwnerOrEditor(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and editors can create categories' });
     }
 
     const categoryId = await PageCategory.create(
@@ -95,10 +105,10 @@ router.put('/:clientId/:categoryId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid condition type' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can update categories' });
+    // Verify user is owner or editor
+    const canManage = await isOwnerOrEditor(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and editors can update categories' });
     }
 
     const updated = await PageCategory.update(
@@ -131,10 +141,10 @@ router.delete('/:clientId/:categoryId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid IDs' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can delete categories' });
+    // Verify user is owner or editor
+    const canManage = await isOwnerOrEditor(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and editors can delete categories' });
     }
 
     const deleted = await PageCategory.delete(categoryId, clientId);

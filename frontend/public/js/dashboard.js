@@ -130,7 +130,10 @@ async function selectClient(clientId) {
 
     // Show/hide management buttons based on access type
     const isOwner = currentClient.access_type === 'owner';
-    document.getElementById('manageCategoriesBtn').style.display = isOwner ? 'inline-block' : 'none';
+    const isEditor = currentClient.access_type === 'editor';
+    const canManageCategories = isOwner || isEditor;
+
+    document.getElementById('manageCategoriesBtn').style.display = canManageCategories ? 'inline-block' : 'none';
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
 
