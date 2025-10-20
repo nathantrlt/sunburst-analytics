@@ -28,6 +28,11 @@ function createSunburst(data) {
         .append('svg')
         .attr('width', width)
         .attr('height', height)
+        .style('pointer-events', 'all') // Allow scroll events
+        .on('wheel', function(event) {
+            // Prevent default zoom behavior but allow page scroll
+            event.stopPropagation();
+        })
         .append('g')
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
@@ -76,7 +81,7 @@ function createSunburst(data) {
         .style('font-size', '16px')
         .style('font-weight', 'bold')
         .style('fill', '#333')
-        .text('User Journeys');
+        .text('Parcours Utilisateurs');
 
     // Add center circle for reset
     svg.append('circle')
@@ -106,7 +111,7 @@ function createSunburst(data) {
             .attr('stroke-width', 2);
 
         hideTooltip();
-        centerText.text('User Journeys');
+        centerText.text('Parcours Utilisateurs');
     }
 
     // Click handler for zooming
@@ -150,7 +155,7 @@ function createSunburst(data) {
                 };
             });
 
-        centerText.text('User Journeys');
+        centerText.text('Parcours Utilisateurs');
     }
 
     // Show tooltip
@@ -171,19 +176,35 @@ function createSunburst(data) {
         tooltip.innerHTML = `
             <div class="tooltip-title">${d.data.name}</div>
             <div class="tooltip-content">
-                <div><strong>Views:</strong> ${d.value.toLocaleString()}</div>
-                <div><strong>Percentage:</strong> ${percentage}%</div>
-                <div><strong>Depth:</strong> ${d.depth}</div>
-                ${d.data.url ? `<div><strong>URL:</strong> ${truncateText(d.data.url, 40)}</div>` : ''}
+                <div><strong>Vues :</strong> ${d.value.toLocaleString()}</div>
+                <div><strong>Pourcentage :</strong> ${percentage}%</div>
+                <div><strong>Profondeur :</strong> ${d.depth}</div>
+                ${d.data.url ? `<div><strong>URL :</strong> ${truncateText(d.data.url, 40)}</div>` : ''}
             </div>
             <div class="tooltip-path">
-                <strong>Path:</strong> ${pathParts.join(' → ')}
+                <strong>Chemin :</strong> ${pathParts.join(' → ')}
             </div>
         `;
 
         tooltip.style.display = 'block';
-        tooltip.style.left = event.pageX + 10 + 'px';
-        tooltip.style.top = event.pageY + 10 + 'px';
+
+        // Use clientX/clientY instead of pageX/pageY for better positioning
+        const tooltipWidth = 300; // Approximate tooltip width
+        const tooltipHeight = 150; // Approximate tooltip height
+
+        let left = event.clientX + 15;
+        let top = event.clientY + 15;
+
+        // Adjust if tooltip goes off screen
+        if (left + tooltipWidth > window.innerWidth) {
+            left = event.clientX - tooltipWidth - 15;
+        }
+        if (top + tooltipHeight > window.innerHeight) {
+            top = event.clientY - tooltipHeight - 15;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
     }
 
     // Hide tooltip

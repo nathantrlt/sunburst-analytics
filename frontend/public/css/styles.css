@@ -425,7 +425,7 @@ body {
 }
 
 .sunburst-tooltip {
-    position: absolute;
+    position: fixed;
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -434,6 +434,7 @@ body {
     pointer-events: none;
     z-index: 1000;
     max-width: 300px;
+    min-width: 250px;
 }
 
 .tooltip-title {
