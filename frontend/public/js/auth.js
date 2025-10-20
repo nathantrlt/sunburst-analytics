@@ -71,7 +71,7 @@ loginForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('loginPassword').value;
 
     if (!email || !password) {
-        showError('loginError', 'Please fill in all fields');
+        showError('loginError', 'Veuillez remplir tous les champs');
         return;
     }
 
@@ -89,7 +89,7 @@ loginForm.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
+            throw new Error(data.error || 'Échec de la connexion');
         }
 
         // Store token and user info
@@ -117,17 +117,17 @@ registerForm.addEventListener('submit', async (e) => {
 
     // Validation
     if (!name || !email || !password || !passwordConfirm) {
-        showError('registerError', 'Please fill in all fields');
+        showError('registerError', 'Veuillez remplir tous les champs');
         return;
     }
 
     if (password.length < 6) {
-        showError('registerError', 'Password must be at least 6 characters');
+        showError('registerError', 'Le mot de passe doit contenir au moins 6 caractères');
         return;
     }
 
     if (password !== passwordConfirm) {
-        showError('registerError', 'Passwords do not match');
+        showError('registerError', 'Les mots de passe ne correspondent pas');
         return;
     }
 
@@ -145,7 +145,7 @@ registerForm.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Registration failed');
+            throw new Error(data.error || 'Échec de l\'inscription');
         }
 
         // Store token and user info
@@ -153,7 +153,7 @@ registerForm.addEventListener('submit', async (e) => {
         localStorage.setItem('user', JSON.stringify(data.user));
 
         // Show success and redirect
-        showSuccess('registerSuccess', 'Account created successfully! Redirecting...');
+        showSuccess('registerSuccess', 'Compte créé avec succès ! Redirection...');
 
         setTimeout(() => {
             window.location.href = '/dashboard.html';

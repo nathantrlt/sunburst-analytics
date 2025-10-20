@@ -74,7 +74,7 @@ async function initDashboard() {
 // Load user info
 function loadUserInfo() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    document.getElementById('userName').textContent = user.name || 'User';
+    document.getElementById('userName').textContent = user.name || 'Utilisateur';
 }
 
 // Load clients list
@@ -93,7 +93,7 @@ function renderClientsList() {
     const container = document.getElementById('clientsList');
 
     if (clients.length === 0) {
-        container.innerHTML = '<p class="empty-state">No sites yet. Add one to get started!</p>';
+        container.innerHTML = '<p class="empty-state">Aucun site pour le moment. Ajoutez-en un pour commencer !</p>';
         return;
     }
 
@@ -225,7 +225,7 @@ function renderPagesTable() {
     const tbody = document.getElementById('pagesTableBody');
 
     if (pagesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No page data available yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucune donnée de page disponible pour le moment.</td></tr>';
         document.getElementById('paginationControls').style.display = 'none';
         return;
     }
@@ -248,7 +248,7 @@ function renderPagesTable() {
     const totalPages = Math.ceil(pagesData.length / itemsPerPage);
     if (totalPages > 1) {
         document.getElementById('paginationControls').style.display = 'flex';
-        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} sur ${totalPages}`;
         document.getElementById('prevPageBtn').disabled = currentPage === 1;
         document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
     } else {
@@ -275,7 +275,7 @@ async function loadCategoryStats() {
         renderCategoryStats(data.categories);
     } catch (error) {
         console.error('Failed to load category stats:', error);
-        document.getElementById('categoryStatsContainer').innerHTML = '<p class="empty-state">Failed to load categories</p>';
+        document.getElementById('categoryStatsContainer').innerHTML = '<p class="empty-state">Échec du chargement des catégories</p>';
     }
 }
 
@@ -284,14 +284,14 @@ function renderCategoryStats(categories) {
     const container = document.getElementById('categoryStatsContainer');
 
     if (categories.length === 0) {
-        container.innerHTML = '<p class="empty-state">No categories configured yet. Click "Manage Categories" to add rules.</p>';
+        container.innerHTML = '<p class="empty-state">Aucune catégorie configurée pour le moment. Cliquez sur "Gérer les Catégories" pour ajouter des règles.</p>';
         return;
     }
 
     container.innerHTML = categories.map(cat => `
         <div class="category-stat-card">
             <div class="category-name">${cat.category}</div>
-            <div class="category-count">${cat.count.toLocaleString()} views</div>
+            <div class="category-count">${cat.count.toLocaleString()} vues</div>
         </div>
     `).join('');
 }
@@ -306,7 +306,7 @@ async function loadCategories() {
     } catch (error) {
         console.error('Failed to load categories:', error);
         document.getElementById('categoriesList').innerHTML =
-            '<p class="empty-state">Failed to load categories</p>';
+            '<p class="empty-state">Échec du chargement des catégories</p>';
     }
 }
 
@@ -315,28 +315,28 @@ function renderCategoriesList(categories) {
     const container = document.getElementById('categoriesList');
 
     if (categories.length === 0) {
-        container.innerHTML = '<p class="empty-state">No category rules yet.</p>';
+        container.innerHTML = '<p class="empty-state">Aucune règle de catégorie pour le moment.</p>';
         return;
     }
 
     container.innerHTML = categories.map(cat => {
         const conditionLabel = {
-            'contains': 'Contains',
-            'starts_with': 'Starts with',
-            'ends_with': 'Ends with',
-            'equals': 'Equals',
-            'regex': 'Regex'
+            'contains': 'Contient',
+            'starts_with': 'Commence par',
+            'ends_with': 'Se termine par',
+            'equals': 'Est égal à',
+            'regex': 'Expression régulière'
         }[cat.condition_type] || cat.condition_type;
 
         return `
             <div class="category-item" data-category-id="${cat.id}">
                 <div class="category-info">
                     <strong>${cat.name}</strong>
-                    <span class="category-rule">${conditionLabel}: "${cat.condition_value}"</span>
-                    <span class="category-priority">Priority: ${cat.priority}</span>
+                    <span class="category-rule">${conditionLabel} : "${cat.condition_value}"</span>
+                    <span class="category-priority">Priorité : ${cat.priority}</span>
                 </div>
                 <button class="btn btn-danger btn-small remove-category-btn" data-category-id="${cat.id}">
-                    Remove
+                    Retirer
                 </button>
             </div>
         `;
@@ -378,7 +378,7 @@ async function handleAddCategory(e) {
 
         // Show success
         const successDiv = document.getElementById('categorySuccess');
-        successDiv.textContent = 'Category added successfully!';
+        successDiv.textContent = 'Catégorie ajoutée avec succès !';
         successDiv.style.display = 'block';
 
         // Reset form
@@ -403,7 +403,7 @@ async function handleAddCategory(e) {
 async function handleRemoveCategory(categoryId) {
     if (!currentClient) return;
 
-    if (!confirm('Are you sure you want to remove this category rule?')) {
+    if (!confirm('Êtes-vous sûr de vouloir retirer cette règle de catégorie ?')) {
         return;
     }
 
@@ -416,7 +416,7 @@ async function handleRemoveCategory(categoryId) {
         await loadCategories();
         await loadCategoryStats();
     } catch (error) {
-        alert('Failed to remove category: ' + error.message);
+        alert('Échec de la suppression de la catégorie : ' + error.message);
     }
 }
 
@@ -430,7 +430,7 @@ async function loadCollaborators() {
     } catch (error) {
         console.error('Failed to load collaborators:', error);
         document.getElementById('collaboratorsList').innerHTML =
-            '<p class="empty-state">Failed to load collaborators</p>';
+            '<p class="empty-state">Échec du chargement des collaborateurs</p>';
     }
 }
 
@@ -439,7 +439,7 @@ function renderCollaboratorsList(collaborators) {
     const container = document.getElementById('collaboratorsList');
 
     if (collaborators.length === 0) {
-        container.innerHTML = '<p class="empty-state">No collaborators yet.</p>';
+        container.innerHTML = '<p class="empty-state">Aucun collaborateur pour le moment.</p>';
         return;
     }
 
@@ -448,10 +448,10 @@ function renderCollaboratorsList(collaborators) {
             <div class="collaborator-info">
                 <strong>${collab.name || collab.email}</strong>
                 <span class="collaborator-email">${collab.email}</span>
-                <span class="collaborator-role badge">${collab.role}</span>
+                <span class="collaborator-role badge">${collab.role === 'viewer' ? 'Lecteur' : collab.role === 'editor' ? 'Éditeur' : collab.role}</span>
             </div>
             <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
-                Remove
+                Retirer
             </button>
         </div>
     `).join('');
@@ -490,7 +490,7 @@ async function handleAddCollaborator(e) {
 
         // Show success
         const successDiv = document.getElementById('collaboratorSuccess');
-        successDiv.textContent = 'Collaborator added successfully!';
+        successDiv.textContent = 'Collaborateur ajouté avec succès !';
         successDiv.style.display = 'block';
 
         // Reset form
@@ -514,7 +514,7 @@ async function handleAddCollaborator(e) {
 async function handleRemoveCollaborator(collaboratorId) {
     if (!currentClient) return;
 
-    if (!confirm('Are you sure you want to remove this collaborator?')) {
+    if (!confirm('Êtes-vous sûr de vouloir retirer ce collaborateur ?')) {
         return;
     }
 
@@ -526,7 +526,7 @@ async function handleRemoveCollaborator(collaboratorId) {
         // Reload collaborators list
         await loadCollaborators();
     } catch (error) {
-        alert('Failed to remove collaborator: ' + error.message);
+        alert('Échec de la suppression du collaborateur : ' + error.message);
     }
 }
 
@@ -565,7 +565,7 @@ function setupEventListeners() {
     document.getElementById('copySnippetBtn').addEventListener('click', () => {
         const snippet = document.getElementById('trackingSnippet').textContent;
         navigator.clipboard.writeText(snippet);
-        alert('Snippet copied to clipboard!');
+        alert('Code de suivi copié dans le presse-papiers !');
     });
 
     // Delete site
@@ -699,7 +699,7 @@ function generateSnippet(apiKey) {
 async function handleDeleteSite() {
     if (!currentClient) return;
 
-    if (!confirm(`Are you sure you want to delete "${currentClient.site_name}"? This will also delete all analytics data.`)) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${currentClient.site_name}" ? Cela supprimera également toutes les données analytiques.`)) {
         return;
     }
 
@@ -714,7 +714,7 @@ async function handleDeleteSite() {
         // Reload clients
         await loadClients();
     } catch (error) {
-        alert('Failed to delete site: ' + error.message);
+        alert('Échec de la suppression du site : ' + error.message);
     }
 }
 

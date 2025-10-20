@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunburst Analytics - Login</title>
+    <title>Sunburst Analytics - Connexion</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="auth-page">
@@ -11,76 +11,76 @@
         <div class="auth-card">
             <div class="auth-header">
                 <h1>📊 Sunburst Analytics</h1>
-                <p>Track and visualize user journeys</p>
+                <p>Suivez et visualisez les parcours utilisateurs</p>
             </div>
 
             <!-- Login Form -->
             <form id="loginForm" class="auth-form">
-                <h2>Login</h2>
+                <h2>Connexion</h2>
 
                 <div id="loginError" class="error-message" style="display: none;"></div>
 
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required placeholder="your@email.com">
+                    <input type="email" id="loginEmail" required placeholder="votre@email.com">
                 </div>
 
                 <div class="form-group">
-                    <label for="loginPassword">Password</label>
+                    <label for="loginPassword">Mot de passe</label>
                     <input type="password" id="loginPassword" required placeholder="••••••••">
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <span class="btn-text">Login</span>
-                    <span class="btn-loader" style="display: none;">Loading...</span>
+                    <span class="btn-text">Se connecter</span>
+                    <span class="btn-loader" style="display: none;">Chargement...</span>
                 </button>
 
                 <p class="auth-switch">
-                    Don't have an account? <a href="#" id="showRegister">Sign up</a>
+                    Pas encore de compte ? <a href="#" id="showRegister">S'inscrire</a>
                 </p>
             </form>
 
             <!-- Register Form -->
             <form id="registerForm" class="auth-form" style="display: none;">
-                <h2>Create Account</h2>
+                <h2>Créer un compte</h2>
 
                 <div id="registerError" class="error-message" style="display: none;"></div>
                 <div id="registerSuccess" class="success-message" style="display: none;"></div>
 
                 <div class="form-group">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" required placeholder="John Doe">
+                    <label for="registerName">Nom complet</label>
+                    <input type="text" id="registerName" required placeholder="Jean Dupont">
                 </div>
 
                 <div class="form-group">
                     <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required placeholder="your@email.com">
+                    <input type="email" id="registerEmail" required placeholder="votre@email.com">
                 </div>
 
                 <div class="form-group">
-                    <label for="registerPassword">Password</label>
+                    <label for="registerPassword">Mot de passe</label>
                     <input type="password" id="registerPassword" required placeholder="••••••••" minlength="6">
-                    <small>Minimum 6 characters</small>
+                    <small>Minimum 6 caractères</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="registerPasswordConfirm">Confirm Password</label>
+                    <label for="registerPasswordConfirm">Confirmer le mot de passe</label>
                     <input type="password" id="registerPasswordConfirm" required placeholder="••••••••">
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="registerBtn">
-                    <span class="btn-text">Create Account</span>
-                    <span class="btn-loader" style="display: none;">Loading...</span>
+                    <span class="btn-text">Créer un compte</span>
+                    <span class="btn-loader" style="display: none;">Chargement...</span>
                 </button>
 
                 <p class="auth-switch">
-                    Already have an account? <a href="#" id="showLogin">Login</a>
+                    Déjà un compte ? <a href="#" id="showLogin">Se connecter</a>
                 </p>
             </form>
         </div>
 
         <div class="auth-footer">
-            <p>&copy; 2024 Sunburst Analytics. Built with ❤️</p>
+            <p>&copy; 2024 Sunburst Analytics. Fait avec ❤️</p>
         </div>
     </div>
 

@@ -12,8 +12,8 @@
         <div class="header-content">
             <h1>📊 Sunburst Analytics</h1>
             <div class="header-user">
-                <span id="userName">Loading...</span>
-                <button id="logoutBtn" class="btn btn-secondary btn-small">Logout</button>
+                <span id="userName">Chargement...</span>
+                <button id="logoutBtn" class="btn btn-secondary btn-small">Déconnexion</button>
             </div>
         </div>
     </header>
@@ -21,19 +21,19 @@
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="dashboard-sidebar">
-            <h3>Your Sites</h3>
+            <h3>Vos Sites</h3>
             <div id="clientsList" class="clients-list">
-                <div class="loading-spinner">Loading sites...</div>
+                <div class="loading-spinner">Chargement des sites...</div>
             </div>
-            <button id="addClientBtn" class="btn btn-primary btn-block">+ Add New Site</button>
+            <button id="addClientBtn" class="btn btn-primary btn-block">+ Ajouter un Nouveau Site</button>
         </aside>
 
         <!-- Main Content -->
         <main class="dashboard-main">
             <!-- Welcome Message (shown when no site selected) -->
             <div id="welcomeMessage" class="welcome-message">
-                <h2>Welcome to Sunburst Analytics</h2>
-                <p>Select a site from the sidebar or add a new one to get started.</p>
+                <h2>Bienvenue sur Sunburst Analytics</h2>
+                <p>Sélectionnez un site dans la barre latérale ou ajoutez-en un nouveau pour commencer.</p>
             </div>
 
             <!-- Dashboard Content (shown when site selected) -->
@@ -45,9 +45,9 @@
                         <p id="siteUrl">https://example.com</p>
                     </div>
                     <div>
-                        <button id="manageCategoriesBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Manage Categories</button>
-                        <button id="manageCollaboratorsBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Manage Collaborators</button>
-                        <button id="deleteSiteBtn" class="btn btn-danger btn-small">Delete Site</button>
+                        <button id="manageCategoriesBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Gérer les Catégories</button>
+                        <button id="manageCollaboratorsBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Gérer les Collaborateurs</button>
+                        <button id="deleteSiteBtn" class="btn btn-danger btn-small">Supprimer le Site</button>
                     </div>
                 </div>
 
@@ -56,28 +56,28 @@
                     <div class="stat-card">
                         <div class="stat-icon">👁️</div>
                         <div class="stat-content">
-                            <h3>Total Pageviews</h3>
+                            <h3>Pages Vues Totales</h3>
                             <p class="stat-value" id="statPageviews">0</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">👥</div>
                         <div class="stat-content">
-                            <h3>Unique Users</h3>
+                            <h3>Utilisateurs Uniques</h3>
                             <p class="stat-value" id="statUsers">0</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">📄</div>
                         <div class="stat-content">
-                            <h3>Avg Pages/Session</h3>
+                            <h3>Pages/Session Moy.</h3>
                             <p class="stat-value" id="statAvgPages">0</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏱️</div>
                         <div class="stat-content">
-                            <h3>Avg Time (seconds)</h3>
+                            <h3>Temps Moy. (secondes)</h3>
                             <p class="stat-value" id="statAvgTime">0</p>
                         </div>
                     </div>
@@ -85,18 +85,18 @@
 
                 <!-- Filters -->
                 <div class="filters-section">
-                    <h3>Filters</h3>
+                    <h3>Filtres</h3>
                     <div class="filters-grid">
                         <div class="form-group">
-                            <label for="startDate">Start Date</label>
+                            <label for="startDate">Date de Début</label>
                             <input type="date" id="startDate">
                         </div>
                         <div class="form-group">
-                            <label for="endDate">End Date</label>
+                            <label for="endDate">Date de Fin</label>
                             <input type="date" id="endDate">
                         </div>
                         <div class="form-group">
-                            <label for="depthSelect">Journey Depth</label>
+                            <label for="depthSelect">Profondeur du Parcours</label>
                             <select id="depthSelect">
                                 <option value="3">3 pages</option>
                                 <option value="5" selected>5 pages</option>
@@ -105,59 +105,59 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <button id="applyFiltersBtn" class="btn btn-primary btn-block">Apply Filters</button>
+                            <button id="applyFiltersBtn" class="btn btn-primary btn-block">Appliquer les Filtres</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sunburst Visualization -->
                 <div class="visualization-section">
-                    <h3>User Journey Visualization</h3>
+                    <h3>Visualisation du Parcours Utilisateur</h3>
                     <div id="sunburstContainer" class="sunburst-container">
                         <div id="sunburstChart"></div>
                         <div id="sunburstTooltip" class="sunburst-tooltip" style="display: none;"></div>
                     </div>
                     <div id="sunburstLoading" class="loading-message" style="display: none;">
-                        Loading visualization...
+                        Chargement de la visualisation...
                     </div>
                     <div id="sunburstEmpty" class="empty-message" style="display: none;">
-                        No journey data available. Start tracking to see user journeys!
+                        Aucune donnée de parcours disponible. Commencez le suivi pour voir les parcours utilisateur !
                     </div>
                 </div>
 
                 <!-- Category Stats -->
                 <div class="category-stats-section" style="margin-bottom: 30px;">
-                    <h3>Page Categories</h3>
+                    <h3>Catégories de Pages</h3>
                     <div id="categoryStatsContainer" class="category-stats-grid">
-                        <p class="empty-state">Loading categories...</p>
+                        <p class="empty-state">Chargement des catégories...</p>
                     </div>
                 </div>
 
                 <!-- Pages Table -->
                 <div class="table-section">
-                    <h3>Page Analytics</h3>
+                    <h3>Analytique des Pages</h3>
                     <div class="table-container">
                         <table id="pagesTable" class="data-table">
                             <thead>
                                 <tr>
                                     <th class="sortable" data-sort="url">URL</th>
-                                    <th class="sortable" data-sort="title">Title</th>
-                                    <th class="sortable" data-sort="views">Total Views</th>
-                                    <th class="sortable" data-sort="position">Avg Position</th>
-                                    <th class="sortable" data-sort="time">Avg Time (s)</th>
+                                    <th class="sortable" data-sort="title">Titre</th>
+                                    <th class="sortable" data-sort="views">Vues Totales</th>
+                                    <th class="sortable" data-sort="position">Position Moy.</th>
+                                    <th class="sortable" data-sort="time">Temps Moy. (s)</th>
                                 </tr>
                             </thead>
                             <tbody id="pagesTableBody">
                                 <tr>
-                                    <td colspan="5" class="table-loading">Loading pages...</td>
+                                    <td colspan="5" class="table-loading">Chargement des pages...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div id="paginationControls" class="pagination-controls" style="display: none;">
-                        <button id="prevPageBtn" class="btn btn-secondary btn-small">Previous</button>
-                        <span id="pageInfo">Page 1 of 1</span>
-                        <button id="nextPageBtn" class="btn btn-secondary btn-small">Next</button>
+                        <button id="prevPageBtn" class="btn btn-secondary btn-small">Précédent</button>
+                        <span id="pageInfo">Page 1 sur 1</span>
+                        <button id="nextPageBtn" class="btn btn-secondary btn-small">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@
     <div id="addSiteModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Site</h2>
+                <h2>Ajouter un Nouveau Site</h2>
                 <button class="modal-close" id="closeAddSiteModal">&times;</button>
             </div>
             <div class="modal-body">
@@ -176,34 +176,34 @@
                     <div id="addSiteError" class="error-message" style="display: none;"></div>
 
                     <div class="form-group">
-                        <label for="newSiteName">Site Name</label>
-                        <input type="text" id="newSiteName" required placeholder="My Awesome Website">
+                        <label for="newSiteName">Nom du Site</label>
+                        <input type="text" id="newSiteName" required placeholder="Mon Site Génial">
                     </div>
 
                     <div class="form-group">
-                        <label for="newSiteUrl">Site URL</label>
+                        <label for="newSiteUrl">URL du Site</label>
                         <input type="url" id="newSiteUrl" required placeholder="https://example.com">
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block" id="submitSiteBtn">
-                        <span class="btn-text">Create Site</span>
-                        <span class="btn-loader" style="display: none;">Creating...</span>
+                        <span class="btn-text">Créer le Site</span>
+                        <span class="btn-loader" style="display: none;">Création...</span>
                     </button>
                 </form>
 
                 <!-- Snippet Display (after creation) -->
                 <div id="snippetDisplay" style="display: none;">
-                    <div class="success-message">Site created successfully!</div>
+                    <div class="success-message">Site créé avec succès !</div>
 
-                    <h3>Tracking Snippet</h3>
-                    <p>Copy and paste this code into your website, or add it via Google Tag Manager:</p>
+                    <h3>Code de Suivi</h3>
+                    <p>Copiez et collez ce code dans votre site web, ou ajoutez-le via Google Tag Manager :</p>
 
                     <div class="code-block">
                         <pre id="trackingSnippet"></pre>
-                        <button id="copySnippetBtn" class="btn btn-secondary btn-small">Copy to Clipboard</button>
+                        <button id="copySnippetBtn" class="btn btn-secondary btn-small">Copier dans le Presse-papiers</button>
                     </div>
 
-                    <button id="doneSnippetBtn" class="btn btn-primary btn-block">Done</button>
+                    <button id="doneSnippetBtn" class="btn btn-primary btn-block">Terminé</button>
                 </div>
             </div>
         </div>
@@ -213,58 +213,58 @@
     <div id="categoriesModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Manage Page Categories</h2>
+                <h2>Gérer les Catégories de Pages</h2>
                 <button class="modal-close" id="closeCategoriesModal">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- Add Category Form -->
                 <div class="add-category-section">
-                    <h3>Add Category Rule</h3>
+                    <h3>Ajouter une Règle de Catégorie</h3>
                     <div id="categoryError" class="error-message" style="display: none;"></div>
                     <div id="categorySuccess" class="success-message" style="display: none;"></div>
 
                     <form id="addCategoryForm">
                         <div class="form-group">
-                            <label for="categoryName">Category Name</label>
+                            <label for="categoryName">Nom de la Catégorie</label>
                             <input type="text" id="categoryName" required placeholder="Article">
                         </div>
 
                         <div class="form-group">
-                            <label for="conditionType">Condition Type</label>
+                            <label for="conditionType">Type de Condition</label>
                             <select id="conditionType" required>
-                                <option value="contains">URL contains</option>
-                                <option value="starts_with">URL starts with</option>
-                                <option value="ends_with">URL ends with</option>
-                                <option value="equals">URL equals</option>
-                                <option value="regex">Regex pattern</option>
+                                <option value="contains">L'URL contient</option>
+                                <option value="starts_with">L'URL commence par</option>
+                                <option value="ends_with">L'URL se termine par</option>
+                                <option value="equals">L'URL est égale à</option>
+                                <option value="regex">Expression régulière</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="conditionValue">Condition Value</label>
+                            <label for="conditionValue">Valeur de la Condition</label>
                             <input type="text" id="conditionValue" required placeholder="/produit">
                             <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
-                                Example: If URL contains "/produit" → Category = "Article"
+                                Exemple : Si l'URL contient "/produit" → Catégorie = "Article"
                             </small>
                         </div>
 
                         <div class="form-group">
-                            <label for="categoryPriority">Priority (higher = checked first)</label>
+                            <label for="categoryPriority">Priorité (plus élevée = vérifiée en premier)</label>
                             <input type="number" id="categoryPriority" value="0" min="0" max="100">
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block" id="addCategoryBtn">
-                            <span class="btn-text">Add Category Rule</span>
-                            <span class="btn-loader" style="display: none;">Adding...</span>
+                            <span class="btn-text">Ajouter la Règle de Catégorie</span>
+                            <span class="btn-loader" style="display: none;">Ajout...</span>
                         </button>
                     </form>
                 </div>
 
                 <!-- Categories List -->
                 <div class="categories-list-section">
-                    <h3>Current Category Rules</h3>
+                    <h3>Règles de Catégories Actuelles</h3>
                     <div id="categoriesList" class="categories-list">
-                        <div class="loading-spinner">Loading categories...</div>
+                        <div class="loading-spinner">Chargement des catégories...</div>
                     </div>
                 </div>
             </div>
@@ -275,38 +275,38 @@
     <div id="collaboratorsModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Manage Collaborators</h2>
+                <h2>Gérer les Collaborateurs</h2>
                 <button class="modal-close" id="closeCollaboratorsModal">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- Add Collaborator Form -->
                 <div class="add-collaborator-section">
-                    <h3>Add Collaborator</h3>
+                    <h3>Ajouter un Collaborateur</h3>
                     <div id="collaboratorError" class="error-message" style="display: none;"></div>
                     <div id="collaboratorSuccess" class="success-message" style="display: none;"></div>
 
                     <form id="addCollaboratorForm" style="display: flex; gap: 10px; margin-bottom: 20px;">
                         <div class="form-group" style="flex: 2; margin: 0;">
-                            <input type="email" id="collaboratorEmail" required placeholder="collaborator@example.com">
+                            <input type="email" id="collaboratorEmail" required placeholder="collaborateur@example.com">
                         </div>
                         <div class="form-group" style="flex: 1; margin: 0;">
                             <select id="collaboratorRole">
-                                <option value="viewer">Viewer</option>
-                                <option value="editor">Editor</option>
+                                <option value="viewer">Lecteur</option>
+                                <option value="editor">Éditeur</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary" id="addCollaboratorBtn">
-                            <span class="btn-text">Add</span>
-                            <span class="btn-loader" style="display: none;">Adding...</span>
+                            <span class="btn-text">Ajouter</span>
+                            <span class="btn-loader" style="display: none;">Ajout...</span>
                         </button>
                     </form>
                 </div>
 
                 <!-- Collaborators List -->
                 <div class="collaborators-list-section">
-                    <h3>Current Collaborators</h3>
+                    <h3>Collaborateurs Actuels</h3>
                     <div id="collaboratorsList" class="collaborators-list">
-                        <div class="loading-spinner">Loading collaborators...</div>
+                        <div class="loading-spinner">Chargement des collaborateurs...</div>
                     </div>
                 </div>
             </div>
