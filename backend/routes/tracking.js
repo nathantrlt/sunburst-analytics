@@ -33,6 +33,16 @@ router.post('/', trackingLimiter, authenticateApiKey, async (req, res) => {
       });
     }
 
+    // Filter out GTM tracking URLs
+    if (pageUrl.includes('gtm-msr.appspot.com') ||
+        pageUrl.includes('googletagmanager.com') ||
+        pageUrl.includes('google-analytics.com')) {
+      return res.status(200).json({
+        success: true,
+        message: 'GTM URL filtered out'
+      });
+    }
+
     // Create pageview record
     await Pageview.create({
       clientId: req.client.id,
@@ -66,6 +76,16 @@ router.post('/time', trackingLimiter, authenticateApiKey, async (req, res) => {
     if (!sessionId || !pageUrl || timeSpent === undefined) {
       return res.status(400).json({
         error: 'Missing required fields: sessionId, pageUrl, timeSpent'
+      });
+    }
+
+    // Filter out GTM tracking URLs
+    if (pageUrl.includes('gtm-msr.appspot.com') ||
+        pageUrl.includes('googletagmanager.com') ||
+        pageUrl.includes('google-analytics.com')) {
+      return res.status(200).json({
+        success: true,
+        message: 'GTM URL filtered out'
       });
     }
 
