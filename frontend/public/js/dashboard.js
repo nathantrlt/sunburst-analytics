@@ -134,6 +134,7 @@ async function selectClient(clientId) {
     const canManageCategories = isOwner || isEditor;
 
     document.getElementById('viewSnippetBtn').style.display = 'inline-block'; // Always visible
+    document.getElementById('cleanupGtmBtn').style.display = 'inline-block'; // Always visible
     document.getElementById('manageCategoriesBtn').style.display = canManageCategories ? 'inline-block' : 'none';
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
@@ -592,6 +593,9 @@ function setupEventListeners() {
         alert('Code de suivi copié dans le presse-papiers !');
     });
 
+    // Cleanup GTM data
+    document.getElementById('cleanupGtmBtn').addEventListener('click', handleCleanupGtm);
+
     // Manage categories
     document.getElementById('manageCategoriesBtn').addEventListener('click', () => {
         document.getElementById('categoriesModal').style.display = 'flex';
@@ -714,6 +718,28 @@ function generateSnippet(apiKey) {
   document.head.appendChild(script);
 })();
 </script>`;
+}
+
+// Handle cleanup GTM data
+async function handleCleanupGtm() {
+    if (!currentClient) return;
+
+    if (!confirm(`Voulez-vous supprimer toutes les données GTM (gtm-msr, googletagmanager, etc.) pour "${currentClient.site_name}" ?`)) {
+        return;
+    }
+
+    try {
+        const data = await apiRequest(`/analytics/cleanup-gtm/${currentClient.id}`, {
+            method: 'DELETE'
+        });
+
+        alert(`✅ ${data.deletedCount} entrées GTM ont été supprimées avec succès.`);
+
+        // Reload analytics data
+        await loadAnalytics();
+    } catch (error) {
+        alert('❌ Erreur lors du nettoyage des données GTM : ' + error.message);
+    }
 }
 
 // Handle delete site

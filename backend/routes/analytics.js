@@ -200,4 +200,30 @@ function transformToSunburst(journeyData, maxDepth) {
   return root;
 }
 
+// DELETE /api/analytics/cleanup-gtm/:clientId - Remove GTM tracking data
+router.delete('/cleanup-gtm/:clientId', verifyClientAccess, async (req, res) => {
+  try {
+    const pool = require('../config/database');
+
+    const [result] = await pool.query(`
+      DELETE FROM pageviews
+      WHERE client_id = ?
+      AND (
+        pageUrl LIKE '%gtm-msr.appspot.com%'
+        OR pageUrl LIKE '%googletagmanager.com%'
+        OR pageUrl LIKE '%google-analytics.com%'
+      )
+    `, [req.clientId]);
+
+    res.json({
+      success: true,
+      message: `${result.affectedRows} entrées GTM supprimées`,
+      deletedCount: result.affectedRows
+    });
+  } catch (error) {
+    console.error('GTM cleanup error:', error);
+    res.status(500).json({ error: 'Failed to cleanup GTM data' });
+  }
+});
+
 module.exports = router;
