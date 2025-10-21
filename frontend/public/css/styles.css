@@ -133,11 +133,12 @@ h2, h3 {
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
+    color: #000000;
 }
 
 .btn-primary:hover {
     background-color: var(--primary-dark);
+    color: #000000;
 }
 
 .btn-primary:disabled {
