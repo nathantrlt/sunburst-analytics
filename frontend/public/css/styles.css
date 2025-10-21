@@ -6,18 +6,18 @@
 }
 
 :root {
-    --primary-color: #3b82f6;
-    --primary-dark: #2563eb;
-    --secondary-color: #64748b;
+    --primary-color: #FCD116;
+    --primary-dark: #e6bc00;
+    --secondary-color: #87DCD5;
     --danger-color: #ef4444;
-    --success-color: #10b981;
-    --bg-color: #f8fafc;
+    --success-color: #87DCD5;
+    --bg-color: #F5F5F7;
     --card-bg: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
+    --text-primary: #0C090A;
+    --text-secondary: #889292;
     --border-color: #e2e8f0;
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(12, 9, 10, 0.1), 0 1px 2px 0 rgba(12, 9, 10, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(12, 9, 10, 0.1), 0 4px 6px -2px rgba(12, 9, 10, 0.05);
 }
 
 body {
@@ -33,7 +33,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0C090A 0%, #889292 100%);
     padding: 20px;
 }
 
