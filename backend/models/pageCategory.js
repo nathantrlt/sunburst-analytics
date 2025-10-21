@@ -2,11 +2,11 @@ const { pool } = require('../config/database');
 
 class PageCategory {
   // Create a new category rule
-  static async create(clientId, name, conditionType, conditionValue, priority = 0) {
+  static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null) {
     try {
       const [result] = await pool.query(
-        'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority) VALUES (?, ?, ?, ?, ?)',
-        [clientId, name, conditionType, conditionValue, priority]
+        'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority, condition_period_days) VALUES (?, ?, ?, ?, ?, ?)',
+        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays]
       );
       return result.insertId;
     } catch (error) {
@@ -46,11 +46,11 @@ class PageCategory {
   }
 
   // Update a category rule
-  static async update(id, clientId, name, conditionType, conditionValue, priority) {
+  static async update(id, clientId, name, conditionType, conditionValue, priority, conditionPeriodDays = null) {
     try {
       const [result] = await pool.query(
-        'UPDATE page_categories SET name = ?, condition_type = ?, condition_value = ?, priority = ? WHERE id = ? AND client_id = ?',
-        [name, conditionType, conditionValue, priority, id, clientId]
+        'UPDATE page_categories SET name = ?, condition_type = ?, condition_value = ?, priority = ?, condition_period_days = ? WHERE id = ? AND client_id = ?',
+        [name, conditionType, conditionValue, priority, conditionPeriodDays, id, clientId]
       );
       return result.affectedRows > 0;
     } catch (error) {
@@ -72,7 +72,7 @@ class PageCategory {
   }
 
   // Apply category rules to a URL
-  static applyCategoryRules(url, rules) {
+  static async applyCategoryRules(clientId, url, rules) {
     // Sort by priority (already sorted in query, but double-check)
     const sortedRules = [...rules].sort((a, b) => {
       if (b.priority !== a.priority) {
@@ -82,7 +82,7 @@ class PageCategory {
     });
 
     for (const rule of sortedRules) {
-      if (this.matchesRule(url, rule)) {
+      if (await this.matchesRule(clientId, url, rule)) {
         return rule.name;
       }
     }
@@ -90,11 +90,38 @@ class PageCategory {
     return 'Uncategorized';
   }
 
+  // Calculate metrics for a URL
+  static async calculateUrlMetrics(clientId, url, periodDays = null) {
+    try {
+      let query = `
+        SELECT
+          COUNT(*) as total_views,
+          AVG(sequence_number) as avg_position,
+          AVG(time_spent) as avg_time_spent
+        FROM pageviews
+        WHERE client_id = ? AND page_url = ?
+      `;
+      const params = [clientId, url];
+
+      if (periodDays) {
+        query += ' AND DATE(timestamp) >= DATE_SUB(CURDATE(), INTERVAL ? DAY)';
+        params.push(periodDays);
+      }
+
+      const [rows] = await pool.query(query, params);
+      return rows[0] || { total_views: 0, avg_position: 0, avg_time_spent: 0 };
+    } catch (error) {
+      console.error('Error calculating URL metrics:', error);
+      return { total_views: 0, avg_position: 0, avg_time_spent: 0 };
+    }
+  }
+
   // Check if a URL matches a rule
-  static matchesRule(url, rule) {
-    const { condition_type, condition_value } = rule;
+  static async matchesRule(clientId, url, rule) {
+    const { condition_type, condition_value, condition_period_days } = rule;
 
     try {
+      // URL-based conditions (synchronous)
       switch (condition_type) {
         case 'contains':
           return url.toLowerCase().includes(condition_value.toLowerCase());
@@ -111,6 +138,33 @@ class PageCategory {
         case 'regex':
           const regex = new RegExp(condition_value, 'i');
           return regex.test(url);
+
+        // Metric-based conditions (asynchronous)
+        case 'pageviews_greater_than':
+        case 'pageviews_less_than':
+        case 'avg_position_greater_than':
+        case 'avg_position_less_than':
+        case 'avg_time_greater_than':
+        case 'avg_time_less_than':
+          const metrics = await this.calculateUrlMetrics(clientId, url, condition_period_days);
+          const threshold = parseFloat(condition_value);
+
+          switch (condition_type) {
+            case 'pageviews_greater_than':
+              return metrics.total_views > threshold;
+            case 'pageviews_less_than':
+              return metrics.total_views < threshold;
+            case 'avg_position_greater_than':
+              return metrics.avg_position > threshold;
+            case 'avg_position_less_than':
+              return metrics.avg_position < threshold;
+            case 'avg_time_greater_than':
+              return metrics.avg_time_spent > threshold;
+            case 'avg_time_less_than':
+              return metrics.avg_time_spent < threshold;
+            default:
+              return false;
+          }
 
         default:
           return false;
@@ -163,13 +217,13 @@ class PageCategory {
       const categoryStats = {};
       const categoryIdMap = {}; // Map category name to first matching rule ID
 
-      pageviews.forEach(pv => {
-        const matchingRule = this.getMatchingRule(pv.page_url, rules);
+      for (const pv of pageviews) {
+        const matchingRule = await this.getMatchingRule(clientId, pv.page_url, rules);
         const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
 
         // If category filter is set, only include matching category
         if (filters.category && categoryName !== filters.category) {
-          return;
+          continue;
         }
 
         if (!categoryStats[categoryName]) {
@@ -177,7 +231,7 @@ class PageCategory {
           categoryIdMap[categoryName] = matchingRule ? matchingRule.id : null;
         }
         categoryStats[categoryName] += parseInt(pv.count);
-      });
+      }
 
       // Convert to array and sort by count
       return Object.entries(categoryStats)
@@ -193,7 +247,7 @@ class PageCategory {
   }
 
   // Get the matching rule for a URL (returns the rule object, not just the name)
-  static getMatchingRule(url, rules) {
+  static async getMatchingRule(clientId, url, rules) {
     const sortedRules = [...rules].sort((a, b) => {
       if (b.priority !== a.priority) {
         return b.priority - a.priority;
@@ -202,7 +256,7 @@ class PageCategory {
     });
 
     for (const rule of sortedRules) {
-      if (this.matchesRule(url, rule)) {
+      if (await this.matchesRule(clientId, url, rule)) {
         return rule;
       }
     }

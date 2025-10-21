@@ -252,9 +252,12 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
     );
 
     // Filter pages that match this category
-    const categoryPages = pageviews.filter(pv =>
-      PageCategory.matchesRule(pv.page_url, category)
-    );
+    const categoryPages = [];
+    for (const pv of pageviews) {
+      if (await PageCategory.matchesRule(req.clientId, pv.page_url, category)) {
+        categoryPages.push(pv);
+      }
+    }
 
     // Calculate global stats
     const totalViews = categoryPages.length;

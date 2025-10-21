@@ -308,11 +308,15 @@ class Pageview {
     const PageCategory = require('./pageCategory');
     const rules = await PageCategory.findByClientId(clientId);
 
-    return pageviews.filter(pv => {
-      const matchingRule = PageCategory.getMatchingRule(pv.page_url, rules);
+    const filtered = [];
+    for (const pv of pageviews) {
+      const matchingRule = await PageCategory.getMatchingRule(clientId, pv.page_url, rules);
       const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
-      return pageCategory === categoryName;
-    });
+      if (pageCategory === categoryName) {
+        filtered.push(pv);
+      }
+    }
+    return filtered;
   }
 
   // Helper to filter page stats by category
@@ -320,11 +324,15 @@ class Pageview {
     const PageCategory = require('./pageCategory');
     const rules = await PageCategory.findByClientId(clientId);
 
-    return pageStats.filter(page => {
-      const matchingRule = PageCategory.getMatchingRule(page.page_url, rules);
+    const filtered = [];
+    for (const page of pageStats) {
+      const matchingRule = await PageCategory.getMatchingRule(clientId, page.page_url, rules);
       const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
-      return pageCategory === categoryName;
-    });
+      if (pageCategory === categoryName) {
+        filtered.push(page);
+      }
+    }
+    return filtered;
   }
 }
 

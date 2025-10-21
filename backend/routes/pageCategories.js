@@ -44,7 +44,7 @@ router.get('/:clientId', async (req, res) => {
 router.post('/:clientId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
-    const { name, conditionType, conditionValue, priority } = req.body;
+    const { name, conditionType, conditionValue, priority, conditionPeriodDays } = req.body;
 
     if (isNaN(clientId)) {
       return res.status(400).json({ error: 'Invalid client ID' });
@@ -55,7 +55,12 @@ router.post('/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Name, condition type, and condition value are required' });
     }
 
-    const validTypes = ['contains', 'starts_with', 'ends_with', 'equals', 'regex'];
+    const validTypes = [
+      'contains', 'starts_with', 'ends_with', 'equals', 'regex',
+      'pageviews_greater_than', 'pageviews_less_than',
+      'avg_position_greater_than', 'avg_position_less_than',
+      'avg_time_greater_than', 'avg_time_less_than'
+    ];
     if (!validTypes.includes(conditionType)) {
       return res.status(400).json({ error: 'Invalid condition type' });
     }
@@ -71,7 +76,8 @@ router.post('/:clientId', async (req, res) => {
       name,
       conditionType,
       conditionValue,
-      priority || 0
+      priority || 0,
+      conditionPeriodDays || null
     );
 
     res.status(201).json({
@@ -89,7 +95,7 @@ router.put('/:clientId/:categoryId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
     const categoryId = parseInt(req.params.categoryId);
-    const { name, conditionType, conditionValue, priority } = req.body;
+    const { name, conditionType, conditionValue, priority, conditionPeriodDays } = req.body;
 
     if (isNaN(clientId) || isNaN(categoryId)) {
       return res.status(400).json({ error: 'Invalid IDs' });
@@ -100,7 +106,12 @@ router.put('/:clientId/:categoryId', async (req, res) => {
       return res.status(400).json({ error: 'Name, condition type, and condition value are required' });
     }
 
-    const validTypes = ['contains', 'starts_with', 'ends_with', 'equals', 'regex'];
+    const validTypes = [
+      'contains', 'starts_with', 'ends_with', 'equals', 'regex',
+      'pageviews_greater_than', 'pageviews_less_than',
+      'avg_position_greater_than', 'avg_position_less_than',
+      'avg_time_greater_than', 'avg_time_less_than'
+    ];
     if (!validTypes.includes(conditionType)) {
       return res.status(400).json({ error: 'Invalid condition type' });
     }
@@ -117,7 +128,8 @@ router.put('/:clientId/:categoryId', async (req, res) => {
       name,
       conditionType,
       conditionValue,
-      priority || 0
+      priority || 0,
+      conditionPeriodDays || null
     );
 
     if (updated) {
