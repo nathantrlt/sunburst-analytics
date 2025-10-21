@@ -59,6 +59,11 @@ class Pageview {
   // Get general statistics for a client
   static async getStats(clientId, filters = {}) {
     try {
+      // If category filter is set, we need to filter differently
+      if (filters.category) {
+        return await this.getStatsByCategory(clientId, filters);
+      }
+
       let query = `
         SELECT
           COUNT(*) as total_pageviews,
@@ -95,6 +100,31 @@ class Pageview {
     } catch (error) {
       throw error;
     }
+  }
+
+  // Get statistics filtered by category
+  static async getStatsByCategory(clientId, filters) {
+    const pageviews = await this.getAllPageviews(clientId, filters);
+
+    const uniqueSessions = new Set();
+    const uniqueUsers = new Set();
+    let totalTimeSpent = 0;
+    let totalSequenceNumber = 0;
+
+    pageviews.forEach(pv => {
+      uniqueSessions.add(pv.session_id);
+      uniqueUsers.add(pv.user_identifier);
+      totalTimeSpent += pv.time_spent || 0;
+      totalSequenceNumber += pv.sequence_number || 0;
+    });
+
+    return {
+      total_pageviews: pageviews.length,
+      unique_sessions: uniqueSessions.size,
+      unique_users: uniqueUsers.size,
+      avg_time_spent: pageviews.length > 0 ? totalTimeSpent / pageviews.length : 0,
+      avg_pages_per_session: pageviews.length > 0 ? totalSequenceNumber / pageviews.length : 0
+    };
   }
 
   // Helper to build traffic source condition
@@ -149,6 +179,12 @@ class Pageview {
       query += ' ORDER BY session_id, sequence_number ASC';
 
       const [rows] = await pool.query(query, params);
+
+      // Apply category filter if specified
+      if (filters.category) {
+        return await this.filterByCategory(rows, clientId, filters.category);
+      }
+
       return rows;
     } catch (error) {
       throw error;
@@ -192,6 +228,12 @@ class Pageview {
       query += ' GROUP BY page_url, page_title ORDER BY total_views DESC';
 
       const [rows] = await pool.query(query, params);
+
+      // Apply category filter if specified
+      if (filters.category) {
+        return await this.filterPageStatsByCategory(rows, clientId, filters.category);
+      }
+
       return rows;
     } catch (error) {
       throw error;
@@ -221,7 +263,9 @@ class Pageview {
           page_url,
           page_title,
           sequence_number,
-          time_spent
+          time_spent,
+          session_id,
+          user_identifier
         FROM pageviews
         WHERE client_id = ?
       `;
@@ -247,10 +291,40 @@ class Pageview {
       }
 
       const [rows] = await pool.query(query, params);
+
+      // Apply category filter if specified
+      if (filters.category) {
+        return await this.filterByCategory(rows, clientId, filters.category);
+      }
+
       return rows;
     } catch (error) {
       throw error;
     }
+  }
+
+  // Helper to filter pageviews by category
+  static async filterByCategory(pageviews, clientId, categoryName) {
+    const PageCategory = require('./pageCategory');
+    const rules = await PageCategory.findByClientId(clientId);
+
+    return pageviews.filter(pv => {
+      const matchingRule = PageCategory.getMatchingRule(pv.page_url, rules);
+      const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
+      return pageCategory === categoryName;
+    });
+  }
+
+  // Helper to filter page stats by category
+  static async filterPageStatsByCategory(pageStats, clientId, categoryName) {
+    const PageCategory = require('./pageCategory');
+    const rules = await PageCategory.findByClientId(clientId);
+
+    return pageStats.filter(page => {
+      const matchingRule = PageCategory.getMatchingRule(page.page_url, rules);
+      const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
+      return pageCategory === categoryName;
+    });
   }
 }
 
