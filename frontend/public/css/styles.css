@@ -147,12 +147,13 @@ h2, h3 {
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    color: white;
+    background-color: #ffffff;
+    color: #000000;
 }
 
 .btn-secondary:hover {
-    background-color: #475569;
+    background-color: #e0e0e0;
+    color: #000000;
 }
 
 .btn-danger {
