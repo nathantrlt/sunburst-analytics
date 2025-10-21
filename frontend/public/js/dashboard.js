@@ -12,7 +12,10 @@ let pagesData = [];
 let currentFilters = {
     startDate: null,
     endDate: null,
-    depth: 5
+    depth: 5,
+    deviceType: null,
+    trafficSource: null,
+    category: null
 };
 
 // Authentication
@@ -138,7 +141,8 @@ async function selectClient(clientId) {
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
 
-    // Load analytics data
+    // Load category filter options and analytics data
+    await loadCategoryFilterOptions();
     await loadAnalytics();
 }
 
@@ -154,12 +158,44 @@ async function loadAnalytics() {
     ]);
 }
 
+// Build query parameters with filters
+function buildFilterParams() {
+    const params = new URLSearchParams();
+    if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
+    if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+    if (currentFilters.deviceType) params.append('deviceType', currentFilters.deviceType);
+    if (currentFilters.trafficSource) params.append('trafficSource', currentFilters.trafficSource);
+    if (currentFilters.category) params.append('category', currentFilters.category);
+    return params;
+}
+
+// Load categories for filter dropdown
+async function loadCategoryFilterOptions() {
+    if (!currentClient) return;
+
+    try {
+        const data = await apiRequest(`/page-categories/${currentClient.id}`);
+        const select = document.getElementById('categoryFilter');
+
+        // Clear existing options except first
+        select.innerHTML = '<option value="">Toutes les catégories</option>';
+
+        // Add category options
+        data.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.name;
+            option.textContent = cat.name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load category filter options:', error);
+    }
+}
+
 // Load statistics
 async function loadStats() {
     try {
-        const params = new URLSearchParams();
-        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
-        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+        const params = buildFilterParams();
 
         const data = await apiRequest(`/analytics/stats/${currentClient.id}?${params}`);
         const stats = data.stats;
@@ -180,9 +216,7 @@ async function loadSunburstData() {
         document.getElementById('sunburstChart').innerHTML = '';
         document.getElementById('sunburstEmpty').style.display = 'none';
 
-        const params = new URLSearchParams();
-        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
-        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+        const params = buildFilterParams();
         params.append('depth', currentFilters.depth);
 
         const data = await apiRequest(`/analytics/sunburst/${currentClient.id}?${params}`);
@@ -208,9 +242,7 @@ async function loadSunburstData() {
 // Load pages data
 async function loadPagesData() {
     try {
-        const params = new URLSearchParams();
-        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
-        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+        const params = buildFilterParams();
 
         const data = await apiRequest(`/analytics/page-positions/${currentClient.id}?${params}`);
         pagesData = data.pages;
@@ -268,9 +300,7 @@ async function loadCategoryStats() {
     if (!currentClient) return;
 
     try {
-        const params = new URLSearchParams();
-        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
-        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+        const params = buildFilterParams();
 
         const data = await apiRequest(`/analytics/category-stats/${currentClient.id}?${params}`);
         renderCategoryStats(data.categories);
@@ -649,6 +679,28 @@ function setupEventListeners() {
         currentFilters.startDate = document.getElementById('startDate').value || null;
         currentFilters.endDate = document.getElementById('endDate').value || null;
         currentFilters.depth = parseInt(document.getElementById('depthSelect').value);
+        currentFilters.deviceType = document.getElementById('deviceFilter').value || null;
+        currentFilters.trafficSource = document.getElementById('trafficSourceFilter').value || null;
+        currentFilters.category = document.getElementById('categoryFilter').value || null;
+        loadAnalytics();
+    });
+
+    // Reset filters
+    document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+        currentFilters = {
+            startDate: null,
+            endDate: null,
+            depth: 5,
+            deviceType: null,
+            trafficSource: null,
+            category: null
+        };
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        document.getElementById('depthSelect').value = '5';
+        document.getElementById('deviceFilter').value = '';
+        document.getElementById('trafficSourceFilter').value = '';
+        document.getElementById('categoryFilter').value = '';
         loadAnalytics();
     });
 
@@ -814,9 +866,7 @@ async function showCategoryDetails(categoryId) {
     document.getElementById('categoryDetailsContent').style.display = 'none';
 
     try {
-        const params = new URLSearchParams();
-        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
-        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+        const params = buildFilterParams();
 
         const data = await apiRequest(`/analytics/category-details/${currentClient.id}/${categoryId}?${params}`);
 

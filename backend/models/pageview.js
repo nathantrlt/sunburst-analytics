@@ -57,7 +57,7 @@ class Pageview {
   }
 
   // Get general statistics for a client
-  static async getStats(clientId, startDate = null, endDate = null) {
+  static async getStats(clientId, filters = {}) {
     try {
       let query = `
         SELECT
@@ -71,14 +71,23 @@ class Pageview {
       `;
       const params = [clientId];
 
-      if (startDate) {
+      if (filters.startDate) {
         query += ' AND timestamp >= ?';
-        params.push(startDate);
+        params.push(filters.startDate);
       }
 
-      if (endDate) {
+      if (filters.endDate) {
         query += ' AND timestamp <= ?';
-        params.push(endDate);
+        params.push(filters.endDate);
+      }
+
+      if (filters.deviceType) {
+        query += ' AND device_type = ?';
+        params.push(filters.deviceType);
+      }
+
+      if (filters.trafficSource) {
+        query += this.buildTrafficSourceCondition(filters.trafficSource);
       }
 
       const [rows] = await pool.query(query, params);
@@ -88,8 +97,24 @@ class Pageview {
     }
   }
 
+  // Helper to build traffic source condition
+  static buildTrafficSourceCondition(trafficSource) {
+    switch (trafficSource) {
+      case 'direct':
+        return " AND (referrer IS NULL OR referrer = '')";
+      case 'search':
+        return " AND (referrer LIKE '%google.%' OR referrer LIKE '%bing.%' OR referrer LIKE '%yahoo.%' OR referrer LIKE '%duckduckgo.%' OR referrer LIKE '%baidu.%')";
+      case 'social':
+        return " AND (referrer LIKE '%facebook.%' OR referrer LIKE '%twitter.%' OR referrer LIKE '%instagram.%' OR referrer LIKE '%linkedin.%' OR referrer LIKE '%pinterest.%' OR referrer LIKE '%tiktok.%' OR referrer LIKE '%youtube.%')";
+      case 'referral':
+        return " AND referrer IS NOT NULL AND referrer != '' AND referrer NOT LIKE '%google.%' AND referrer NOT LIKE '%bing.%' AND referrer NOT LIKE '%yahoo.%' AND referrer NOT LIKE '%facebook.%' AND referrer NOT LIKE '%twitter.%' AND referrer NOT LIKE '%instagram.%' AND referrer NOT LIKE '%linkedin.%'";
+      default:
+        return '';
+    }
+  }
+
   // Get journey data for sunburst visualization
-  static async getJourneyData(clientId, depth = 5, startDate = null, endDate = null) {
+  static async getJourneyData(clientId, depth = 5, filters = {}) {
     try {
       let query = `
         SELECT
@@ -102,14 +127,23 @@ class Pageview {
       `;
       const params = [clientId, depth];
 
-      if (startDate) {
+      if (filters.startDate) {
         query += ' AND timestamp >= ?';
-        params.push(startDate);
+        params.push(filters.startDate);
       }
 
-      if (endDate) {
+      if (filters.endDate) {
         query += ' AND timestamp <= ?';
-        params.push(endDate);
+        params.push(filters.endDate);
+      }
+
+      if (filters.deviceType) {
+        query += ' AND device_type = ?';
+        params.push(filters.deviceType);
+      }
+
+      if (filters.trafficSource) {
+        query += this.buildTrafficSourceCondition(filters.trafficSource);
       }
 
       query += ' ORDER BY session_id, sequence_number ASC';
@@ -122,7 +156,7 @@ class Pageview {
   }
 
   // Get page position statistics
-  static async getPagePositions(clientId, startDate = null, endDate = null) {
+  static async getPagePositions(clientId, filters = {}) {
     try {
       let query = `
         SELECT
@@ -136,14 +170,23 @@ class Pageview {
       `;
       const params = [clientId];
 
-      if (startDate) {
+      if (filters.startDate) {
         query += ' AND timestamp >= ?';
-        params.push(startDate);
+        params.push(filters.startDate);
       }
 
-      if (endDate) {
+      if (filters.endDate) {
         query += ' AND timestamp <= ?';
-        params.push(endDate);
+        params.push(filters.endDate);
+      }
+
+      if (filters.deviceType) {
+        query += ' AND device_type = ?';
+        params.push(filters.deviceType);
+      }
+
+      if (filters.trafficSource) {
+        query += this.buildTrafficSourceCondition(filters.trafficSource);
       }
 
       query += ' GROUP BY page_url, page_title ORDER BY total_views DESC';
@@ -171,7 +214,7 @@ class Pageview {
   }
 
   // Get all pageviews for a client (for category filtering)
-  static async getAllPageviews(clientId, startDate = null, endDate = null) {
+  static async getAllPageviews(clientId, filters = {}) {
     try {
       let query = `
         SELECT
@@ -184,14 +227,23 @@ class Pageview {
       `;
       const params = [clientId];
 
-      if (startDate) {
+      if (filters.startDate) {
         query += ' AND timestamp >= ?';
-        params.push(startDate);
+        params.push(filters.startDate);
       }
 
-      if (endDate) {
+      if (filters.endDate) {
         query += ' AND timestamp <= ?';
-        params.push(endDate);
+        params.push(filters.endDate);
+      }
+
+      if (filters.deviceType) {
+        query += ' AND device_type = ?';
+        params.push(filters.deviceType);
+      }
+
+      if (filters.trafficSource) {
+        query += this.buildTrafficSourceCondition(filters.trafficSource);
       }
 
       const [rows] = await pool.query(query, params);

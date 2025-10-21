@@ -9,6 +9,17 @@ const { authenticateToken } = require('../middleware/auth');
 // All routes require authentication
 router.use(authenticateToken);
 
+// Helper to extract filters from query params
+function extractFilters(query) {
+  return {
+    startDate: query.startDate || null,
+    endDate: query.endDate || null,
+    deviceType: query.deviceType || null,
+    trafficSource: query.trafficSource || null,
+    category: query.category || null
+  };
+}
+
 // Verify client access middleware (owner or collaborator)
 const verifyClientAccess = async (req, res, next) => {
   try {
@@ -34,12 +45,11 @@ const verifyClientAccess = async (req, res, next) => {
 // GET /api/analytics/stats/:clientId - Get general statistics
 router.get('/stats/:clientId', verifyClientAccess, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const filters = extractFilters(req.query);
 
     const stats = await Pageview.getStats(
       req.clientId,
-      startDate || null,
-      endDate || null
+      filters
     );
 
     res.json({
@@ -60,8 +70,8 @@ router.get('/stats/:clientId', verifyClientAccess, async (req, res) => {
 // GET /api/analytics/sunburst/:clientId - Get data for sunburst visualization
 router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
   try {
-    const { startDate, endDate, depth } = req.query;
-    const maxDepth = parseInt(depth) || 5;
+    const filters = extractFilters(req.query);
+    const maxDepth = parseInt(req.query.depth) || 5;
 
     if (maxDepth < 1 || maxDepth > 20) {
       return res.status(400).json({ error: 'Depth must be between 1 and 20' });
@@ -70,8 +80,7 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
     const journeyData = await Pageview.getJourneyData(
       req.clientId,
       maxDepth,
-      startDate || null,
-      endDate || null
+      filters
     );
 
     // Transform data into hierarchical structure for sunburst
@@ -87,12 +96,11 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
 // GET /api/analytics/page-positions/:clientId - Get page position statistics
 router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const filters = extractFilters(req.query);
 
     const pagePositions = await Pageview.getPagePositions(
       req.clientId,
-      startDate || null,
-      endDate || null
+      filters
     );
 
     const formattedData = pagePositions.map(page => ({
@@ -113,12 +121,11 @@ router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => 
 // GET /api/analytics/category-stats/:clientId - Get statistics by category
 router.get('/category-stats/:clientId', verifyClientAccess, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const filters = extractFilters(req.query);
 
     const categoryStats = await PageCategory.getCategoryStats(
       req.clientId,
-      startDate || null,
-      endDate || null
+      filters
     );
 
     res.json({ categories: categoryStats });
@@ -229,7 +236,7 @@ router.delete('/cleanup-gtm/:clientId', verifyClientAccess, async (req, res) => 
 // GET /api/analytics/category-details/:clientId/:categoryId - Get detailed category analytics
 router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const filters = extractFilters(req.query);
     const categoryId = parseInt(req.params.categoryId);
 
     // Get category info
@@ -241,8 +248,7 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
     // Get all pageviews and apply category matching
     const pageviews = await Pageview.getAllPageviews(
       req.clientId,
-      startDate || null,
-      endDate || null
+      filters
     );
 
     // Filter pages that match this category

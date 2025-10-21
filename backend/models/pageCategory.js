@@ -123,7 +123,7 @@ class PageCategory {
   }
 
   // Get category statistics for a client
-  static async getCategoryStats(clientId, startDate = null, endDate = null) {
+  static async getCategoryStats(clientId, filters = {}) {
     try {
       // First get all rules
       const rules = await this.findByClientId(clientId);
@@ -136,14 +136,23 @@ class PageCategory {
       `;
       const params = [clientId];
 
-      if (startDate) {
+      if (filters.startDate) {
         query += ' AND timestamp >= ?';
-        params.push(startDate);
+        params.push(filters.startDate);
       }
 
-      if (endDate) {
+      if (filters.endDate) {
         query += ' AND timestamp <= ?';
-        params.push(endDate);
+        params.push(filters.endDate);
+      }
+
+      if (filters.deviceType) {
+        query += ' AND device_type = ?';
+        params.push(filters.deviceType);
+      }
+
+      if (filters.trafficSource) {
+        query += require('./pageview').buildTrafficSourceCondition(filters.trafficSource);
       }
 
       query += ' GROUP BY page_url';
@@ -157,6 +166,11 @@ class PageCategory {
       pageviews.forEach(pv => {
         const matchingRule = this.getMatchingRule(pv.page_url, rules);
         const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
+
+        // If category filter is set, only include matching category
+        if (filters.category && categoryName !== filters.category) {
+          return;
+        }
 
         if (!categoryStats[categoryName]) {
           categoryStats[categoryName] = 0;

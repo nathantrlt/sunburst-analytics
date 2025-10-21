@@ -97,6 +97,31 @@
                             <input type="date" id="endDate">
                         </div>
                         <div class="form-group">
+                            <label for="deviceFilter">Type d'Appareil</label>
+                            <select id="deviceFilter">
+                                <option value="">Tous les appareils</option>
+                                <option value="desktop">Desktop</option>
+                                <option value="mobile">Mobile</option>
+                                <option value="tablet">Tablet</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="trafficSourceFilter">Source de Trafic</label>
+                            <select id="trafficSourceFilter">
+                                <option value="">Toutes les sources</option>
+                                <option value="direct">Direct</option>
+                                <option value="search">Moteurs de recherche</option>
+                                <option value="social">Réseaux sociaux</option>
+                                <option value="referral">Sites référents</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryFilter">Catégorie de Page</label>
+                            <select id="categoryFilter">
+                                <option value="">Toutes les catégories</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="depthSelect">Profondeur du Parcours</label>
                             <select id="depthSelect">
                                 <option value="3">3 pages</option>
@@ -107,6 +132,9 @@
                         </div>
                         <div class="form-group">
                             <button id="applyFiltersBtn" class="btn btn-primary btn-block">Appliquer les Filtres</button>
+                        </div>
+                        <div class="form-group">
+                            <button id="resetFiltersBtn" class="btn btn-secondary btn-block">Réinitialiser</button>
                         </div>
                     </div>
                 </div>
