@@ -226,4 +226,84 @@ router.delete('/cleanup-gtm/:clientId', verifyClientAccess, async (req, res) => 
   }
 });
 
+// GET /api/analytics/category-details/:clientId/:categoryId - Get detailed category analytics
+router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const categoryId = parseInt(req.params.categoryId);
+
+    // Get category info
+    const category = await PageCategory.findById(categoryId);
+    if (!category || category.client_id !== req.clientId) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    // Get all pageviews and apply category matching
+    const pageviews = await Pageview.getAllPageviews(
+      req.clientId,
+      startDate || null,
+      endDate || null
+    );
+
+    // Filter pages that match this category
+    const categoryPages = pageviews.filter(pv =>
+      PageCategory.matchesRule(pv.page_url, category)
+    );
+
+    // Calculate global stats
+    const totalViews = categoryPages.length;
+    const uniquePages = [...new Set(categoryPages.map(p => p.page_url))].length;
+    const avgDepth = categoryPages.length > 0
+      ? categoryPages.reduce((sum, p) => sum + p.sequence_number, 0) / categoryPages.length
+      : 0;
+    const avgTimeSpent = categoryPages.length > 0
+      ? categoryPages.reduce((sum, p) => sum + p.time_spent, 0) / categoryPages.length
+      : 0;
+
+    // Group by page for detailed stats
+    const pageStats = {};
+    categoryPages.forEach(pv => {
+      if (!pageStats[pv.page_url]) {
+        pageStats[pv.page_url] = {
+          url: pv.page_url,
+          title: pv.page_title || pv.page_url,
+          views: 0,
+          totalDepth: 0,
+          totalTime: 0
+        };
+      }
+      pageStats[pv.page_url].views++;
+      pageStats[pv.page_url].totalDepth += pv.sequence_number;
+      pageStats[pv.page_url].totalTime += pv.time_spent;
+    });
+
+    const pages = Object.values(pageStats).map(p => ({
+      url: p.url,
+      title: p.title,
+      views: p.views,
+      avgDepth: Math.round(p.totalDepth / p.views),
+      avgTimeSpent: Math.round(p.totalTime / p.views)
+    })).sort((a, b) => b.views - a.views);
+
+    res.json({
+      category: {
+        id: category.id,
+        name: category.name,
+        condition_type: category.condition_type,
+        condition_value: category.condition_value
+      },
+      stats: {
+        totalViews,
+        uniquePages,
+        avgDepth: Math.round(avgDepth),
+        avgTimeSpent: Math.round(avgTimeSpent)
+      },
+      pages
+    });
+  } catch (error) {
+    console.error('Get category details error:', error);
+    res.status(500).json({ error: 'Failed to fetch category details' });
+  }
+});
+
 module.exports = router;

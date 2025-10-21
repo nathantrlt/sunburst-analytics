@@ -290,11 +290,19 @@ function renderCategoryStats(categories) {
     }
 
     container.innerHTML = categories.map(cat => `
-        <div class="category-stat-card">
+        <div class="category-stat-card clickable" data-category-id="${cat.id}" style="cursor: pointer;">
             <div class="category-name">${cat.category}</div>
             <div class="category-count">${cat.count.toLocaleString()} vues</div>
         </div>
     `).join('');
+
+    // Add click handlers
+    document.querySelectorAll('.category-stat-card.clickable').forEach(card => {
+        card.addEventListener('click', () => {
+            const categoryId = card.dataset.categoryId;
+            showCategoryDetails(categoryId);
+        });
+    });
 }
 
 // Load categories for management modal
@@ -585,6 +593,11 @@ function setupEventListeners() {
         document.getElementById('viewSnippetModal').style.display = 'none';
     });
 
+    // Close category details modal
+    document.getElementById('closeCategoryDetailsModal').addEventListener('click', () => {
+        document.getElementById('categoryDetailsModal').style.display = 'none';
+    });
+
     // Copy view snippet
     document.getElementById('copyViewSnippetBtn').addEventListener('click', () => {
         const snippet = document.getElementById('viewTrackingSnippet').textContent;
@@ -782,6 +795,52 @@ function sortPagesData(sortBy) {
 
     currentPage = 1;
     renderPagesTable();
+}
+
+// Show category details modal
+async function showCategoryDetails(categoryId) {
+    document.getElementById('categoryDetailsModal').style.display = 'flex';
+    document.getElementById('categoryDetailsLoading').style.display = 'block';
+    document.getElementById('categoryDetailsContent').style.display = 'none';
+
+    try {
+        const params = new URLSearchParams();
+        if (currentFilters.startDate) params.append('startDate', currentFilters.startDate);
+        if (currentFilters.endDate) params.append('endDate', currentFilters.endDate);
+
+        const data = await apiRequest(`/analytics/category-details/${currentClient.id}/${categoryId}?${params}`);
+
+        // Update title
+        document.getElementById('categoryDetailsTitle').textContent = `Catégorie : ${data.category.name}`;
+
+        // Update global stats
+        document.getElementById('catStatViews').textContent = data.stats.totalViews.toLocaleString();
+        document.getElementById('catStatPages').textContent = data.stats.uniquePages.toLocaleString();
+        document.getElementById('catStatDepth').textContent = data.stats.avgDepth;
+        document.getElementById('catStatTime').textContent = data.stats.avgTimeSpent;
+
+        // Update pages table
+        const tbody = document.getElementById('categoryPagesTableBody');
+        if (data.pages.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">Aucune page dans cette catégorie</td></tr>';
+        } else {
+            tbody.innerHTML = data.pages.map(page => `
+                <tr>
+                    <td><a href="${page.url}" target="_blank">${page.url}</a></td>
+                    <td>${page.title}</td>
+                    <td>${page.views.toLocaleString()}</td>
+                    <td>${page.avgDepth}</td>
+                    <td>${page.avgTimeSpent}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('categoryDetailsLoading').style.display = 'none';
+        document.getElementById('categoryDetailsContent').style.display = 'block';
+    } catch (error) {
+        console.error('Failed to load category details:', error);
+        document.getElementById('categoryDetailsLoading').innerHTML = '<p class="error-message">Échec du chargement des détails</p>';
+    }
 }
 
 // Initialize on page load

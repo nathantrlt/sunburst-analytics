@@ -28,12 +28,17 @@ class PageCategory {
   }
 
   // Get a single category rule
-  static async findById(id, clientId) {
+  static async findById(id, clientId = null) {
     try {
-      const [rows] = await pool.query(
-        'SELECT * FROM page_categories WHERE id = ? AND client_id = ?',
-        [id, clientId]
-      );
+      let query = 'SELECT * FROM page_categories WHERE id = ?';
+      const params = [id];
+
+      if (clientId !== null) {
+        query += ' AND client_id = ?';
+        params.push(clientId);
+      }
+
+      const [rows] = await pool.query(query, params);
       return rows[0] || null;
     } catch (error) {
       throw error;

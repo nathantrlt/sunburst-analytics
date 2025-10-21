@@ -332,6 +332,73 @@
         </div>
     </div>
 
+    <!-- Category Details Modal -->
+    <div id="categoryDetailsModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="categoryDetailsTitle">Détails de la Catégorie</h2>
+                <button class="modal-close" id="closeCategoryDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="categoryDetailsLoading" class="loading-message">Chargement...</div>
+                <div id="categoryDetailsContent" style="display: none;">
+                    <!-- Stats globales -->
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-icon">👁️</div>
+                            <div class="stat-content">
+                                <h3>Vues Totales</h3>
+                                <p class="stat-value" id="catStatViews">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📄</div>
+                            <div class="stat-content">
+                                <h3>Pages Uniques</h3>
+                                <p class="stat-value" id="catStatPages">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3>Profondeur Moy.</h3>
+                                <p class="stat-value" id="catStatDepth">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <h3>Temps Moy. (s)</h3>
+                                <p class="stat-value" id="catStatTime">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Liste des pages -->
+                    <h3>Pages de cette catégorie</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>URL</th>
+                                    <th>Titre</th>
+                                    <th>Vues</th>
+                                    <th>Profondeur Moy.</th>
+                                    <th>Temps Moy. (s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoryPagesTableBody">
+                                <tr>
+                                    <td colspan="5">Aucune page</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/sunburst.js"></script>

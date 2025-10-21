@@ -169,6 +169,37 @@ class Pageview {
       throw error;
     }
   }
+
+  // Get all pageviews for a client (for category filtering)
+  static async getAllPageviews(clientId, startDate = null, endDate = null) {
+    try {
+      let query = `
+        SELECT
+          page_url,
+          page_title,
+          sequence_number,
+          time_spent
+        FROM pageviews
+        WHERE client_id = ?
+      `;
+      const params = [clientId];
+
+      if (startDate) {
+        query += ' AND timestamp >= ?';
+        params.push(startDate);
+      }
+
+      if (endDate) {
+        query += ' AND timestamp <= ?';
+        params.push(endDate);
+      }
+
+      const [rows] = await pool.query(query, params);
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = Pageview;
