@@ -56,7 +56,7 @@
 
   // Session and state management
   var sessionId = getOrCreateSessionId();
-  var sequenceNumber = 0;
+  var sequenceNumber = getSequenceNumber();
   var currentPageUrl = getActualUrl();
   var pageStartTime = Date.now();
   var lastUrl = currentPageUrl;
@@ -75,6 +75,24 @@
     var newId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     sessionStorage.setItem('sunburst_session_id', newId);
     return newId;
+  }
+
+  /**
+   * Get or initialize sequence number from sessionStorage
+   */
+  function getSequenceNumber() {
+    var stored = sessionStorage.getItem('sunburst_sequence_number');
+    if (stored) {
+      return parseInt(stored, 10);
+    }
+    return 0;
+  }
+
+  /**
+   * Save sequence number to sessionStorage
+   */
+  function saveSequenceNumber(num) {
+    sessionStorage.setItem('sunburst_sequence_number', num.toString());
   }
 
   /**
@@ -218,6 +236,7 @@
 
     // Increment sequence number
     sequenceNumber++;
+    saveSequenceNumber(sequenceNumber);
 
     // Send tracking data
     sendTrackingData({
