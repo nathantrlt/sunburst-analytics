@@ -150,24 +150,50 @@ class PageCategory {
 
       const [pageviews] = await pool.query(query, params);
 
-      // Apply rules to each URL
+      // Apply rules to each URL and track which rule matched
       const categoryStats = {};
+      const categoryIdMap = {}; // Map category name to first matching rule ID
 
       pageviews.forEach(pv => {
-        const category = this.applyCategoryRules(pv.page_url, rules);
-        if (!categoryStats[category]) {
-          categoryStats[category] = 0;
+        const matchingRule = this.getMatchingRule(pv.page_url, rules);
+        const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
+
+        if (!categoryStats[categoryName]) {
+          categoryStats[categoryName] = 0;
+          categoryIdMap[categoryName] = matchingRule ? matchingRule.id : null;
         }
-        categoryStats[category] += parseInt(pv.count);
+        categoryStats[categoryName] += parseInt(pv.count);
       });
 
       // Convert to array and sort by count
       return Object.entries(categoryStats)
-        .map(([category, count]) => ({ category, count }))
+        .map(([category, count]) => ({
+          id: categoryIdMap[category],
+          category,
+          count
+        }))
         .sort((a, b) => b.count - a.count);
     } catch (error) {
       throw error;
     }
+  }
+
+  // Get the matching rule for a URL (returns the rule object, not just the name)
+  static getMatchingRule(url, rules) {
+    const sortedRules = [...rules].sort((a, b) => {
+      if (b.priority !== a.priority) {
+        return b.priority - a.priority;
+      }
+      return a.id - b.id;
+    });
+
+    for (const rule of sortedRules) {
+      if (this.matchesRule(url, rule)) {
+        return rule;
+      }
+    }
+
+    return null;
   }
 }
 

@@ -289,14 +289,19 @@ function renderCategoryStats(categories) {
         return;
     }
 
-    container.innerHTML = categories.map(cat => `
-        <div class="category-stat-card clickable" data-category-id="${cat.id}" style="cursor: pointer;">
-            <div class="category-name">${cat.category}</div>
-            <div class="category-count">${cat.count.toLocaleString()} vues</div>
-        </div>
-    `).join('');
+    container.innerHTML = categories.map(cat => {
+        const isClickable = cat.id !== null;
+        return `
+            <div class="category-stat-card ${isClickable ? 'clickable' : ''}"
+                 ${isClickable ? `data-category-id="${cat.id}"` : ''}
+                 style="${isClickable ? 'cursor: pointer;' : ''}">
+                <div class="category-name">${cat.category}</div>
+                <div class="category-count">${cat.count.toLocaleString()} vues</div>
+            </div>
+        `;
+    }).join('');
 
-    // Add click handlers
+    // Add click handlers only for clickable categories
     document.querySelectorAll('.category-stat-card.clickable').forEach(card => {
         card.addEventListener('click', () => {
             const categoryId = card.dataset.categoryId;
