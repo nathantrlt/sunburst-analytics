@@ -137,12 +137,12 @@ class PageCategory {
       const params = [clientId];
 
       if (filters.startDate) {
-        query += ' AND timestamp >= ?';
+        query += ' AND DATE(timestamp) >= ?';
         params.push(filters.startDate);
       }
 
       if (filters.endDate) {
-        query += ' AND timestamp <= ?';
+        query += ' AND DATE(timestamp) <= ?';
         params.push(filters.endDate);
       }
 
