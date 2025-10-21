@@ -365,18 +365,28 @@ function renderCategoriesList(categories) {
 
     container.innerHTML = categories.map(cat => {
         const conditionLabel = {
-            'contains': 'Contient',
-            'starts_with': 'Commence par',
-            'ends_with': 'Se termine par',
-            'equals': 'Est égal à',
-            'regex': 'Expression régulière'
+            'contains': 'URL contient',
+            'starts_with': 'URL commence par',
+            'ends_with': 'URL se termine par',
+            'equals': 'URL est égale à',
+            'regex': 'Expression régulière',
+            'pageviews_greater_than': 'Nb vues >',
+            'pageviews_less_than': 'Nb vues <',
+            'avg_position_greater_than': 'Position moy. >',
+            'avg_position_less_than': 'Position moy. <',
+            'avg_time_greater_than': 'Temps moy. >',
+            'avg_time_less_than': 'Temps moy. <'
         }[cat.condition_type] || cat.condition_type;
+
+        const periodInfo = cat.condition_period_days
+            ? ` (${cat.condition_period_days} jours)`
+            : '';
 
         return `
             <div class="category-item" data-category-id="${cat.id}">
                 <div class="category-info">
                     <strong>${cat.name}</strong>
-                    <span class="category-rule">${conditionLabel} : "${cat.condition_value}"</span>
+                    <span class="category-rule">${conditionLabel} : "${cat.condition_value}"${periodInfo}</span>
                     <span class="category-priority">Priorité : ${cat.priority}</span>
                 </div>
                 <button class="btn btn-danger btn-small remove-category-btn" data-category-id="${cat.id}">
@@ -396,6 +406,44 @@ function renderCategoriesList(categories) {
     });
 }
 
+// Update form based on condition type
+function updateConditionForm() {
+    const conditionType = document.getElementById('conditionType').value;
+    const periodGroup = document.getElementById('periodGroup');
+    const conditionValueLabel = document.getElementById('conditionValueLabel');
+    const conditionValueInput = document.getElementById('conditionValue');
+    const conditionValueHint = document.getElementById('conditionValueHint');
+
+    const isMetricBased = [
+        'pageviews_greater_than', 'pageviews_less_than',
+        'avg_position_greater_than', 'avg_position_less_than',
+        'avg_time_greater_than', 'avg_time_less_than'
+    ].includes(conditionType);
+
+    if (isMetricBased) {
+        periodGroup.style.display = 'block';
+        conditionValueLabel.textContent = 'Valeur Seuil';
+        conditionValueInput.type = 'number';
+        conditionValueInput.placeholder = '100';
+        conditionValueInput.step = conditionType.includes('avg_position') ? '0.1' : '1';
+
+        if (conditionType.includes('pageviews')) {
+            conditionValueHint.textContent = 'Exemple : 100 pour filtrer les pages avec plus/moins de 100 vues';
+        } else if (conditionType.includes('avg_position')) {
+            conditionValueHint.textContent = 'Exemple : 3.5 pour filtrer les pages en position moyenne > ou < 3.5';
+        } else if (conditionType.includes('avg_time')) {
+            conditionValueHint.textContent = 'Exemple : 60 pour filtrer les pages avec plus/moins de 60 secondes passées';
+        }
+    } else {
+        periodGroup.style.display = 'none';
+        conditionValueLabel.textContent = 'Valeur de la Condition';
+        conditionValueInput.type = 'text';
+        conditionValueInput.placeholder = '/produit';
+        conditionValueInput.step = '';
+        conditionValueHint.textContent = 'Exemple : Si l\'URL contient "/produit" → Catégorie = "Article"';
+    }
+}
+
 // Handle add category
 async function handleAddCategory(e) {
     e.preventDefault();
@@ -405,6 +453,9 @@ async function handleAddCategory(e) {
     const conditionType = document.getElementById('conditionType').value;
     const conditionValue = document.getElementById('conditionValue').value.trim();
     const priority = parseInt(document.getElementById('categoryPriority').value) || 0;
+    const conditionPeriodDays = document.getElementById('conditionPeriod').value
+        ? parseInt(document.getElementById('conditionPeriod').value)
+        : null;
 
     document.getElementById('categoryError').style.display = 'none';
     document.getElementById('categorySuccess').style.display = 'none';
@@ -417,7 +468,13 @@ async function handleAddCategory(e) {
 
         await apiRequest(`/page-categories/${currentClient.id}`, {
             method: 'POST',
-            body: JSON.stringify({ name, conditionType, conditionValue, priority })
+            body: JSON.stringify({
+                name,
+                conditionType,
+                conditionValue,
+                priority,
+                conditionPeriodDays
+            })
         });
 
         // Show success
@@ -427,10 +484,12 @@ async function handleAddCategory(e) {
 
         // Reset form
         document.getElementById('addCategoryForm').reset();
+        updateConditionForm(); // Reset form display
 
         // Reload categories
         await loadCategories();
         await loadCategoryStats();
+        await loadCategoryFilterOptions();
     } catch (error) {
         const errorDiv = document.getElementById('categoryError');
         errorDiv.textContent = error.message;
@@ -656,6 +715,9 @@ function setupEventListeners() {
 
     // Add category form
     document.getElementById('addCategoryForm').addEventListener('submit', handleAddCategory);
+
+    // Update form when condition type changes
+    document.getElementById('conditionType').addEventListener('change', updateConditionForm);
 
     // Manage collaborators
     document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {
