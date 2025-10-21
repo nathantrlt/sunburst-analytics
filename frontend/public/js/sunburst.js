@@ -14,8 +14,8 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions
-    const width = Math.min(container.clientWidth, 800);
-    const height = Math.min(container.clientHeight, 600);
+    const width = container.clientWidth || 800;
+    const height = 600;
     const radius = Math.min(width, height) / 2;
 
     // Color scale
@@ -26,9 +26,12 @@ function createSunburst(data) {
     // Create SVG
     const svg = d3.select('#sunburstChart')
         .append('svg')
-        .attr('width', width)
+        .attr('width', '100%')
         .attr('height', height)
-        .style('pointer-events', 'all') // Allow scroll events
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .style('display', 'block')
+        .style('margin', '0 auto')
+        .style('pointer-events', 'all')
         .on('wheel', function(event) {
             // Prevent default zoom behavior but allow page scroll
             event.stopPropagation();
