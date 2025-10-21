@@ -220,49 +220,12 @@ function createSunburst(data) {
         return text.substring(0, maxLength) + '...';
     }
 
-    // Add legend
-    addLegend(svg, root, color, radius);
-
     // Make it responsive
     window.addEventListener('resize', debounce(() => {
         if (currentSunburstData) {
             createSunburst(currentSunburstData);
         }
     }, 250));
-}
-
-// Add legend to sunburst
-function addLegend(svg, root, color, radius) {
-    const topLevelNodes = root.children || [];
-    if (topLevelNodes.length === 0) return;
-
-    const legend = svg.append('g')
-        .attr('class', 'sunburst-legend')
-        .attr('transform', `translate(${radius + 20}, ${-radius})`);
-
-    const legendItems = legend.selectAll('.legend-item')
-        .data(topLevelNodes.slice(0, 10)) // Show max 10 items
-        .enter()
-        .append('g')
-        .attr('class', 'legend-item')
-        .attr('transform', (d, i) => `translate(0, ${i * 25})`);
-
-    legendItems.append('rect')
-        .attr('width', 18)
-        .attr('height', 18)
-        .attr('fill', d => color(d.data.name))
-        .attr('fill-opacity', 0.7);
-
-    legendItems.append('text')
-        .attr('x', 24)
-        .attr('y', 9)
-        .attr('dy', '0.35em')
-        .style('font-size', '12px')
-        .style('fill', '#333')
-        .text(d => {
-            const name = d.data.name;
-            return name.length > 20 ? name.substring(0, 20) + '...' : name;
-        });
 }
 
 // Debounce helper
