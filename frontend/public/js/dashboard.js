@@ -802,6 +802,11 @@ function sortPagesData(sortBy) {
     renderPagesTable();
 }
 
+// Category pages data and sorting state
+let categoryPagesData = [];
+let categorySortColumn = 'views';
+let categorySortDirection = 'desc';
+
 // Show category details modal
 async function showCategoryDetails(categoryId) {
     document.getElementById('categoryDetailsModal').style.display = 'flex';
@@ -824,21 +829,12 @@ async function showCategoryDetails(categoryId) {
         document.getElementById('catStatDepth').textContent = data.stats.avgDepth;
         document.getElementById('catStatTime').textContent = data.stats.avgTimeSpent;
 
-        // Update pages table
-        const tbody = document.getElementById('categoryPagesTableBody');
-        if (data.pages.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5">Aucune page dans cette catégorie</td></tr>';
-        } else {
-            tbody.innerHTML = data.pages.map(page => `
-                <tr>
-                    <td><a href="${page.url}" target="_blank">${page.url}</a></td>
-                    <td>${page.title}</td>
-                    <td>${page.views.toLocaleString()}</td>
-                    <td>${page.avgDepth}</td>
-                    <td>${page.avgTimeSpent}</td>
-                </tr>
-            `).join('');
-        }
+        // Store pages data and render
+        categoryPagesData = data.pages;
+        categorySortColumn = 'views';
+        categorySortDirection = 'desc';
+        renderCategoryPagesTable();
+        setupCategorySortHandlers();
 
         document.getElementById('categoryDetailsLoading').style.display = 'none';
         document.getElementById('categoryDetailsContent').style.display = 'block';
@@ -846,6 +842,71 @@ async function showCategoryDetails(categoryId) {
         console.error('Failed to load category details:', error);
         document.getElementById('categoryDetailsLoading').innerHTML = '<p class="error-message">Échec du chargement des détails</p>';
     }
+}
+
+// Render category pages table
+function renderCategoryPagesTable() {
+    const tbody = document.getElementById('categoryPagesTableBody');
+
+    if (categoryPagesData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Aucune page dans cette catégorie</td></tr>';
+        return;
+    }
+
+    // Sort data
+    const sortedData = [...categoryPagesData].sort((a, b) => {
+        let aVal = a[categorySortColumn];
+        let bVal = b[categorySortColumn];
+
+        // String comparison for text fields
+        if (typeof aVal === 'string') {
+            aVal = aVal.toLowerCase();
+            bVal = bVal.toLowerCase();
+        }
+
+        if (categorySortDirection === 'asc') {
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        } else {
+            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+        }
+    });
+
+    tbody.innerHTML = sortedData.map(page => `
+        <tr>
+            <td><a href="${page.url}" target="_blank">${page.url}</a></td>
+            <td>${page.title}</td>
+            <td>${page.views.toLocaleString()}</td>
+            <td>${page.avgDepth}</td>
+            <td>${page.avgTimeSpent}</td>
+        </tr>
+    `).join('');
+
+    // Update sort indicators
+    document.querySelectorAll('#categoryDetailsModal .sortable').forEach(th => {
+        const indicator = th.querySelector('.sort-indicator');
+        if (th.dataset.sort === categorySortColumn) {
+            indicator.textContent = categorySortDirection === 'asc' ? ' ↑' : ' ↓';
+        } else {
+            indicator.textContent = '';
+        }
+    });
+}
+
+// Setup sort handlers for category pages table
+function setupCategorySortHandlers() {
+    document.querySelectorAll('#categoryDetailsModal .sortable').forEach(th => {
+        th.style.cursor = 'pointer';
+        th.onclick = () => {
+            const column = th.dataset.sort;
+            if (categorySortColumn === column) {
+                categorySortDirection = categorySortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                categorySortColumn = column;
+                categorySortDirection = column === 'url' || column === 'title' ? 'asc' : 'desc';
+            }
+            renderCategoryPagesTable();
+        };
+    });
 }
 
 // Initialize on page load
