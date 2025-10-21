@@ -5,7 +5,8 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "migrate": "node backend/migrations/add_metric_categories.js"
   },
   "keywords": [
     "analytics",

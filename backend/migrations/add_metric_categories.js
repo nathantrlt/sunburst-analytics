@@ -6,13 +6,22 @@ async function migrate() {
   try {
     console.log('Starting migration: add_metric_categories');
 
-    // Add condition_period_days column
-    await connection.query(`
-      ALTER TABLE page_categories
-      ADD COLUMN IF NOT EXISTS condition_period_days INT DEFAULT NULL
-      AFTER condition_value
+    // Check if condition_period_days column exists
+    const [columns] = await connection.query(`
+      SHOW COLUMNS FROM page_categories LIKE 'condition_period_days'
     `);
-    console.log('✓ Added condition_period_days column');
+
+    if (columns.length === 0) {
+      // Add condition_period_days column
+      await connection.query(`
+        ALTER TABLE page_categories
+        ADD COLUMN condition_period_days INT DEFAULT NULL
+        AFTER condition_value
+      `);
+      console.log('✓ Added condition_period_days column');
+    } else {
+      console.log('✓ Column condition_period_days already exists');
+    }
 
     // Modify condition_type ENUM to add new types
     await connection.query(`
