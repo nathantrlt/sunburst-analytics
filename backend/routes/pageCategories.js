@@ -56,7 +56,7 @@ router.post('/:clientId', async (req, res) => {
     }
 
     const validTypes = [
-      'contains', 'starts_with', 'ends_with', 'equals', 'regex',
+      'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
       'pageviews_greater_than', 'pageviews_less_than',
       'avg_position_greater_than', 'avg_position_less_than',
       'avg_time_greater_than', 'avg_time_less_than'
@@ -107,7 +107,7 @@ router.put('/:clientId/:categoryId', async (req, res) => {
     }
 
     const validTypes = [
-      'contains', 'starts_with', 'ends_with', 'equals', 'regex',
+      'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
       'pageviews_greater_than', 'pageviews_less_than',
       'avg_position_greater_than', 'avg_position_less_than',
       'avg_time_greater_than', 'avg_time_less_than'
