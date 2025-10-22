@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const { testConnection, initDatabase } = require('./config/database');
+const { migrate } = require('./migrations/add_metric_categories');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
@@ -83,6 +84,10 @@ const startServer = async () => {
 
     // Initialize database tables
     await initDatabase();
+
+    // Run migrations
+    console.log('Running database migrations...');
+    await migrate();
 
     // Start listening
     app.listen(PORT, () => {
