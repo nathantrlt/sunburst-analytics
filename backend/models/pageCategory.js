@@ -126,6 +126,9 @@ class PageCategory {
         case 'contains':
           return url.toLowerCase().includes(condition_value.toLowerCase());
 
+        case 'not_contains':
+          return !url.toLowerCase().includes(condition_value.toLowerCase());
+
         case 'starts_with':
           return url.toLowerCase().startsWith(condition_value.toLowerCase());
 

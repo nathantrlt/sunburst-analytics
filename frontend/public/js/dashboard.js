@@ -366,6 +366,7 @@ function renderCategoriesList(categories) {
     container.innerHTML = categories.map(cat => {
         const conditionLabel = {
             'contains': 'URL contient',
+            'not_contains': 'URL ne contient pas',
             'starts_with': 'URL commence par',
             'ends_with': 'URL se termine par',
             'equals': 'URL est égale à',
