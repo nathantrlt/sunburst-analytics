@@ -204,6 +204,35 @@ function transformToSunburst(journeyData, maxDepth) {
 
   cleanupTree(root);
 
+  // Group first-level children with less than 1% into "Autres"
+  if (root.children && root.children.length > 0) {
+    const totalValue = root.children.reduce((sum, child) => sum + child.value, 0);
+    const threshold = totalValue * 0.01; // 1% threshold
+
+    const mainChildren = [];
+    const otherChildren = [];
+
+    root.children.forEach(child => {
+      if (child.value >= threshold) {
+        mainChildren.push(child);
+      } else {
+        otherChildren.push(child);
+      }
+    });
+
+    // If there are children to group
+    if (otherChildren.length > 0) {
+      const autresNode = {
+        name: 'Autres',
+        value: otherChildren.reduce((sum, child) => sum + child.value, 0),
+        children: otherChildren
+      };
+      mainChildren.push(autresNode);
+    }
+
+    root.children = mainChildren;
+  }
+
   return root;
 }
 
