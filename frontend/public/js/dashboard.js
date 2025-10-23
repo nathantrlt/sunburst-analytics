@@ -758,8 +758,7 @@ function setupEventListeners() {
             trafficSource: null,
             category: null
         };
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
+        updateDateRangeLabel();
         document.getElementById('depthSelect').value = '5';
         document.getElementById('deviceFilter').value = '';
         document.getElementById('trafficSourceFilter').value = '';
@@ -767,8 +766,11 @@ function setupEventListeners() {
         loadAnalytics();
     });
 
-    // Initialize Flatpickr date pickers with presets
-    let startDatePicker, endDatePicker;
+    // Date Range Modal Management
+    let tempStartDate = null;
+    let tempEndDate = null;
+    let selectedPreset = 'all';
+    let startCalendar, endCalendar;
 
     // Format date to YYYY-MM-DD
     function formatDate(date) {
@@ -779,127 +781,172 @@ function setupEventListeners() {
         return `${year}-${month}-${day}`;
     }
 
-    // Custom plugin to add quick date range buttons
-    function dateRangePlugin(startPicker, endPicker) {
-        return function(fp) {
-            return {
-                onReady: function() {
-                    const calendar = fp.calendarContainer;
-
-                    // Create presets container
-                    const presetsDiv = document.createElement('div');
-                    presetsDiv.className = 'flatpickr-presets';
-                    presetsDiv.innerHTML = `
-                        <button type="button" data-range="7">7 derniers jours</button>
-                        <button type="button" data-range="15">15 derniers jours</button>
-                        <button type="button" data-range="30">30 derniers jours</button>
-                        <button type="button" data-range="year">Année en cours</button>
-                        <button type="button" data-range="365">1 an (365 jours)</button>
-                        <button type="button" data-range="all">Toutes les dates</button>
-                    `;
-
-                    // Insert presets at the top of calendar
-                    calendar.insertBefore(presetsDiv, calendar.firstChild);
-
-                    // Add click handlers for preset buttons
-                    presetsDiv.querySelectorAll('button').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            const range = btn.dataset.range;
-                            const today = new Date();
-                            let start = null;
-                            let end = null;
-
-                            switch(range) {
-                                case '7':
-                                    start = new Date(today);
-                                    start.setDate(today.getDate() - 7);
-                                    end = new Date(today);
-                                    break;
-                                case '15':
-                                    start = new Date(today);
-                                    start.setDate(today.getDate() - 15);
-                                    end = new Date(today);
-                                    break;
-                                case '30':
-                                    start = new Date(today);
-                                    start.setDate(today.getDate() - 30);
-                                    end = new Date(today);
-                                    break;
-                                case 'year':
-                                    start = new Date(today.getFullYear(), 0, 1);
-                                    end = new Date(today);
-                                    break;
-                                case '365':
-                                    start = new Date(today);
-                                    start.setDate(today.getDate() - 365);
-                                    end = new Date(today);
-                                    break;
-                                case 'all':
-                                    start = null;
-                                    end = null;
-                                    break;
-                            }
-
-                            // Update both pickers
-                            if (startPicker) {
-                                if (start) {
-                                    startPicker.setDate(start, true);
-                                } else {
-                                    startPicker.clear();
-                                }
-                            }
-
-                            if (endPicker) {
-                                if (end) {
-                                    endPicker.setDate(end, true);
-                                } else {
-                                    endPicker.clear();
-                                }
-                            }
-
-                            // Update filters
-                            currentFilters.startDate = formatDate(start);
-                            currentFilters.endDate = formatDate(end);
-
-                            // Close calendar and reload
-                            fp.close();
-                            loadAnalytics();
-                        });
-                    });
-                }
-            };
-        };
+    // Format date for display
+    function formatDateDisplay(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
     }
 
-    // Initialize start date picker
-    startDatePicker = flatpickr('#startDate', {
-        dateFormat: 'Y-m-d',
-        allowInput: true,
-        onChange: function(selectedDates, dateStr) {
-            currentFilters.startDate = dateStr || null;
-        },
-        onReady: function(selectedDates, dateStr, instance) {
-            // Add presets after both pickers are initialized
-            setTimeout(() => {
-                dateRangePlugin(startDatePicker, endDatePicker)(instance).onReady();
-            }, 100);
+    // Update date range label
+    function updateDateRangeLabel() {
+        const label = document.getElementById('dateRangeLabel');
+        const startDate = currentFilters.startDate;
+        const endDate = currentFilters.endDate;
+
+        if (!startDate && !endDate) {
+            label.textContent = 'Toutes les dates';
+        } else if (startDate && endDate) {
+            label.textContent = `${formatDateDisplay(startDate)} - ${formatDateDisplay(endDate)}`;
+        } else if (startDate) {
+            label.textContent = `À partir du ${formatDateDisplay(startDate)}`;
+        } else if (endDate) {
+            label.textContent = `Jusqu'au ${formatDateDisplay(endDate)}`;
+        }
+    }
+
+    // Calculate date range from preset
+    function getDateRangeFromPreset(range) {
+        const today = new Date();
+        let start = null;
+        let end = null;
+
+        switch(range) {
+            case 'today':
+                start = new Date(today);
+                end = new Date(today);
+                break;
+            case 'yesterday':
+                start = new Date(today);
+                start.setDate(today.getDate() - 1);
+                end = new Date(start);
+                break;
+            case '7':
+                start = new Date(today);
+                start.setDate(today.getDate() - 7);
+                end = new Date(today);
+                break;
+            case '15':
+                start = new Date(today);
+                start.setDate(today.getDate() - 15);
+                end = new Date(today);
+                break;
+            case '30':
+                start = new Date(today);
+                start.setDate(today.getDate() - 30);
+                end = new Date(today);
+                break;
+            case 'year':
+                start = new Date(today.getFullYear(), 0, 1);
+                end = new Date(today);
+                break;
+            case '365':
+                start = new Date(today);
+                start.setDate(today.getDate() - 365);
+                end = new Date(today);
+                break;
+            case 'all':
+                start = null;
+                end = null;
+                break;
+        }
+
+        return { start, end };
+    }
+
+    // Open date range modal
+    document.getElementById('dateRangeBtn').addEventListener('click', () => {
+        tempStartDate = currentFilters.startDate ? new Date(currentFilters.startDate) : null;
+        tempEndDate = currentFilters.endDate ? new Date(currentFilters.endDate) : null;
+
+        // Initialize calendars
+        if (!startCalendar) {
+            startCalendar = flatpickr('#startCalendar', {
+                inline: true,
+                dateFormat: 'Y-m-d',
+                defaultDate: tempStartDate,
+                onChange: function(selectedDates) {
+                    tempStartDate = selectedDates[0] || null;
+                    // Clear preset selection
+                    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                }
+            });
+        }
+
+        if (!endCalendar) {
+            endCalendar = flatpickr('#endCalendar', {
+                inline: true,
+                dateFormat: 'Y-m-d',
+                defaultDate: tempEndDate,
+                onChange: function(selectedDates) {
+                    tempEndDate = selectedDates[0] || null;
+                    // Clear preset selection
+                    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                }
+            });
+        }
+
+        // Update calendars with current dates
+        if (tempStartDate) startCalendar.setDate(tempStartDate, false);
+        if (tempEndDate) endCalendar.setDate(tempEndDate, false);
+
+        document.getElementById('dateRangeModal').style.display = 'flex';
+    });
+
+    // Close modal
+    function closeDateRangeModal() {
+        document.getElementById('dateRangeModal').style.display = 'none';
+    }
+
+    document.getElementById('closeDateRangeModal').addEventListener('click', closeDateRangeModal);
+    document.getElementById('cancelDateRange').addEventListener('click', closeDateRangeModal);
+
+    // Click outside modal to close
+    document.getElementById('dateRangeModal').addEventListener('click', (e) => {
+        if (e.target.id === 'dateRangeModal') {
+            closeDateRangeModal();
         }
     });
 
-    // Initialize end date picker
-    endDatePicker = flatpickr('#endDate', {
-        dateFormat: 'Y-m-d',
-        allowInput: true,
-        onChange: function(selectedDates, dateStr) {
-            currentFilters.endDate = dateStr || null;
-        },
-        onReady: function(selectedDates, dateStr, instance) {
-            // Add presets after both pickers are initialized
-            setTimeout(() => {
-                dateRangePlugin(startDatePicker, endDatePicker)(instance).onReady();
-            }, 100);
-        }
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const range = btn.dataset.range;
+            selectedPreset = range;
+
+            // Update active state
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Calculate dates
+            const { start, end } = getDateRangeFromPreset(range);
+            tempStartDate = start;
+            tempEndDate = end;
+
+            // Update calendars
+            if (tempStartDate) {
+                startCalendar.setDate(tempStartDate, false);
+            } else {
+                startCalendar.clear();
+            }
+
+            if (tempEndDate) {
+                endCalendar.setDate(tempEndDate, false);
+            } else {
+                endCalendar.clear();
+            }
+        });
+    });
+
+    // Apply date range
+    document.getElementById('applyDateRange').addEventListener('click', () => {
+        currentFilters.startDate = tempStartDate ? formatDate(tempStartDate) : null;
+        currentFilters.endDate = tempEndDate ? formatDate(tempEndDate) : null;
+
+        updateDateRangeLabel();
+        closeDateRangeModal();
+        loadAnalytics();
     });
 
     // Pagination

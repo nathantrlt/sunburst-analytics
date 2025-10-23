@@ -431,24 +431,30 @@ h2, h3 {
     gap: 16px;
 }
 
-/* Date Input Wrapper */
-.date-input-wrapper {
-    position: relative;
+/* Date Range Selector Button */
+.date-range-selector {
+    width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.date-input-wrapper input {
-    flex: 1;
-    padding-right: 40px !important;
+.date-range-selector:hover {
+    background: rgba(252, 209, 22, 0.1);
+    border-color: var(--primary-color);
 }
 
-.calendar-icon {
-    position: absolute;
-    right: 12px;
+.date-range-selector .calendar-icon {
     font-size: 18px;
-    pointer-events: none;
-    user-select: none;
 }
 
 /* Flatpickr Custom Styles */
@@ -491,32 +497,133 @@ h2, h3 {
     border-color: var(--primary-color) !important;
 }
 
-.flatpickr-presets {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 12px;
+/* Date Range Modal */
+.date-range-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.date-range-modal-content {
     background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 750px;
+    box-shadow: var(--shadow-lg);
+}
+
+.date-range-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
     border-bottom: 1px solid var(--border-color);
 }
 
-.flatpickr-presets button {
-    background: transparent;
+.date-range-modal-header h3 {
+    margin: 0;
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
 }
 
-.flatpickr-presets button:hover {
+.close-modal {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.date-range-modal-body {
+    display: flex;
+    padding: 0;
+    min-height: 400px;
+}
+
+.date-range-presets {
+    width: 200px;
+    padding: 16px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preset-btn {
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+    background: rgba(252, 209, 22, 0.1);
+}
+
+.preset-btn.active {
     background: var(--primary-color);
     color: var(--bg-color);
-    border-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.date-range-calendars {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.calendar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.calendar-section label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.date-range-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Flatpickr in modal adjustments */
+.flatpickr-calendar.inline {
+    position: relative !important;
+    box-shadow: none !important;
 }
 
 .flatpickr-months .flatpickr-month {

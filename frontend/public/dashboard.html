@@ -89,18 +89,11 @@
                     <h3>Filtres</h3>
                     <div class="filters-grid">
                         <div class="form-group">
-                            <label for="startDate">Date de Début</label>
-                            <div class="date-input-wrapper">
-                                <input type="text" id="startDate" placeholder="Sélectionner une date">
+                            <label>Période</label>
+                            <button type="button" id="dateRangeBtn" class="date-range-selector">
+                                <span id="dateRangeLabel">Toutes les dates</span>
                                 <span class="calendar-icon">📅</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">Date de Fin</label>
-                            <div class="date-input-wrapper">
-                                <input type="text" id="endDate" placeholder="Sélectionner une date">
-                                <span class="calendar-icon">📅</span>
-                            </div>
+                            </button>
                         </div>
                         <div class="form-group">
                             <label for="deviceFilter">Type d'Appareil</label>
@@ -444,6 +437,42 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Picker Modal -->
+    <div id="dateRangeModal" class="date-range-modal" style="display: none;">
+        <div class="date-range-modal-content">
+            <div class="date-range-modal-header">
+                <h3>Sélectionner une période</h3>
+                <button type="button" class="close-modal" id="closeDateRangeModal">&times;</button>
+            </div>
+            <div class="date-range-modal-body">
+                <div class="date-range-presets">
+                    <button type="button" class="preset-btn" data-range="today">Aujourd'hui</button>
+                    <button type="button" class="preset-btn" data-range="yesterday">Hier</button>
+                    <button type="button" class="preset-btn" data-range="7">7 derniers jours</button>
+                    <button type="button" class="preset-btn" data-range="15">15 derniers jours</button>
+                    <button type="button" class="preset-btn" data-range="30">30 derniers jours</button>
+                    <button type="button" class="preset-btn" data-range="year">Année en cours</button>
+                    <button type="button" class="preset-btn" data-range="365">Dernière année</button>
+                    <button type="button" class="preset-btn active" data-range="all">Toutes les dates</button>
+                </div>
+                <div class="date-range-calendars">
+                    <div class="calendar-section">
+                        <label>Date de début</label>
+                        <div id="startCalendar"></div>
+                    </div>
+                    <div class="calendar-section">
+                        <label>Date de fin</label>
+                        <div id="endCalendar"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="date-range-modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelDateRange">Annuler</button>
+                <button type="button" class="btn btn-primary" id="applyDateRange">Appliquer</button>
             </div>
         </div>
     </div>
