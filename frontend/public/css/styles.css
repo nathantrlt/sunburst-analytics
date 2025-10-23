@@ -431,39 +431,86 @@ h2, h3 {
     gap: 16px;
 }
 
-/* Date Quick Filters */
-.date-quick-filters {
-    display: flex;
-    flex-wrap: wrap;
+/* Flatpickr Custom Styles */
+.flatpickr-calendar {
+    background: var(--card-bg) !important;
+    border: 2px solid var(--border-color) !important;
+    box-shadow: var(--shadow-lg) !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.flatpickr-months {
+    background: var(--card-bg) !important;
+}
+
+.flatpickr-current-month {
+    color: var(--text-primary) !important;
+}
+
+.flatpickr-weekday {
+    color: var(--text-secondary) !important;
+}
+
+.flatpickr-day {
+    color: var(--text-primary) !important;
+}
+
+.flatpickr-day:hover {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--bg-color) !important;
+}
+
+.flatpickr-day.selected {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--bg-color) !important;
+}
+
+.flatpickr-day.today {
+    border-color: var(--primary-color) !important;
+}
+
+.flatpickr-presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    padding: 12px;
+    background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
 }
 
-.quick-filter-btn {
+.flatpickr-presets button {
     background: transparent;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
+    padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     transition: all 0.2s ease;
     font-family: 'Montserrat', sans-serif;
 }
 
-.quick-filter-btn:hover {
+.flatpickr-presets button:hover {
     background: var(--primary-color);
     color: var(--bg-color);
     border-color: var(--primary-color);
 }
 
-.quick-filter-btn.active {
-    background: var(--primary-color);
-    color: var(--bg-color);
-    border-color: var(--primary-color);
+.flatpickr-months .flatpickr-month {
+    background: var(--card-bg) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    fill: var(--primary-color) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+    fill: var(--text-primary) !important;
 }
 
 .sunburst-container {

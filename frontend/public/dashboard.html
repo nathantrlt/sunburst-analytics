@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dashboard-page">
@@ -86,17 +87,6 @@
                 <!-- Filters -->
                 <div class="filters-section">
                     <h3>Filtres</h3>
-
-                    <!-- Date Range Quick Filters -->
-                    <div class="date-quick-filters">
-                        <button class="quick-filter-btn" data-range="7">7 derniers jours</button>
-                        <button class="quick-filter-btn" data-range="15">15 derniers jours</button>
-                        <button class="quick-filter-btn" data-range="30">30 derniers jours</button>
-                        <button class="quick-filter-btn" data-range="year">Année en cours</button>
-                        <button class="quick-filter-btn" data-range="365">1 an (365 jours)</button>
-                        <button class="quick-filter-btn" data-range="all">Toutes les dates</button>
-                    </div>
-
                     <div class="filters-grid">
                         <div class="form-group">
                             <label for="startDate">Date de Début</label>
@@ -453,6 +443,7 @@
     </div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/sunburst.js"></script>
 </body>
