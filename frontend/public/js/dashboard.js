@@ -764,7 +764,76 @@ function setupEventListeners() {
         document.getElementById('deviceFilter').value = '';
         document.getElementById('trafficSourceFilter').value = '';
         document.getElementById('categoryFilter').value = '';
+        // Remove active class from quick filter buttons
+        document.querySelectorAll('.quick-filter-btn').forEach(btn => btn.classList.remove('active'));
         loadAnalytics();
+    });
+
+    // Quick date range filters
+    document.querySelectorAll('.quick-filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const range = e.target.dataset.range;
+            const today = new Date();
+            let startDate = null;
+            let endDate = null;
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to clicked button
+            e.target.classList.add('active');
+
+            switch(range) {
+                case '7':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 7);
+                    endDate = new Date(today);
+                    break;
+                case '15':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 15);
+                    endDate = new Date(today);
+                    break;
+                case '30':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 30);
+                    endDate = new Date(today);
+                    break;
+                case 'year':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    endDate = new Date(today);
+                    break;
+                case '365':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 365);
+                    endDate = new Date(today);
+                    break;
+                case 'all':
+                    startDate = null;
+                    endDate = null;
+                    break;
+            }
+
+            // Format dates to YYYY-MM-DD
+            const formatDate = (date) => {
+                if (!date) return '';
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            // Update input fields
+            document.getElementById('startDate').value = formatDate(startDate);
+            document.getElementById('endDate').value = formatDate(endDate);
+
+            // Update current filters
+            currentFilters.startDate = formatDate(startDate) || null;
+            currentFilters.endDate = formatDate(endDate) || null;
+
+            // Load analytics with new filters
+            loadAnalytics();
+        });
     });
 
     // Pagination
