@@ -431,6 +431,26 @@ h2, h3 {
     gap: 16px;
 }
 
+/* Date Input Wrapper */
+.date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-wrapper input {
+    flex: 1;
+    padding-right: 40px !important;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 12px;
+    font-size: 18px;
+    pointer-events: none;
+    user-select: none;
+}
+
 /* Flatpickr Custom Styles */
 .flatpickr-calendar {
     background: var(--card-bg) !important;
