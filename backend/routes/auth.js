@@ -56,25 +56,36 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('Login attempt for email:', email);
+
     // Validate input
     if (!email || !password) {
+      console.log('Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // Find user by email
     const user = await User.findByEmail(email);
     if (!user) {
+      console.log('User not found for email:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    console.log('User found:', user.id, user.email);
 
     // Verify password
     const isValidPassword = await User.verifyPassword(password, user.password);
     if (!isValidPassword) {
+      console.log('Invalid password for user:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log('Password valid, generating token');
+
     // Generate token
     const token = generateToken(user.id, user.email);
+
+    console.log('Login successful for:', email);
 
     res.json({
       message: 'Login successful',
