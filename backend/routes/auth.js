@@ -130,4 +130,49 @@ router.post('/logout', authenticateToken, (req, res) => {
   res.json({ message: 'Logout successful' });
 });
 
+// POST /api/auth/reset-password - Reset password (temporary endpoint for recovery)
+// IMPORTANT: This should be removed or secured better in production
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword, resetKey } = req.body;
+
+    // Verify reset key (use a secret key from env)
+    const validResetKey = process.env.RESET_PASSWORD_KEY || 'temp_reset_key_2024';
+    if (resetKey !== validResetKey) {
+      console.log('Invalid reset key provided');
+      return res.status(403).json({ error: 'Invalid reset key' });
+    }
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: 'Email and new password are required' });
+    }
+
+    // Find user
+    const user = await User.findByEmail(email);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Resetting password for user:', user.id, user.email);
+
+    // Hash new password
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in database
+    const { pool } = require('../config/database');
+    await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, user.id]);
+
+    console.log('Password reset successful for:', email);
+
+    res.json({
+      message: 'Password reset successful',
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Password reset failed' });
+  }
+});
+
 module.exports = router;
