@@ -857,13 +857,6 @@ function setupEventListeners() {
 
     // Open date range modal
     document.getElementById('dateRangeBtn').addEventListener('click', () => {
-        // Check if flatpickr is loaded
-        if (typeof flatpickr === 'undefined') {
-            console.error('Flatpickr is not loaded');
-            alert('Le calendrier n\'est pas encore chargé. Veuillez rafraîchir la page.');
-            return;
-        }
-
         tempStartDate = currentFilters.startDate ? new Date(currentFilters.startDate) : null;
         tempEndDate = currentFilters.endDate ? new Date(currentFilters.endDate) : null;
 

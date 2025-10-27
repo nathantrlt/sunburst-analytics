@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dashboard-page">
@@ -477,9 +477,24 @@
         </div>
     </div>
 
-    <script defer src="https://d3js.org/d3.v7.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-    <script defer src="js/dashboard.js"></script>
-    <script defer src="js/sunburst.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+    <script>
+        // Wait for Flatpickr to load before loading dashboard.js
+        function waitForFlatpickr() {
+            if (typeof flatpickr !== 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'js/dashboard.js';
+                document.body.appendChild(script);
+
+                const sunburstScript = document.createElement('script');
+                sunburstScript.src = 'js/sunburst.js';
+                script.onload = () => document.body.appendChild(sunburstScript);
+            } else {
+                setTimeout(waitForFlatpickr, 50);
+            }
+        }
+        waitForFlatpickr();
+    </script>
 </body>
 </html>
