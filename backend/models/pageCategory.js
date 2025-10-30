@@ -4,12 +4,19 @@ class PageCategory {
   // Create a new category rule
   static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null, conditionsJson = null) {
     try {
+      // Ensure conditionsJson is properly stringified
+      let conditionsJsonStr = null;
+      if (conditionsJson) {
+        conditionsJsonStr = typeof conditionsJson === 'string' ? conditionsJson : JSON.stringify(conditionsJson);
+      }
+
       const [result] = await pool.query(
         'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority, condition_period_days, conditions_json) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson ? JSON.stringify(conditionsJson) : null]
+        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJsonStr]
       );
       return result.insertId;
     } catch (error) {
+      console.error('PageCategory.create error:', error);
       throw error;
     }
   }
@@ -48,12 +55,19 @@ class PageCategory {
   // Update a category rule
   static async update(id, clientId, name, conditionType, conditionValue, priority, conditionPeriodDays = null, conditionsJson = null) {
     try {
+      // Ensure conditionsJson is properly stringified
+      let conditionsJsonStr = null;
+      if (conditionsJson) {
+        conditionsJsonStr = typeof conditionsJson === 'string' ? conditionsJson : JSON.stringify(conditionsJson);
+      }
+
       const [result] = await pool.query(
         'UPDATE page_categories SET name = ?, condition_type = ?, condition_value = ?, priority = ?, condition_period_days = ?, conditions_json = ? WHERE id = ? AND client_id = ?',
-        [name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson ? JSON.stringify(conditionsJson) : null, id, clientId]
+        [name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJsonStr, id, clientId]
       );
       return result.affectedRows > 0;
     } catch (error) {
+      console.error('PageCategory.update error:', error);
       throw error;
     }
   }
