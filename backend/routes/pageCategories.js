@@ -121,6 +121,8 @@ router.put('/:clientId/:categoryId', async (req, res) => {
     const categoryId = parseInt(req.params.categoryId);
     const { name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson } = req.body;
 
+    console.log('Update category request:', { categoryId, name, conditionType, conditionValue, priority, conditionsJson });
+
     if (isNaN(clientId) || isNaN(categoryId)) {
       return res.status(400).json({ error: 'Invalid IDs' });
     }
@@ -132,7 +134,20 @@ router.put('/:clientId/:categoryId', async (req, res) => {
 
     // Either conditionsJson or (conditionType + conditionValue) must be provided
     if (!conditionsJson && (!conditionType || !conditionValue)) {
+      console.log('Validation failed: missing conditions');
       return res.status(400).json({ error: 'Either conditionsJson or (conditionType and conditionValue) are required' });
+    }
+
+    // Validate conditionsJson structure if provided
+    if (conditionsJson) {
+      if (!conditionsJson.operator || !conditionsJson.conditions || !Array.isArray(conditionsJson.conditions)) {
+        console.log('Invalid conditionsJson structure:', conditionsJson);
+        return res.status(400).json({ error: 'Invalid conditionsJson structure' });
+      }
+      if (conditionsJson.conditions.length === 0) {
+        console.log('conditionsJson has no conditions');
+        return res.status(400).json({ error: 'At least one condition is required' });
+      }
     }
 
     // If using legacy single condition, validate condition type

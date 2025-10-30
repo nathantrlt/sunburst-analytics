@@ -596,9 +596,22 @@ function toggleAdvancedConditions(enabled) {
         });
         // Show advanced mode
         advancedSection.style.display = 'block';
-        // Add at least one condition if empty
+
+        // If there's an existing simple condition, convert it to advanced mode
+        const conditionType = document.getElementById('conditionType').value;
+        const conditionValue = document.getElementById('conditionValue').value.trim();
+
         if (document.getElementById('multiConditionsList').children.length === 0) {
-            addConditionRow();
+            // If we have a simple condition filled, convert it
+            if (conditionType && conditionValue) {
+                addConditionRow();
+                const lastCondition = document.getElementById('multiConditionsList').lastElementChild;
+                lastCondition.querySelector('.condition-type').value = conditionType;
+                lastCondition.querySelector('.condition-value').value = conditionValue;
+            } else {
+                // Otherwise add empty condition
+                addConditionRow();
+            }
         }
     } else {
         // Show simple mode fields
