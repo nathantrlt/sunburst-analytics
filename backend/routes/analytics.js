@@ -87,7 +87,7 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
     // Load categories if needed
     let categories = [];
     if (viewMode === 'category') {
-      categories = await PageCategory.findByClient(req.clientId);
+      categories = await PageCategory.findByClientId(req.clientId);
     }
 
     // Transform data into hierarchical structure for sunburst
