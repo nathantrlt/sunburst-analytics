@@ -44,25 +44,33 @@ router.get('/:clientId', async (req, res) => {
 router.post('/:clientId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
-    const { name, conditionType, conditionValue, priority, conditionPeriodDays } = req.body;
+    const { name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson } = req.body;
 
     if (isNaN(clientId)) {
       return res.status(400).json({ error: 'Invalid client ID' });
     }
 
     // Validate input
-    if (!name || !conditionType || !conditionValue) {
-      return res.status(400).json({ error: 'Name, condition type, and condition value are required' });
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
     }
 
-    const validTypes = [
-      'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
-      'pageviews_greater_than', 'pageviews_less_than',
-      'avg_position_greater_than', 'avg_position_less_than',
-      'avg_time_greater_than', 'avg_time_less_than'
-    ];
-    if (!validTypes.includes(conditionType)) {
-      return res.status(400).json({ error: 'Invalid condition type' });
+    // Either conditionsJson or (conditionType + conditionValue) must be provided
+    if (!conditionsJson && (!conditionType || !conditionValue)) {
+      return res.status(400).json({ error: 'Either conditionsJson or (conditionType and conditionValue) are required' });
+    }
+
+    // If using legacy single condition, validate condition type
+    if (conditionType) {
+      const validTypes = [
+        'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
+        'pageviews_greater_than', 'pageviews_less_than',
+        'avg_position_greater_than', 'avg_position_less_than',
+        'avg_time_greater_than', 'avg_time_less_than'
+      ];
+      if (!validTypes.includes(conditionType)) {
+        return res.status(400).json({ error: 'Invalid condition type' });
+      }
     }
 
     // Verify user is owner or editor
@@ -74,10 +82,11 @@ router.post('/:clientId', async (req, res) => {
     const categoryId = await PageCategory.create(
       clientId,
       name,
-      conditionType,
-      conditionValue,
+      conditionType || null,
+      conditionValue || null,
       priority || 0,
-      conditionPeriodDays || null
+      conditionPeriodDays || null,
+      conditionsJson || null
     );
 
     res.status(201).json({
@@ -95,25 +104,33 @@ router.put('/:clientId/:categoryId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
     const categoryId = parseInt(req.params.categoryId);
-    const { name, conditionType, conditionValue, priority, conditionPeriodDays } = req.body;
+    const { name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson } = req.body;
 
     if (isNaN(clientId) || isNaN(categoryId)) {
       return res.status(400).json({ error: 'Invalid IDs' });
     }
 
     // Validate input
-    if (!name || !conditionType || !conditionValue) {
-      return res.status(400).json({ error: 'Name, condition type, and condition value are required' });
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
     }
 
-    const validTypes = [
-      'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
-      'pageviews_greater_than', 'pageviews_less_than',
-      'avg_position_greater_than', 'avg_position_less_than',
-      'avg_time_greater_than', 'avg_time_less_than'
-    ];
-    if (!validTypes.includes(conditionType)) {
-      return res.status(400).json({ error: 'Invalid condition type' });
+    // Either conditionsJson or (conditionType + conditionValue) must be provided
+    if (!conditionsJson && (!conditionType || !conditionValue)) {
+      return res.status(400).json({ error: 'Either conditionsJson or (conditionType and conditionValue) are required' });
+    }
+
+    // If using legacy single condition, validate condition type
+    if (conditionType) {
+      const validTypes = [
+        'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
+        'pageviews_greater_than', 'pageviews_less_than',
+        'avg_position_greater_than', 'avg_position_less_than',
+        'avg_time_greater_than', 'avg_time_less_than'
+      ];
+      if (!validTypes.includes(conditionType)) {
+        return res.status(400).json({ error: 'Invalid condition type' });
+      }
     }
 
     // Verify user is owner or editor
@@ -126,10 +143,11 @@ router.put('/:clientId/:categoryId', async (req, res) => {
       categoryId,
       clientId,
       name,
-      conditionType,
-      conditionValue,
+      conditionType || null,
+      conditionValue || null,
       priority || 0,
-      conditionPeriodDays || null
+      conditionPeriodDays || null,
+      conditionsJson || null
     );
 
     if (updated) {

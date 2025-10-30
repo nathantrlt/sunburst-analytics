@@ -2,11 +2,11 @@ const { pool } = require('../config/database');
 
 class PageCategory {
   // Create a new category rule
-  static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null) {
+  static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null, conditionsJson = null) {
     try {
       const [result] = await pool.query(
-        'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority, condition_period_days) VALUES (?, ?, ?, ?, ?, ?)',
-        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays]
+        'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority, condition_period_days, conditions_json) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson ? JSON.stringify(conditionsJson) : null]
       );
       return result.insertId;
     } catch (error) {
@@ -46,11 +46,11 @@ class PageCategory {
   }
 
   // Update a category rule
-  static async update(id, clientId, name, conditionType, conditionValue, priority, conditionPeriodDays = null) {
+  static async update(id, clientId, name, conditionType, conditionValue, priority, conditionPeriodDays = null, conditionsJson = null) {
     try {
       const [result] = await pool.query(
-        'UPDATE page_categories SET name = ?, condition_type = ?, condition_value = ?, priority = ?, condition_period_days = ? WHERE id = ? AND client_id = ?',
-        [name, conditionType, conditionValue, priority, conditionPeriodDays, id, clientId]
+        'UPDATE page_categories SET name = ?, condition_type = ?, condition_value = ?, priority = ?, condition_period_days = ?, conditions_json = ? WHERE id = ? AND client_id = ?',
+        [name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson ? JSON.stringify(conditionsJson) : null, id, clientId]
       );
       return result.affectedRows > 0;
     } catch (error) {
@@ -116,11 +116,112 @@ class PageCategory {
     }
   }
 
-  // Check if a URL matches a rule
-  static async matchesRule(clientId, url, rule) {
-    const { condition_type, condition_value, condition_period_days } = rule;
+  // Evaluate complex multi-condition rules
+  static async evaluateConditions(clientId, url, conditions) {
+    if (!conditions || !conditions.operator || !conditions.conditions) {
+      return false;
+    }
+
+    const { operator, conditions: conditionList } = conditions;
+    const results = [];
+
+    for (const condition of conditionList) {
+      // If condition has nested conditions (recursive)
+      if (condition.operator && condition.conditions) {
+        const result = await this.evaluateConditions(clientId, url, condition);
+        results.push(result);
+      } else {
+        // Evaluate single condition
+        const result = await this.evaluateSingleCondition(clientId, url, condition);
+        results.push(result);
+      }
+    }
+
+    // Apply operator
+    if (operator === 'AND') {
+      return results.every(r => r === true);
+    } else if (operator === 'OR') {
+      return results.some(r => r === true);
+    }
+
+    return false;
+  }
+
+  // Evaluate a single condition
+  static async evaluateSingleCondition(clientId, url, condition) {
+    const { type, value, period_days } = condition;
 
     try {
+      // URL-based conditions
+      switch (type) {
+        case 'contains':
+          return url.toLowerCase().includes(value.toLowerCase());
+
+        case 'not_contains':
+          return !url.toLowerCase().includes(value.toLowerCase());
+
+        case 'starts_with':
+          return url.toLowerCase().startsWith(value.toLowerCase());
+
+        case 'ends_with':
+          return url.toLowerCase().endsWith(value.toLowerCase());
+
+        case 'equals':
+          return url.toLowerCase() === value.toLowerCase();
+
+        case 'regex':
+          const regex = new RegExp(value, 'i');
+          return regex.test(url);
+
+        // Metric-based conditions
+        case 'pageviews_greater_than':
+        case 'pageviews_less_than':
+        case 'avg_position_greater_than':
+        case 'avg_position_less_than':
+        case 'avg_time_greater_than':
+        case 'avg_time_less_than':
+          const metrics = await this.calculateUrlMetrics(clientId, url, period_days);
+          const threshold = parseFloat(value);
+
+          switch (type) {
+            case 'pageviews_greater_than':
+              return metrics.total_views > threshold;
+            case 'pageviews_less_than':
+              return metrics.total_views < threshold;
+            case 'avg_position_greater_than':
+              return metrics.avg_position > threshold;
+            case 'avg_position_less_than':
+              return metrics.avg_position < threshold;
+            case 'avg_time_greater_than':
+              return metrics.avg_time_spent > threshold;
+            case 'avg_time_less_than':
+              return metrics.avg_time_spent < threshold;
+            default:
+              return false;
+          }
+
+        default:
+          return false;
+      }
+    } catch (error) {
+      console.error('Error evaluating single condition:', error);
+      return false;
+    }
+  }
+
+  // Check if a URL matches a rule
+  static async matchesRule(clientId, url, rule) {
+    try {
+      // If conditions_json exists, use multi-condition evaluation
+      if (rule.conditions_json) {
+        const conditions = typeof rule.conditions_json === 'string'
+          ? JSON.parse(rule.conditions_json)
+          : rule.conditions_json;
+        return await this.evaluateConditions(clientId, url, conditions);
+      }
+
+      // Otherwise, use legacy single condition
+      const { condition_type, condition_value, condition_period_days } = rule;
       // URL-based conditions (synchronous)
       switch (condition_type) {
         case 'contains':

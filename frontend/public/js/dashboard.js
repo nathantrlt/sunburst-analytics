@@ -468,6 +468,11 @@ function resetCategoryForm() {
     document.querySelector('#addCategoryBtn .btn-text').textContent = 'Ajouter la Règle de Catégorie';
     document.getElementById('categoryError').style.display = 'none';
     document.getElementById('categorySuccess').style.display = 'none';
+
+    // Reset advanced conditions
+    document.getElementById('advancedConditionsToggle').checked = false;
+    document.getElementById('multiConditionsList').innerHTML = '';
+    toggleAdvancedConditions(false);
 }
 
 // Update form based on condition type
@@ -508,18 +513,109 @@ function updateConditionForm() {
     }
 }
 
+// Build conditionsJson from multi-condition UI
+function buildConditionsJson() {
+    const operator = document.getElementById('multiConditionOperator').value;
+    const conditionItems = document.querySelectorAll('.condition-item');
+
+    const conditions = [];
+    conditionItems.forEach(item => {
+        const type = item.querySelector('.condition-type').value;
+        const value = item.querySelector('.condition-value').value.trim();
+        const periodInput = item.querySelector('.condition-period');
+
+        const condition = { type, value };
+        if (periodInput && periodInput.value) {
+            condition.period_days = parseInt(periodInput.value);
+        }
+
+        conditions.push(condition);
+    });
+
+    return {
+        operator,
+        conditions
+    };
+}
+
+// Add a new condition to the multi-condition list
+function addConditionRow() {
+    const container = document.getElementById('multiConditionsList');
+    const index = container.children.length;
+
+    const conditionHtml = `
+        <div class="condition-item">
+            <div class="form-group">
+                <label>Type</label>
+                <select class="condition-type" required>
+                    <optgroup label="Basé sur l'URL">
+                        <option value="contains">L'URL contient</option>
+                        <option value="not_contains">L'URL ne contient pas</option>
+                        <option value="starts_with">L'URL commence par</option>
+                        <option value="ends_with">L'URL se termine par</option>
+                        <option value="equals">L'URL est égale à</option>
+                        <option value="regex">Expression régulière</option>
+                    </optgroup>
+                    <optgroup label="Basé sur les Métriques">
+                        <option value="pageviews_greater_than">Nombre de vues > que</option>
+                        <option value="pageviews_less_than">Nombre de vues < que</option>
+                        <option value="avg_position_greater_than">Position moyenne > que</option>
+                        <option value="avg_position_less_than">Position moyenne < que</option>
+                        <option value="avg_time_greater_than">Temps moyen > que (secondes)</option>
+                        <option value="avg_time_less_than">Temps moyen < que (secondes)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Valeur</label>
+                <input type="text" class="condition-value" required placeholder="/produit">
+            </div>
+            <button type="button" class="btn btn-danger btn-small remove-condition-btn">✕</button>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', conditionHtml);
+
+    // Add event listener to remove button
+    const removeBtn = container.lastElementChild.querySelector('.remove-condition-btn');
+    removeBtn.addEventListener('click', () => {
+        container.removeChild(container.lastElementChild);
+    });
+}
+
+// Toggle advanced conditions mode
+function toggleAdvancedConditions(enabled) {
+    const simpleSection = document.querySelectorAll('#conditionType, #conditionValue, #periodGroup');
+    const advancedSection = document.getElementById('advancedConditionsSection');
+
+    if (enabled) {
+        // Hide simple mode fields
+        simpleSection.forEach(el => {
+            if (el) el.closest('.form-group').style.display = 'none';
+        });
+        // Show advanced mode
+        advancedSection.style.display = 'block';
+        // Add at least one condition if empty
+        if (document.getElementById('multiConditionsList').children.length === 0) {
+            addConditionRow();
+        }
+    } else {
+        // Show simple mode fields
+        simpleSection.forEach(el => {
+            if (el) el.closest('.form-group').style.display = 'block';
+        });
+        // Hide advanced mode
+        advancedSection.style.display = 'none';
+    }
+}
+
 // Handle add category
 async function handleAddCategory(e) {
     e.preventDefault();
     if (!currentClient) return;
 
     const name = document.getElementById('categoryName').value.trim();
-    const conditionType = document.getElementById('conditionType').value;
-    const conditionValue = document.getElementById('conditionValue').value.trim();
     const priority = parseInt(document.getElementById('categoryPriority').value) || 0;
-    const conditionPeriodDays = document.getElementById('conditionPeriod').value
-        ? parseInt(document.getElementById('conditionPeriod').value)
-        : null;
 
     document.getElementById('categoryError').style.display = 'none';
     document.getElementById('categorySuccess').style.display = 'none';
@@ -530,17 +626,40 @@ async function handleAddCategory(e) {
         btn.querySelector('.btn-loader').style.display = 'inline';
         btn.disabled = true;
 
+        // Check if advanced mode is enabled
+        const isAdvancedMode = document.getElementById('advancedConditionsToggle').checked;
+
+        let requestBody;
+        if (isAdvancedMode) {
+            // Build conditionsJson from multi-condition list
+            const conditionsJson = buildConditionsJson();
+            requestBody = {
+                name,
+                priority,
+                conditionsJson
+            };
+        } else {
+            // Use legacy single condition
+            const conditionType = document.getElementById('conditionType').value;
+            const conditionValue = document.getElementById('conditionValue').value.trim();
+            const conditionPeriodDays = document.getElementById('conditionPeriod').value
+                ? parseInt(document.getElementById('conditionPeriod').value)
+                : null;
+
+            requestBody = {
+                name,
+                conditionType,
+                conditionValue,
+                priority,
+                conditionPeriodDays
+            };
+        }
+
         if (editingCategoryId) {
             // Update existing category
             await apiRequest(`/page-categories/${currentClient.id}/${editingCategoryId}`, {
                 method: 'PUT',
-                body: JSON.stringify({
-                    name,
-                    conditionType,
-                    conditionValue,
-                    priority,
-                    conditionPeriodDays
-                })
+                body: JSON.stringify(requestBody)
             });
 
             // Show success
@@ -551,13 +670,7 @@ async function handleAddCategory(e) {
             // Add new category
             await apiRequest(`/page-categories/${currentClient.id}`, {
                 method: 'POST',
-                body: JSON.stringify({
-                    name,
-                    conditionType,
-                    conditionValue,
-                    priority,
-                    conditionPeriodDays
-                })
+                body: JSON.stringify(requestBody)
             });
 
             // Show success
@@ -802,6 +915,16 @@ function setupEventListeners() {
 
     // Update form when condition type changes
     document.getElementById('conditionType').addEventListener('change', updateConditionForm);
+
+    // Advanced conditions toggle
+    document.getElementById('advancedConditionsToggle').addEventListener('change', (e) => {
+        toggleAdvancedConditions(e.target.checked);
+    });
+
+    // Add condition button
+    document.getElementById('addConditionBtn').addEventListener('click', () => {
+        addConditionRow();
+    });
 
     // Manage collaborators
     document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {

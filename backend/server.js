@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const { testConnection, initDatabase } = require('./config/database');
-const { migrate } = require('./migrations/add_metric_categories');
+const { migrate: migrateMetricCategories } = require('./migrations/add_metric_categories');
+const { migrate: migrateMultiConditions } = require('./migrations/add_multi_conditions');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
@@ -88,7 +89,8 @@ const startServer = async () => {
 
     // Run migrations
     console.log('Running database migrations...');
-    await migrate();
+    await migrateMetricCategories();
+    await migrateMultiConditions();
 
     // Start listening
     app.listen(PORT, () => {

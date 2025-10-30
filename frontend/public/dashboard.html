@@ -304,6 +304,33 @@
                             <input type="number" id="categoryPriority" value="0" min="0" max="100">
                         </div>
 
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="advancedConditionsToggle" style="width: auto; display: inline-block; margin-right: 8px;">
+                                Mode Avancé (Conditions Multiples)
+                            </label>
+                            <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                                Activer pour combiner plusieurs conditions avec ET/OU
+                            </small>
+                        </div>
+
+                        <!-- Advanced Conditions Builder (hidden by default) -->
+                        <div id="advancedConditionsSection" style="display: none;">
+                            <div class="form-group">
+                                <label for="multiConditionOperator">Opérateur Principal</label>
+                                <select id="multiConditionOperator">
+                                    <option value="AND">ET (toutes les conditions doivent être vraies)</option>
+                                    <option value="OR">OU (au moins une condition doit être vraie)</option>
+                                </select>
+                            </div>
+
+                            <div id="multiConditionsList" class="multi-conditions-list">
+                                <!-- Conditions will be added dynamically -->
+                            </div>
+
+                            <button type="button" class="btn btn-secondary btn-small" id="addConditionBtn">+ Ajouter une Condition</button>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-block" id="addCategoryBtn">
                             <span class="btn-text">Ajouter la Règle de Catégorie</span>
                             <span class="btn-loader" style="display: none;">Ajout...</span>
