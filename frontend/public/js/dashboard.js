@@ -857,6 +857,12 @@ function setupEventListeners() {
 
     // Open date range modal
     document.getElementById('dateRangeBtn').addEventListener('click', () => {
+        // Check if flatpickr is available
+        if (typeof flatpickr === 'undefined') {
+            console.error('Flatpickr library not loaded');
+            return;
+        }
+
         tempStartDate = currentFilters.startDate ? new Date(currentFilters.startDate) : null;
         tempEndDate = currentFilters.endDate ? new Date(currentFilters.endDate) : null;
 

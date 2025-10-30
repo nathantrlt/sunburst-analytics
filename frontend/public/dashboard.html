@@ -479,22 +479,7 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-    <script>
-        // Wait for Flatpickr to load before loading dashboard.js
-        function waitForFlatpickr() {
-            if (typeof flatpickr !== 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'js/dashboard.js';
-                document.body.appendChild(script);
-
-                const sunburstScript = document.createElement('script');
-                sunburstScript.src = 'js/sunburst.js';
-                script.onload = () => document.body.appendChild(sunburstScript);
-            } else {
-                setTimeout(waitForFlatpickr, 50);
-            }
-        }
-        waitForFlatpickr();
-    </script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/sunburst.js"></script>
 </body>
 </html>
