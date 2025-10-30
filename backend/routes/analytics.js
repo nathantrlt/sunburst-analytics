@@ -294,25 +294,57 @@ router.delete('/cleanup-gtm/:clientId', verifyClientAccess, async (req, res) => 
 router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async (req, res) => {
   try {
     const filters = extractFilters(req.query);
-    const categoryId = parseInt(req.params.categoryId);
+    const categoryIdParam = req.params.categoryId;
 
-    // Get category info
-    const category = await PageCategory.findById(categoryId);
-    if (!category || category.client_id !== req.clientId) {
-      return res.status(404).json({ error: 'Category not found' });
-    }
-
-    // Get all pageviews and apply category matching
+    // Get all pageviews
     const pageviews = await Pageview.getAllPageviews(
       req.clientId,
       filters
     );
 
-    // Filter pages that match this category
-    const categoryPages = [];
-    for (const pv of pageviews) {
-      if (await PageCategory.matchesRule(req.clientId, pv.page_url, category)) {
-        categoryPages.push(pv);
+    let category;
+    let categoryPages = [];
+
+    // Handle "uncategorized" special case
+    if (categoryIdParam === 'uncategorized') {
+      category = {
+        id: null,
+        name: 'Uncategorized',
+        condition_type: null,
+        condition_value: null
+      };
+
+      // Get all rules to check against
+      const rules = await PageCategory.findByClientId(req.clientId);
+
+      // Find pages that don't match ANY category
+      for (const pv of pageviews) {
+        let matched = false;
+        for (const rule of rules) {
+          if (await PageCategory.matchesRule(req.clientId, pv.page_url, rule)) {
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          categoryPages.push(pv);
+        }
+      }
+    } else {
+      // Normal category
+      const categoryId = parseInt(categoryIdParam);
+
+      // Get category info
+      category = await PageCategory.findById(categoryId);
+      if (!category || category.client_id !== req.clientId) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+
+      // Filter pages that match this category
+      for (const pv of pageviews) {
+        if (await PageCategory.matchesRule(req.clientId, pv.page_url, category)) {
+          categoryPages.push(pv);
+        }
       }
     }
 

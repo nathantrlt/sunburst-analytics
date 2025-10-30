@@ -329,18 +329,19 @@ function renderCategoryStats(categories) {
     }
 
     container.innerHTML = categories.map(cat => {
-        const isClickable = cat.id !== null;
+        // All categories are clickable now, including Uncategorized
+        const categoryId = cat.id !== null ? cat.id : 'uncategorized';
         return `
-            <div class="category-stat-card ${isClickable ? 'clickable' : ''}"
-                 ${isClickable ? `data-category-id="${cat.id}"` : ''}
-                 style="${isClickable ? 'cursor: pointer;' : ''}">
+            <div class="category-stat-card clickable"
+                 data-category-id="${categoryId}"
+                 style="cursor: pointer;">
                 <div class="category-name">${cat.category}</div>
                 <div class="category-count">${cat.count.toLocaleString()} vues</div>
             </div>
         `;
     }).join('');
 
-    // Add click handlers only for clickable categories
+    // Add click handlers for all categories
     document.querySelectorAll('.category-stat-card.clickable').forEach(card => {
         card.addEventListener('click', () => {
             const categoryId = card.dataset.categoryId;
