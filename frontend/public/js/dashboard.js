@@ -633,6 +633,19 @@ async function handleAddCategory(e) {
         if (isAdvancedMode) {
             // Build conditionsJson from multi-condition list
             const conditionsJson = buildConditionsJson();
+            console.log('Built conditionsJson:', conditionsJson);
+
+            // Validate that we have at least one condition with values
+            if (!conditionsJson.conditions || conditionsJson.conditions.length === 0) {
+                throw new Error('Veuillez ajouter au moins une condition');
+            }
+
+            // Check that all conditions have values
+            const emptyConditions = conditionsJson.conditions.filter(c => !c.value);
+            if (emptyConditions.length > 0) {
+                throw new Error('Toutes les conditions doivent avoir une valeur');
+            }
+
             requestBody = {
                 name,
                 priority,
