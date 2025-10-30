@@ -169,6 +169,17 @@ router.put('/:clientId/:categoryId', async (req, res) => {
       return res.status(403).json({ error: 'Only owners and editors can update categories' });
     }
 
+    console.log('About to call PageCategory.update with:', {
+      categoryId,
+      clientId,
+      name,
+      conditionType: conditionType || null,
+      conditionValue: conditionValue || null,
+      priority: priority || 0,
+      conditionPeriodDays: conditionPeriodDays || null,
+      conditionsJson: conditionsJson || null
+    });
+
     const updated = await PageCategory.update(
       categoryId,
       clientId,
@@ -187,7 +198,12 @@ router.put('/:clientId/:categoryId', async (req, res) => {
     }
   } catch (error) {
     console.error('Update category error:', error);
-    res.status(500).json({ error: 'Failed to update category' });
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', JSON.stringify(error, null, 2));
+    res.status(500).json({
+      error: 'Failed to update category',
+      details: error.message
+    });
   }
 });
 
