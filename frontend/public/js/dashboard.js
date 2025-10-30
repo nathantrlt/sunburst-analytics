@@ -9,6 +9,7 @@ let clients = [];
 let currentPage = 1;
 let itemsPerPage = 10;
 let pagesData = [];
+let editingCategoryId = null; // Track category being edited
 let currentFilters = {
     startDate: null,
     endDate: null,
@@ -398,12 +399,29 @@ function renderCategoriesList(categories) {
                     <span class="category-rule">${conditionLabel} : "${cat.condition_value}"${periodInfo}</span>
                     <span class="category-priority">Priorité : ${cat.priority}</span>
                 </div>
-                <button class="btn btn-danger btn-small remove-category-btn" data-category-id="${cat.id}">
-                    Retirer
-                </button>
+                <div class="category-actions">
+                    <button class="btn btn-secondary btn-small edit-category-btn" data-category-id="${cat.id}">
+                        Modifier
+                    </button>
+                    <button class="btn btn-danger btn-small remove-category-btn" data-category-id="${cat.id}">
+                        Retirer
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
+
+    // Add click handlers for edit buttons
+    document.querySelectorAll('.edit-category-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const categoryId = parseInt(btn.dataset.categoryId);
+            const category = categories.find(c => c.id === categoryId);
+            if (category) {
+                populateCategoryForm(category);
+            }
+        });
+    });
 
     // Add click handlers for remove buttons
     document.querySelectorAll('.remove-category-btn').forEach(btn => {
@@ -413,6 +431,43 @@ function renderCategoriesList(categories) {
             await handleRemoveCategory(categoryId);
         });
     });
+}
+
+// Populate category form for editing
+function populateCategoryForm(category) {
+    editingCategoryId = category.id;
+
+    // Fill form fields
+    document.getElementById('categoryName').value = category.name;
+    document.getElementById('conditionType').value = category.condition_type;
+    document.getElementById('conditionValue').value = category.condition_value;
+    document.getElementById('categoryPriority').value = category.priority;
+
+    if (category.condition_period_days) {
+        document.getElementById('conditionPeriod').value = category.condition_period_days;
+    } else {
+        document.getElementById('conditionPeriod').value = '';
+    }
+
+    // Update form based on condition type
+    updateConditionForm();
+
+    // Change form title and button text
+    document.querySelector('.add-category-section h3').textContent = 'Modifier la Règle de Catégorie';
+    document.querySelector('#addCategoryBtn .btn-text').textContent = 'Mettre à Jour';
+
+    // Scroll to form
+    document.querySelector('.add-category-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Reset category form to add mode
+function resetCategoryForm() {
+    editingCategoryId = null;
+    document.getElementById('addCategoryForm').reset();
+    document.querySelector('.add-category-section h3').textContent = 'Ajouter une Règle de Catégorie';
+    document.querySelector('#addCategoryBtn .btn-text').textContent = 'Ajouter la Règle de Catégorie';
+    document.getElementById('categoryError').style.display = 'none';
+    document.getElementById('categorySuccess').style.display = 'none';
 }
 
 // Update form based on condition type
@@ -475,25 +530,44 @@ async function handleAddCategory(e) {
         btn.querySelector('.btn-loader').style.display = 'inline';
         btn.disabled = true;
 
-        await apiRequest(`/page-categories/${currentClient.id}`, {
-            method: 'POST',
-            body: JSON.stringify({
-                name,
-                conditionType,
-                conditionValue,
-                priority,
-                conditionPeriodDays
-            })
-        });
+        if (editingCategoryId) {
+            // Update existing category
+            await apiRequest(`/page-categories/${currentClient.id}/${editingCategoryId}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    name,
+                    conditionType,
+                    conditionValue,
+                    priority,
+                    conditionPeriodDays
+                })
+            });
 
-        // Show success
-        const successDiv = document.getElementById('categorySuccess');
-        successDiv.textContent = 'Catégorie ajoutée avec succès !';
-        successDiv.style.display = 'block';
+            // Show success
+            const successDiv = document.getElementById('categorySuccess');
+            successDiv.textContent = 'Catégorie mise à jour avec succès !';
+            successDiv.style.display = 'block';
+        } else {
+            // Add new category
+            await apiRequest(`/page-categories/${currentClient.id}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    name,
+                    conditionType,
+                    conditionValue,
+                    priority,
+                    conditionPeriodDays
+                })
+            });
+
+            // Show success
+            const successDiv = document.getElementById('categorySuccess');
+            successDiv.textContent = 'Catégorie ajoutée avec succès !';
+            successDiv.style.display = 'block';
+        }
 
         // Reset form
-        document.getElementById('addCategoryForm').reset();
-        updateConditionForm(); // Reset form display
+        resetCategoryForm();
 
         // Reload categories
         await loadCategories();
@@ -720,6 +794,7 @@ function setupEventListeners() {
     // Close categories modal
     document.getElementById('closeCategoriesModal').addEventListener('click', () => {
         document.getElementById('categoriesModal').style.display = 'none';
+        resetCategoryForm();
     });
 
     // Add category form

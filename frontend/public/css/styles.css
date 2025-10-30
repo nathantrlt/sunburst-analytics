@@ -1047,6 +1047,11 @@ h2, h3 {
     color: var(--text-secondary);
 }
 
+.category-actions {
+    display: flex;
+    gap: 10px;
+}
+
 .add-category-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
