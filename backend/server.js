@@ -16,13 +16,14 @@ const pageCategoryRoutes = require('./routes/pageCategories');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware - Configure CSP to allow D3.js CDN and tracker
+// Security middleware - Configure CSP to allow external CDNs
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://d3js.org"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://d3js.org", "https://unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'"]
     }
