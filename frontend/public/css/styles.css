@@ -640,6 +640,42 @@ h2, h3 {
     fill: var(--text-primary) !important;
 }
 
+/* Sunburst View Toggle */
+.sunburst-view-toggle {
+    display: inline-flex;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.view-toggle-btn {
+    padding: 10px 20px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-right: 1px solid var(--primary-color);
+}
+
+.view-toggle-btn:last-child {
+    border-right: none;
+}
+
+.view-toggle-btn:hover {
+    background: rgba(252, 209, 22, 0.1);
+}
+
+.view-toggle-btn.active {
+    background: var(--primary-color);
+    color: var(--bg-dark);
+    font-weight: 600;
+}
+
 .sunburst-container {
     position: relative;
     min-height: 600px;

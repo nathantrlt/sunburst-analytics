@@ -15,7 +15,8 @@ let currentFilters = {
     depth: 5,
     deviceType: null,
     trafficSource: null,
-    category: null
+    category: null,
+    viewMode: 'url' // 'url' or 'category'
 };
 
 // Authentication
@@ -169,6 +170,14 @@ function buildFilterParams() {
     return params;
 }
 
+// Build filter params for sunburst (includes depth and viewMode)
+function buildSunburstParams() {
+    const params = buildFilterParams();
+    params.append('depth', currentFilters.depth);
+    params.append('viewMode', currentFilters.viewMode);
+    return params;
+}
+
 // Load categories for filter dropdown
 async function loadCategoryFilterOptions() {
     if (!currentClient) return;
@@ -216,8 +225,7 @@ async function loadSunburstData() {
         document.getElementById('sunburstChart').innerHTML = '';
         document.getElementById('sunburstEmpty').style.display = 'none';
 
-        const params = buildFilterParams();
-        params.append('depth', currentFilters.depth);
+        const params = buildSunburstParams();
 
         const data = await apiRequest(`/analytics/sunburst/${currentClient.id}?${params}`);
 
@@ -764,6 +772,25 @@ function setupEventListeners() {
         document.getElementById('trafficSourceFilter').value = '';
         document.getElementById('categoryFilter').value = '';
         loadAnalytics();
+    });
+
+    // Sunburst View Mode Toggle
+    document.getElementById('viewByUrlBtn').addEventListener('click', () => {
+        if (currentFilters.viewMode !== 'url') {
+            currentFilters.viewMode = 'url';
+            document.getElementById('viewByUrlBtn').classList.add('active');
+            document.getElementById('viewByCategoryBtn').classList.remove('active');
+            loadSunburstData();
+        }
+    });
+
+    document.getElementById('viewByCategoryBtn').addEventListener('click', () => {
+        if (currentFilters.viewMode !== 'category') {
+            currentFilters.viewMode = 'category';
+            document.getElementById('viewByCategoryBtn').classList.add('active');
+            document.getElementById('viewByUrlBtn').classList.remove('active');
+            loadSunburstData();
+        }
     });
 
     // Date Range Modal Management

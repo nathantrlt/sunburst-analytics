@@ -72,6 +72,7 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const filters = extractFilters(req.query);
     const maxDepth = parseInt(req.query.depth) || 5;
+    const viewMode = req.query.viewMode || 'url'; // 'url' or 'category'
 
     if (maxDepth < 1 || maxDepth > 20) {
       return res.status(400).json({ error: 'Depth must be between 1 and 20' });
@@ -83,8 +84,14 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
       filters
     );
 
+    // Load categories if needed
+    let categories = [];
+    if (viewMode === 'category') {
+      categories = await PageCategory.findByClient(req.clientId);
+    }
+
     // Transform data into hierarchical structure for sunburst
-    const sunburstData = transformToSunburst(journeyData, maxDepth);
+    const sunburstData = await transformToSunburst(journeyData, maxDepth, viewMode, categories);
 
     res.json({ data: sunburstData });
   } catch (error) {
@@ -135,24 +142,45 @@ router.get('/category-stats/:clientId', verifyClientAccess, async (req, res) => 
   }
 });
 
+// Helper function to get category name for a URL
+async function getCategoryForUrl(url, categories) {
+  for (const category of categories) {
+    if (await PageCategory.matchesRule(category.client_id, url, category)) {
+      return category.name;
+    }
+  }
+  return null;
+}
+
 // Helper function to transform journey data to sunburst format
-function transformToSunburst(journeyData, maxDepth) {
+async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', categories = []) {
   if (!journeyData || journeyData.length === 0) {
     return { name: 'root', children: [] };
   }
 
-  // Group by session
+  // Group by session and determine page names
   const sessions = {};
-  journeyData.forEach(row => {
+
+  for (const row of journeyData) {
     if (!sessions[row.session_id]) {
       sessions[row.session_id] = [];
     }
+
+    let pageName;
+    if (viewMode === 'category') {
+      // Try to find category for this URL
+      const categoryName = await getCategoryForUrl(row.page_url, categories);
+      pageName = categoryName || row.page_url; // fallback to URL if no category
+    } else {
+      pageName = row.page_title || row.page_url;
+    }
+
     sessions[row.session_id].push({
       url: row.page_url,
-      title: row.page_title || row.page_url,
+      name: pageName,
       sequence: row.sequence_number
     });
-  });
+  }
 
   // Build hierarchical tree
   const root = { name: 'root', children: [] };
@@ -169,7 +197,7 @@ function transformToSunburst(journeyData, maxDepth) {
     session.forEach((page, index) => {
       if (index >= maxDepth) return;
 
-      const pageName = page.title || page.url;
+      const pageName = page.name;
       currentPath += '/' + pageName;
 
       // Find or create child at current level
