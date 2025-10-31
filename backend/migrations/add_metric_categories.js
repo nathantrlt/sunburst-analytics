@@ -23,17 +23,25 @@ async function migrate() {
       console.log('✓ Column condition_period_days already exists');
     }
 
-    // Modify condition_type ENUM to add new types
+    // Convert empty strings to NULL first
+    await connection.query(`
+      UPDATE page_categories
+      SET condition_type = NULL
+      WHERE condition_type = '' OR condition_type IS NULL
+    `);
+    await connection.query(`
+      UPDATE page_categories
+      SET condition_value = NULL
+      WHERE condition_value = '' OR condition_value IS NULL
+    `);
+
+    // Change condition_type from ENUM to VARCHAR to support both legacy and multi-conditions
     await connection.query(`
       ALTER TABLE page_categories
-      MODIFY COLUMN condition_type ENUM(
-        'contains', 'not_contains', 'starts_with', 'ends_with', 'equals', 'regex',
-        'pageviews_greater_than', 'pageviews_less_than',
-        'avg_position_greater_than', 'avg_position_less_than',
-        'avg_time_greater_than', 'avg_time_less_than'
-      ) NOT NULL
+      MODIFY COLUMN condition_type VARCHAR(50) NULL,
+      MODIFY COLUMN condition_value TEXT NULL
     `);
-    console.log('✓ Updated condition_type ENUM');
+    console.log('✓ Updated condition_type to VARCHAR (nullable)');
 
     console.log('Migration completed successfully');
   } catch (error) {
