@@ -18,7 +18,20 @@ async function migrate() {
     const needsMigration = columns.some(col => col.IS_NULLABLE === 'NO');
 
     if (needsMigration) {
-      // Allow NULL in condition_type and condition_value for multi-condition categories
+      // First, convert empty strings to NULL
+      await connection.query(`
+        UPDATE page_categories
+        SET condition_type = NULL
+        WHERE condition_type = '' OR condition_type IS NULL
+      `);
+      await connection.query(`
+        UPDATE page_categories
+        SET condition_value = NULL
+        WHERE condition_value = '' OR condition_value IS NULL
+      `);
+      console.log('✓ Converted empty strings to NULL');
+
+      // Then allow NULL in condition_type and condition_value for multi-condition categories
       await connection.query(`
         ALTER TABLE page_categories
         MODIFY COLUMN condition_type VARCHAR(50) NULL,
