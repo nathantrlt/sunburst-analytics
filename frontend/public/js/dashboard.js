@@ -454,20 +454,62 @@ function renderCategoriesList(categories) {
 function populateCategoryForm(category) {
     editingCategoryId = category.id;
 
-    // Fill form fields
+    // Fill common fields
     document.getElementById('categoryName').value = category.name;
-    document.getElementById('conditionType').value = category.condition_type;
-    document.getElementById('conditionValue').value = category.condition_value;
     document.getElementById('categoryPriority').value = category.priority;
 
-    if (category.condition_period_days) {
-        document.getElementById('conditionPeriod').value = category.condition_period_days;
-    } else {
-        document.getElementById('conditionPeriod').value = '';
-    }
+    // Check if this category uses multi-conditions
+    if (category.conditions_json) {
+        // Parse conditions
+        const conditions = typeof category.conditions_json === 'string'
+            ? JSON.parse(category.conditions_json)
+            : category.conditions_json;
 
-    // Update form based on condition type
-    updateConditionForm();
+        // Enable advanced mode
+        document.getElementById('advancedConditionsToggle').checked = true;
+        toggleAdvancedConditions(true);
+
+        // Set operator
+        document.getElementById('multiConditionOperator').value = conditions.operator || 'AND';
+
+        // Clear existing conditions
+        document.getElementById('multiConditionsList').innerHTML = '';
+
+        // Add each condition
+        if (conditions.conditions && Array.isArray(conditions.conditions)) {
+            conditions.conditions.forEach(condition => {
+                addConditionRow();
+                const lastItem = document.getElementById('multiConditionsList').lastElementChild;
+                lastItem.querySelector('.condition-type').value = condition.type;
+                lastItem.querySelector('.condition-value').value = condition.value;
+
+                // Set period if it exists
+                if (condition.period_days) {
+                    const periodInput = lastItem.querySelector('.condition-period');
+                    if (periodInput) {
+                        periodInput.value = condition.period_days;
+                    }
+                }
+            });
+        }
+    } else {
+        // Legacy single condition
+        document.getElementById('conditionType').value = category.condition_type || '';
+        document.getElementById('conditionValue').value = category.condition_value || '';
+
+        if (category.condition_period_days) {
+            document.getElementById('conditionPeriod').value = category.condition_period_days;
+        } else {
+            document.getElementById('conditionPeriod').value = '';
+        }
+
+        // Make sure advanced mode is off
+        document.getElementById('advancedConditionsToggle').checked = false;
+        toggleAdvancedConditions(false);
+
+        // Update form based on condition type
+        updateConditionForm();
+    }
 
     // Change form title and button text
     document.querySelector('.add-category-section h3').textContent = 'Modifier la Règle de Catégorie';
