@@ -374,30 +374,46 @@ function renderCategoriesList(categories) {
     }
 
     container.innerHTML = categories.map(cat => {
-        const conditionLabel = {
-            'contains': 'URL contient',
-            'not_contains': 'URL ne contient pas',
-            'starts_with': 'URL commence par',
-            'ends_with': 'URL se termine par',
-            'equals': 'URL est égale à',
-            'regex': 'Expression régulière',
-            'pageviews_greater_than': 'Nb vues >',
-            'pageviews_less_than': 'Nb vues <',
-            'avg_position_greater_than': 'Position moy. >',
-            'avg_position_less_than': 'Position moy. <',
-            'avg_time_greater_than': 'Temps moy. >',
-            'avg_time_less_than': 'Temps moy. <'
-        }[cat.condition_type] || cat.condition_type;
+        let ruleDisplay = '';
 
-        const periodInfo = cat.condition_period_days
-            ? ` (${cat.condition_period_days} jours)`
-            : '';
+        // Check if it's a multi-condition category
+        if (cat.conditions_json) {
+            const conditions = typeof cat.conditions_json === 'string'
+                ? JSON.parse(cat.conditions_json)
+                : cat.conditions_json;
+
+            const operator = conditions.operator === 'AND' ? 'ET' : 'OU';
+            const conditionsCount = conditions.conditions ? conditions.conditions.length : 0;
+            ruleDisplay = `${conditionsCount} conditions (${operator})`;
+        } else {
+            // Legacy single condition
+            const conditionLabel = {
+                'contains': 'URL contient',
+                'not_contains': 'URL ne contient pas',
+                'starts_with': 'URL commence par',
+                'ends_with': 'URL se termine par',
+                'equals': 'URL est égale à',
+                'regex': 'Expression régulière',
+                'pageviews_greater_than': 'Nb vues >',
+                'pageviews_less_than': 'Nb vues <',
+                'avg_position_greater_than': 'Position moy. >',
+                'avg_position_less_than': 'Position moy. <',
+                'avg_time_greater_than': 'Temps moy. >',
+                'avg_time_less_than': 'Temps moy. <'
+            }[cat.condition_type] || cat.condition_type;
+
+            const periodInfo = cat.condition_period_days
+                ? ` (${cat.condition_period_days} jours)`
+                : '';
+
+            ruleDisplay = `${conditionLabel} : "${cat.condition_value}"${periodInfo}`;
+        }
 
         return `
             <div class="category-item" data-category-id="${cat.id}">
                 <div class="category-info">
                     <strong>${cat.name}</strong>
-                    <span class="category-rule">${conditionLabel} : "${cat.condition_value}"${periodInfo}</span>
+                    <span class="category-rule">${ruleDisplay}</span>
                     <span class="category-priority">Priorité : ${cat.priority}</span>
                 </div>
                 <div class="category-actions">
