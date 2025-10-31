@@ -7,6 +7,7 @@ require('dotenv').config();
 const { testConnection, initDatabase } = require('./config/database');
 const { migrate: migrateMetricCategories } = require('./migrations/add_metric_categories');
 const { migrate: migrateMultiConditions } = require('./migrations/add_multi_conditions');
+const { migrate: migrateAllowNullConditions } = require('./migrations/allow_null_legacy_conditions');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
@@ -91,6 +92,7 @@ const startServer = async () => {
     console.log('Running database migrations...');
     await migrateMetricCategories();
     await migrateMultiConditions();
+    await migrateAllowNullConditions();
 
     // Start listening
     app.listen(PORT, () => {
