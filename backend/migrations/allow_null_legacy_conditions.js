@@ -6,13 +6,28 @@ async function migrate() {
   try {
     console.log('Starting migration: allow_null_legacy_conditions');
 
-    // Allow NULL in condition_type and condition_value for multi-condition categories
-    await connection.query(`
-      ALTER TABLE page_categories
-      MODIFY COLUMN condition_type VARCHAR(50) NULL,
-      MODIFY COLUMN condition_value TEXT NULL
+    // Check if columns are already nullable
+    const [columns] = await connection.query(`
+      SELECT COLUMN_NAME, IS_NULLABLE
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'page_categories'
+        AND COLUMN_NAME IN ('condition_type', 'condition_value')
     `);
-    console.log('✓ Allowed NULL in condition_type and condition_value columns');
+
+    const needsMigration = columns.some(col => col.IS_NULLABLE === 'NO');
+
+    if (needsMigration) {
+      // Allow NULL in condition_type and condition_value for multi-condition categories
+      await connection.query(`
+        ALTER TABLE page_categories
+        MODIFY COLUMN condition_type VARCHAR(50) NULL,
+        MODIFY COLUMN condition_value TEXT NULL
+      `);
+      console.log('✓ Allowed NULL in condition_type and condition_value columns');
+    } else {
+      console.log('✓ Columns already allow NULL, skipping migration');
+    }
 
     console.log('Migration completed successfully');
   } catch (error) {
