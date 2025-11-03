@@ -404,4 +404,76 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
   }
 });
 
+// GET /api/analytics/category-distribution/:clientId - Get category distribution stats
+router.get('/category-distribution/:clientId', verifyClientAccess, async (req, res) => {
+  try {
+    const filters = extractFilters(req.query);
+
+    // Load categories
+    const categories = await PageCategory.findByClientId(req.clientId);
+
+    // Get all pageviews
+    const pageviews = await Pageview.getFilteredPageviews(req.clientId, filters);
+
+    // Track unique pages and their view counts
+    const pageUrlMap = new Map(); // url -> { category: string, viewCount: number }
+
+    for (const pv of pageviews) {
+      if (!pageUrlMap.has(pv.page_url)) {
+        // Determine category for this page
+        const matchingRule = await PageCategory.getMatchingRule(req.clientId, pv.page_url, categories);
+        const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
+
+        pageUrlMap.set(pv.page_url, {
+          category: categoryName,
+          viewCount: 0
+        });
+      }
+
+      // Increment view count
+      pageUrlMap.get(pv.page_url).viewCount++;
+    }
+
+    // Calculate stats
+    const pagesByCategory = {}; // category -> unique page count
+    const viewsByCategory = {}; // category -> total views
+
+    for (const [url, data] of pageUrlMap.entries()) {
+      const { category, viewCount } = data;
+
+      // Count unique pages
+      pagesByCategory[category] = (pagesByCategory[category] || 0) + 1;
+
+      // Count views
+      viewsByCategory[category] = (viewsByCategory[category] || 0) + viewCount;
+    }
+
+    // Convert to arrays and calculate percentages
+    const totalPages = pageUrlMap.size;
+    const totalViews = Array.from(pageUrlMap.values()).reduce((sum, data) => sum + data.viewCount, 0);
+
+    const pagesDistribution = Object.entries(pagesByCategory).map(([category, count]) => ({
+      category,
+      count,
+      percentage: totalPages > 0 ? (count / totalPages * 100).toFixed(1) : 0
+    })).sort((a, b) => b.count - a.count);
+
+    const viewsDistribution = Object.entries(viewsByCategory).map(([category, count]) => ({
+      category,
+      count,
+      percentage: totalViews > 0 ? (count / totalViews * 100).toFixed(1) : 0
+    })).sort((a, b) => b.count - a.count);
+
+    res.json({
+      totalPages,
+      totalViews,
+      pagesByCategory: pagesDistribution,
+      viewsByCategory: viewsDistribution
+    });
+  } catch (error) {
+    console.error('Get category distribution error:', error);
+    res.status(500).json({ error: 'Failed to fetch category distribution' });
+  }
+});
+
 module.exports = router;

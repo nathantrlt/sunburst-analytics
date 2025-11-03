@@ -156,7 +156,8 @@ async function loadAnalytics() {
         loadStats(),
         loadSunburstData(),
         loadPagesData(),
-        loadCategoryStats()
+        loadCategoryStats(),
+        loadCategoryDistribution()
     ]);
 }
 
@@ -348,6 +349,104 @@ function renderCategoryStats(categories) {
             showCategoryDetails(categoryId);
         });
     });
+}
+
+// Load category distribution bars
+async function loadCategoryDistribution() {
+    if (!currentClient) return;
+
+    try {
+        const params = buildFilterParams();
+        const data = await apiRequest(`/analytics/category-distribution/${currentClient.id}?${params}`);
+
+        renderCategoryDistributionBars(data);
+    } catch (error) {
+        console.error('Failed to load category distribution:', error);
+        document.getElementById('pagesCategoryBar').innerHTML = '<div class="bar-loading">Échec du chargement</div>';
+        document.getElementById('viewsCategoryBar').innerHTML = '<div class="bar-loading">Échec du chargement</div>';
+    }
+}
+
+// Render category distribution bars
+function renderCategoryDistributionBars(data) {
+    const { pagesByCategory, viewsByCategory } = data;
+
+    // Generate color palette
+    const colors = generateCategoryColors(
+        [...new Set([...pagesByCategory.map(c => c.category), ...viewsByCategory.map(c => c.category)])]
+    );
+
+    // Render pages distribution bar
+    renderDistributionBar('pagesCategoryBar', 'pagesCategoryLegend', pagesByCategory, colors, 'pages');
+
+    // Render views distribution bar
+    renderDistributionBar('viewsCategoryBar', 'viewsCategoryLegend', viewsByCategory, colors, 'vues');
+}
+
+// Generate consistent colors for categories
+function generateCategoryColors(categories) {
+    const palette = [
+        '#3b82f6', // blue
+        '#10b981', // green
+        '#f59e0b', // orange
+        '#ef4444', // red
+        '#8b5cf6', // purple
+        '#ec4899', // pink
+        '#14b8a6', // teal
+        '#f97316', // deep orange
+        '#06b6d4', // cyan
+        '#84cc16', // lime
+    ];
+
+    const colors = {};
+    categories.forEach((category, index) => {
+        if (category === 'Uncategorized') {
+            colors[category] = '#6b7280'; // gray for uncategorized
+        } else {
+            colors[category] = palette[index % palette.length];
+        }
+    });
+
+    return colors;
+}
+
+// Render a single distribution bar
+function renderDistributionBar(barId, legendId, distribution, colors, unit) {
+    const barElement = document.getElementById(barId);
+    const legendElement = document.getElementById(legendId);
+
+    if (distribution.length === 0) {
+        barElement.innerHTML = '<div class="bar-loading">Aucune donnée</div>';
+        legendElement.innerHTML = '';
+        return;
+    }
+
+    // Render bar segments
+    barElement.innerHTML = distribution.map(item => {
+        const percentage = parseFloat(item.percentage);
+        if (percentage < 1) return ''; // Don't show segments < 1%
+
+        const color = colors[item.category];
+        return `
+            <div class="category-bar-segment"
+                 style="width: ${percentage}%; background-color: ${color};"
+                 title="${item.category}: ${item.count} ${unit} (${percentage}%)">
+                <span>${percentage >= 5 ? `${percentage}%` : ''}</span>
+            </div>
+        `;
+    }).join('');
+
+    // Render legend
+    legendElement.innerHTML = distribution.map(item => {
+        const color = colors[item.category];
+        return `
+            <div class="category-legend-item">
+                <div class="category-legend-color" style="background-color: ${color};"></div>
+                <span class="category-legend-label">${item.category}:</span>
+                <span class="category-legend-value">${item.count} ${unit} (${item.percentage}%)</span>
+            </div>
+        `;
+    }).join('');
 }
 
 // Load categories for management modal
@@ -770,6 +869,7 @@ async function handleAddCategory(e) {
         // Reload categories
         await loadCategories();
         await loadCategoryStats();
+        await loadCategoryDistribution();
         await loadCategoryFilterOptions();
     } catch (error) {
         const errorDiv = document.getElementById('categoryError');
@@ -799,6 +899,7 @@ async function handleRemoveCategory(categoryId) {
         // Reload categories
         await loadCategories();
         await loadCategoryStats();
+        await loadCategoryDistribution();
     } catch (error) {
         alert('Échec de la suppression de la catégorie : ' + error.message);
     }
