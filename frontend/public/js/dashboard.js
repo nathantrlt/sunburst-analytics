@@ -383,7 +383,7 @@ function renderCategoryDistributionBars(data) {
     renderDistributionBar('viewsCategoryBar', 'viewsCategoryLegend', viewsByCategory, colors, 'vues');
 }
 
-// Global color palette for categories
+// Global color palette for categories (consistent across all views)
 const CATEGORY_COLOR_PALETTE = [
     '#3b82f6', // blue
     '#10b981', // green
