@@ -24,27 +24,9 @@ function createSunburst(data) {
         if (window.getCategoryColor) {
             return window.getCategoryColor(name);
         }
-        // Fallback to D3 color scheme
+        // Fallback to D3 color scheme for URL view
         const fallbackColor = d3.scaleOrdinal(d3.schemeCategory10);
         return fallbackColor(name);
-    };
-
-    // Function to generate color variations based on depth
-    const getColorWithDepth = (baseColor, depth) => {
-        // Convert hex to HSL for manipulation
-        const color = d3.color(baseColor);
-        if (!color) return baseColor;
-
-        const hsl = d3.hsl(color);
-
-        // Adjust lightness based on depth (deeper = darker)
-        // Level 1: base color
-        // Level 2: slightly lighter
-        // Level 3+: progressively lighter
-        const lightnessAdjust = (depth - 1) * 0.15;
-        hsl.l = Math.min(0.9, hsl.l + lightnessAdjust);
-
-        return hsl.toString();
     };
 
     // Create SVG
@@ -88,15 +70,9 @@ function createSunburst(data) {
         .append('path')
         .attr('d', arc)
         .attr('fill', d => {
-            // Assign colors based on top-level parent (depth 1)
-            let topLevelNode = d;
-            while (topLevelNode.depth > 1) topLevelNode = topLevelNode.parent;
-
-            // Get base color for the category
-            const baseColor = getColor(topLevelNode.data.name);
-
-            // Apply depth-based variation
-            return getColorWithDepth(baseColor, d.depth);
+            // Each node gets the color of its own category name
+            // No variations based on depth - same category = same color
+            return getColor(d.data.name);
         })
         .attr('fill-opacity', 0.95)
         .attr('stroke', '#fff')
