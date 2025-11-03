@@ -385,16 +385,21 @@ function renderCategoryDistributionBars(data) {
 
 // Global color palette for categories (consistent across all views)
 const CATEGORY_COLOR_PALETTE = [
-    '#3b82f6', // blue
-    '#10b981', // green
-    '#f59e0b', // orange
-    '#ef4444', // red
-    '#8b5cf6', // purple
-    '#ec4899', // pink
-    '#14b8a6', // teal
-    '#f97316', // deep orange
-    '#06b6d4', // cyan
-    '#84cc16', // lime
+    '#3b82f6', // 1. Bleu
+    '#10b981', // 2. Vert
+    '#f59e0b', // 3. Orange
+    '#ef4444', // 4. Rouge
+    '#8b5cf6', // 5. Violet
+    '#ec4899', // 6. Rose/Magenta
+    '#06b6d4', // 7. Cyan
+    '#84cc16', // 8. Vert citron
+    '#6366f1', // 9. Indigo
+    '#eab308', // 10. Jaune
+    '#14b8a6', // 11. Teal/Turquoise
+    '#f97316', // 12. Orange foncé
+    '#fb7185', // 13. Rose saumon
+    '#3730a3', // 14. Bleu marine
+    '#059669', // 15. Vert émeraude
 ];
 
 // Get color for a specific category (deterministic based on category name)
