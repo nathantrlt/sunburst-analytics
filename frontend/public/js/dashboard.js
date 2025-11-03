@@ -443,19 +443,38 @@ function renderDistributionBar(barId, legendId, distribution, colors, unit) {
     }
 
     // Render bar segments
-    barElement.innerHTML = distribution.map(item => {
+    barElement.innerHTML = distribution.map((item, index) => {
         const percentage = parseFloat(item.percentage);
         if (percentage < 1) return ''; // Don't show segments < 1%
 
         const color = colors[item.category];
         return `
             <div class="category-bar-segment"
-                 style="width: ${percentage}%; background-color: ${color};"
-                 title="${item.category}: ${item.count} ${unit} (${percentage}%)">
+                 data-segment-index="${index}"
+                 style="width: ${percentage}%; background-color: ${color};">
                 <span>${percentage >= 5 ? `${percentage}%` : ''}</span>
             </div>
         `;
     }).join('');
+
+    // Add hover tooltips
+    const segments = barElement.querySelectorAll('.category-bar-segment');
+    segments.forEach((segment, index) => {
+        const item = distribution[index];
+        if (!item) return;
+
+        segment.addEventListener('mouseenter', (e) => {
+            showCategoryTooltip(e, item.category, item.count, unit, item.percentage);
+        });
+
+        segment.addEventListener('mousemove', (e) => {
+            updateCategoryTooltipPosition(e);
+        });
+
+        segment.addEventListener('mouseleave', () => {
+            hideCategoryTooltip();
+        });
+    });
 
     // Render legend
     legendElement.innerHTML = distribution.map(item => {
@@ -468,6 +487,54 @@ function renderDistributionBar(barId, legendId, distribution, colors, unit) {
             </div>
         `;
     }).join('');
+}
+
+// Category bar tooltip functions
+let categoryTooltip = null;
+
+function showCategoryTooltip(event, categoryName, count, unit, percentage) {
+    // Create tooltip if it doesn't exist
+    if (!categoryTooltip) {
+        categoryTooltip = document.createElement('div');
+        categoryTooltip.className = 'category-bar-tooltip';
+        document.body.appendChild(categoryTooltip);
+    }
+
+    // Set content
+    categoryTooltip.innerHTML = `
+        <div class="tooltip-category-name">${categoryName}</div>
+        <div class="tooltip-category-info">${count} ${unit} (${percentage}%)</div>
+    `;
+
+    // Position and show
+    categoryTooltip.style.display = 'block';
+    updateCategoryTooltipPosition(event);
+}
+
+function updateCategoryTooltipPosition(event) {
+    if (!categoryTooltip) return;
+
+    const offset = 10;
+    let left = event.clientX + offset;
+    let top = event.clientY + offset;
+
+    // Adjust if tooltip goes off screen
+    const tooltipRect = categoryTooltip.getBoundingClientRect();
+    if (left + tooltipRect.width > window.innerWidth) {
+        left = event.clientX - tooltipRect.width - offset;
+    }
+    if (top + tooltipRect.height > window.innerHeight) {
+        top = event.clientY - tooltipRect.height - offset;
+    }
+
+    categoryTooltip.style.left = left + 'px';
+    categoryTooltip.style.top = top + 'px';
+}
+
+function hideCategoryTooltip() {
+    if (categoryTooltip) {
+        categoryTooltip.style.display = 'none';
+    }
 }
 
 // Load categories for management modal
