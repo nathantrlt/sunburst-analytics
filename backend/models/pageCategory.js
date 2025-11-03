@@ -133,32 +133,35 @@ class PageCategory {
   // Evaluate complex multi-condition rules
   static async evaluateConditions(clientId, url, conditions) {
     if (!conditions || !conditions.operator || !conditions.conditions) {
+      console.log('Invalid conditions structure:', conditions);
       return false;
     }
 
     const { operator, conditions: conditionList } = conditions;
+    console.log(`Evaluating ${conditionList.length} conditions with operator ${operator} for URL: ${url}`);
     const results = [];
 
     for (const condition of conditionList) {
       // If condition has nested conditions (recursive)
       if (condition.operator && condition.conditions) {
         const result = await this.evaluateConditions(clientId, url, condition);
+        console.log(`Nested condition result: ${result}`);
         results.push(result);
       } else {
         // Evaluate single condition
         const result = await this.evaluateSingleCondition(clientId, url, condition);
+        console.log(`Condition ${condition.type} "${condition.value}" result: ${result}`);
         results.push(result);
       }
     }
 
     // Apply operator
-    if (operator === 'AND') {
-      return results.every(r => r === true);
-    } else if (operator === 'OR') {
-      return results.some(r => r === true);
-    }
+    const finalResult = operator === 'AND'
+      ? results.every(r => r === true)
+      : results.some(r => r === true);
 
-    return false;
+    console.log(`Final result for ${operator} operation: ${finalResult} (individual results: ${results.join(', ')})`);
+    return finalResult;
   }
 
   // Evaluate a single condition
@@ -228,9 +231,11 @@ class PageCategory {
     try {
       // If conditions_json exists, use multi-condition evaluation
       if (rule.conditions_json) {
+        console.log(`Rule "${rule.name}" has conditions_json:`, rule.conditions_json);
         const conditions = typeof rule.conditions_json === 'string'
           ? JSON.parse(rule.conditions_json)
           : rule.conditions_json;
+        console.log('Parsed conditions:', JSON.stringify(conditions, null, 2));
         return await this.evaluateConditions(clientId, url, conditions);
       }
 
