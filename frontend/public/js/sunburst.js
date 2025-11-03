@@ -29,6 +29,24 @@ function createSunburst(data) {
         return fallbackColor(name);
     };
 
+    // Function to generate color variations based on depth
+    const getColorWithDepth = (baseColor, depth) => {
+        // Convert hex to HSL for manipulation
+        const color = d3.color(baseColor);
+        if (!color) return baseColor;
+
+        const hsl = d3.hsl(color);
+
+        // Adjust lightness based on depth (deeper = darker)
+        // Level 1: base color
+        // Level 2: slightly lighter
+        // Level 3+: progressively lighter
+        const lightnessAdjust = (depth - 1) * 0.15;
+        hsl.l = Math.min(0.9, hsl.l + lightnessAdjust);
+
+        return hsl.toString();
+    };
+
     // Create SVG
     const svg = d3.select('#sunburstChart')
         .append('svg')
@@ -73,9 +91,14 @@ function createSunburst(data) {
             // Assign colors based on top-level parent (depth 1)
             let topLevelNode = d;
             while (topLevelNode.depth > 1) topLevelNode = topLevelNode.parent;
-            return getColor(topLevelNode.data.name);
+
+            // Get base color for the category
+            const baseColor = getColor(topLevelNode.data.name);
+
+            // Apply depth-based variation
+            return getColorWithDepth(baseColor, d.depth);
         })
-        .attr('fill-opacity', d => 0.6 + (d.depth * 0.1))
+        .attr('fill-opacity', 0.95)
         .attr('stroke', '#fff')
         .attr('stroke-width', 2)
         .style('cursor', 'pointer')
@@ -117,7 +140,7 @@ function createSunburst(data) {
     // Mouse out handler
     function handleMouseOut(event, d) {
         d3.select(event.currentTarget)
-            .attr('fill-opacity', 0.6 + (d.depth * 0.1))
+            .attr('fill-opacity', 0.95)
             .attr('stroke-width', 2);
 
         hideTooltip();
