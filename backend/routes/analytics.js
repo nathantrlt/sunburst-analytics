@@ -413,7 +413,7 @@ router.get('/category-distribution/:clientId', verifyClientAccess, async (req, r
     const categories = await PageCategory.findByClientId(req.clientId);
 
     // Get all pageviews
-    const pageviews = await Pageview.getFilteredPageviews(req.clientId, filters);
+    const pageviews = await Pageview.getAllPageviews(req.clientId, filters);
 
     // Track unique pages and their view counts
     const pageUrlMap = new Map(); // url -> { category: string, viewCount: number }
