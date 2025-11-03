@@ -18,10 +18,16 @@ function createSunburst(data) {
     const height = 600;
     const radius = Math.min(width, height) / 2;
 
-    // Color scale
-    const color = d3.scaleOrdinal()
-        .domain(['root'])
-        .range(d3.schemeCategory10);
+    // Color function using category colors if available
+    const getColor = (name) => {
+        // Use getCategoryColor if available (for category view)
+        if (window.getCategoryColor) {
+            return window.getCategoryColor(name);
+        }
+        // Fallback to D3 color scheme
+        const fallbackColor = d3.scaleOrdinal(d3.schemeCategory10);
+        return fallbackColor(name);
+    };
 
     // Create SVG
     const svg = d3.select('#sunburstChart')
@@ -64,9 +70,10 @@ function createSunburst(data) {
         .append('path')
         .attr('d', arc)
         .attr('fill', d => {
-            // Assign colors based on top-level parent
-            while (d.depth > 1) d = d.parent;
-            return color(d.data.name);
+            // Assign colors based on top-level parent (depth 1)
+            let topLevelNode = d;
+            while (topLevelNode.depth > 1) topLevelNode = topLevelNode.parent;
+            return getColor(topLevelNode.data.name);
         })
         .attr('fill-opacity', d => 0.6 + (d.depth * 0.1))
         .attr('stroke', '#fff')

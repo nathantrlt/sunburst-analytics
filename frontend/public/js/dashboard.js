@@ -383,32 +383,48 @@ function renderCategoryDistributionBars(data) {
     renderDistributionBar('viewsCategoryBar', 'viewsCategoryLegend', viewsByCategory, colors, 'vues');
 }
 
+// Global color palette for categories
+const CATEGORY_COLOR_PALETTE = [
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#f59e0b', // orange
+    '#ef4444', // red
+    '#8b5cf6', // purple
+    '#ec4899', // pink
+    '#14b8a6', // teal
+    '#f97316', // deep orange
+    '#06b6d4', // cyan
+    '#84cc16', // lime
+];
+
+// Get color for a specific category (deterministic based on category name)
+function getCategoryColor(categoryName) {
+    if (categoryName === 'Uncategorized') {
+        return '#6b7280'; // gray for uncategorized
+    }
+
+    // Generate a deterministic hash from category name
+    let hash = 0;
+    for (let i = 0; i < categoryName.length; i++) {
+        hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Use hash to pick a color from palette
+    const index = Math.abs(hash) % CATEGORY_COLOR_PALETTE.length;
+    return CATEGORY_COLOR_PALETTE[index];
+}
+
 // Generate consistent colors for categories
 function generateCategoryColors(categories) {
-    const palette = [
-        '#3b82f6', // blue
-        '#10b981', // green
-        '#f59e0b', // orange
-        '#ef4444', // red
-        '#8b5cf6', // purple
-        '#ec4899', // pink
-        '#14b8a6', // teal
-        '#f97316', // deep orange
-        '#06b6d4', // cyan
-        '#84cc16', // lime
-    ];
-
     const colors = {};
-    categories.forEach((category, index) => {
-        if (category === 'Uncategorized') {
-            colors[category] = '#6b7280'; // gray for uncategorized
-        } else {
-            colors[category] = palette[index % palette.length];
-        }
+    categories.forEach(category => {
+        colors[category] = getCategoryColor(category);
     });
-
     return colors;
 }
+
+// Export for use in sunburst
+window.getCategoryColor = getCategoryColor;
 
 // Render a single distribution bar
 function renderDistributionBar(barId, legendId, distribution, colors, unit) {
