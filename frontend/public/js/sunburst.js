@@ -63,8 +63,9 @@ function createSunburst(data) {
 
     partition(root);
 
-    // Track currently focused node
+    // Track currently focused node for zoom state
     let focusedNode = root;
+    let previousFocusedNode = root;
 
     // Arc generator
     const arc = d3.arc()
@@ -133,64 +134,86 @@ function createSunburst(data) {
         centerText.text('Parcours Utilisateurs');
     }
 
+    // Helper: check if target is a descendant of source (or equal)
+    function isVisible(target, source) {
+        let current = target;
+        while (current) {
+            if (current === source) return true;
+            current = current.parent;
+        }
+        return false;
+    }
+
+    // Helper: calculate arc coordinates for a node given a focus
+    function arcPosition(node, focus) {
+        const xScale = (focus.x1 - focus.x0) || 0.01; // Avoid division by zero
+        const yScale = (focus.y1 - focus.y0) || 0.01;
+
+        return {
+            startAngle: Math.max(0, Math.min(2 * Math.PI, (node.x0 - focus.x0) / xScale * 2 * Math.PI)),
+            endAngle: Math.max(0, Math.min(2 * Math.PI, (node.x1 - focus.x0) / xScale * 2 * Math.PI)),
+            innerRadius: Math.max(0, (node.y0 - focus.y0) / yScale * radius),
+            outerRadius: Math.max(0, (node.y1 - focus.y0) / yScale * radius)
+        };
+    }
+
     // Click handler for zooming
     function handleClick(event, d) {
         event.stopPropagation();
 
+        // Store previous focus for interpolation
+        previousFocusedNode = focusedNode;
+
         // Update focused node
         focusedNode = d;
-
-        // Helper: check if target is a descendant of source (or equal)
-        function isVisible(target, source) {
-            let current = target;
-            while (current) {
-                if (current === source) return true;
-                current = current.parent;
-            }
-            return false;
-        }
 
         // Transition for zoom animation
         const t = svg.transition()
             .duration(750)
             .ease(d3.easeCubicInOut);
 
-        // Update each path with zoom effect
-        paths.transition(t)
-            .attrTween('d', function(node) {
-                const i = d3.interpolate(
-                    {x0: node.x0, x1: node.x1, y0: node.y0, y1: node.y1},
-                    {x0: node.x0, x1: node.x1, y0: node.y0, y1: node.y1}
-                );
+        // Update each path with smooth zoom effect
+        paths.each(function(node) {
+            const path = d3.select(this);
+            const willBeVisible = isVisible(node, d);
 
-                return function(progress) {
-                    const current = i(progress);
+            path.transition(t)
+                .attrTween('d', function() {
+                    // Calculate start position (from previous focus)
+                    const startPos = arcPosition(node, previousFocusedNode);
 
-                    // Calculate zoomed coordinates
-                    const xScale = (d.x1 - d.x0);
-                    const yScale = (d.y1 - d.y0);
+                    // Calculate end position (to new focus)
+                    const endPos = arcPosition(node, focusedNode);
 
-                    const startAngle = Math.max(0, Math.min(2 * Math.PI, (current.x0 - d.x0) / xScale * 2 * Math.PI));
-                    const endAngle = Math.max(0, Math.min(2 * Math.PI, (current.x1 - d.x0) / xScale * 2 * Math.PI));
-                    const innerRadius = Math.max(0, (current.y0 - d.y0) / yScale * radius);
-                    const outerRadius = Math.max(0, (current.y1 - d.y0) / yScale * radius);
+                    // Create interpolators for each coordinate
+                    const interpolateStartAngle = d3.interpolate(startPos.startAngle, endPos.startAngle);
+                    const interpolateEndAngle = d3.interpolate(startPos.endAngle, endPos.endAngle);
+                    const interpolateInnerRadius = d3.interpolate(startPos.innerRadius, endPos.innerRadius);
+                    const interpolateOuterRadius = d3.interpolate(startPos.outerRadius, endPos.outerRadius);
 
-                    const zoomArc = d3.arc()
-                        .startAngle(startAngle)
-                        .endAngle(endAngle)
-                        .innerRadius(innerRadius)
-                        .outerRadius(outerRadius);
+                    return function(t) {
+                        const currentArc = d3.arc()
+                            .startAngle(interpolateStartAngle(t))
+                            .endAngle(interpolateEndAngle(t))
+                            .innerRadius(interpolateInnerRadius(t))
+                            .outerRadius(interpolateOuterRadius(t));
 
-                    return zoomArc(current);
-                };
-            })
-            .style('opacity', function(node) {
-                // Show clicked node and all its descendants, hide others
-                return isVisible(node, d) ? 0.95 : 0;
-            })
-            .style('pointer-events', function(node) {
-                return isVisible(node, d) ? 'auto' : 'none';
-            });
+                        return currentArc(node);
+                    };
+                })
+                .styleTween('opacity', function() {
+                    // Get current opacity
+                    const currentOpacity = parseFloat(d3.select(this).style('opacity')) || 0.95;
+                    const targetOpacity = willBeVisible ? 0.95 : 0;
+
+                    // Interpolate opacity
+                    return d3.interpolate(currentOpacity, targetOpacity);
+                })
+                .on('end', function() {
+                    // Update pointer events after transition
+                    d3.select(this).style('pointer-events', willBeVisible ? 'auto' : 'none');
+                });
+        });
 
         // Update center text
         centerText.text(truncateText(d.data.name, 20));
@@ -198,6 +221,9 @@ function createSunburst(data) {
 
     // Reset zoom
     function resetZoom() {
+        // Store previous focus for interpolation
+        previousFocusedNode = focusedNode;
+
         // Reset to root
         focusedNode = root;
 
@@ -206,47 +232,51 @@ function createSunburst(data) {
             .duration(750)
             .ease(d3.easeCubicInOut);
 
-        // Restore all paths with zoom-out animation
-        paths.transition(t)
-            .attrTween('d', function(node) {
-                // Interpolate back to original arc
-                return function(progress) {
-                    // If currently focused, interpolate from zoomed to original
-                    if (focusedNode !== root) {
-                        const xScale = (focusedNode.x1 - focusedNode.x0);
-                        const yScale = (focusedNode.y1 - focusedNode.y0);
+        // Restore all paths with smooth zoom-out animation
+        paths.each(function(node) {
+            const path = d3.select(this);
 
-                        // Interpolate from zoomed to original
-                        const currentStartAngle = d3.interpolate(
-                            Math.max(0, Math.min(2 * Math.PI, (node.x0 - focusedNode.x0) / xScale * 2 * Math.PI)),
-                            node.x0
-                        )(progress);
-                        const currentEndAngle = d3.interpolate(
-                            Math.max(0, Math.min(2 * Math.PI, (node.x1 - focusedNode.x0) / xScale * 2 * Math.PI)),
-                            node.x1
-                        )(progress);
-                        const currentInnerRadius = d3.interpolate(
-                            Math.max(0, (node.y0 - focusedNode.y0) / yScale * radius),
-                            node.y0
-                        )(progress);
-                        const currentOuterRadius = d3.interpolate(
-                            Math.max(0, (node.y1 - focusedNode.y0) / yScale * radius),
-                            node.y1
-                        )(progress);
+            path.transition(t)
+                .attrTween('d', function() {
+                    // Calculate start position (from previous focus)
+                    const startPos = arcPosition(node, previousFocusedNode);
 
-                        const resetArc = d3.arc()
-                            .startAngle(currentStartAngle)
-                            .endAngle(currentEndAngle)
-                            .innerRadius(currentInnerRadius)
-                            .outerRadius(currentOuterRadius);
+                    // Calculate end position (back to root = original arc)
+                    const endPos = {
+                        startAngle: node.x0,
+                        endAngle: node.x1,
+                        innerRadius: node.y0,
+                        outerRadius: node.y1
+                    };
 
-                        return resetArc(node);
-                    }
-                    return arc(node);
-                };
-            })
-            .style('opacity', 0.95)
-            .style('pointer-events', 'auto');
+                    // Create interpolators
+                    const interpolateStartAngle = d3.interpolate(startPos.startAngle, endPos.startAngle);
+                    const interpolateEndAngle = d3.interpolate(startPos.endAngle, endPos.endAngle);
+                    const interpolateInnerRadius = d3.interpolate(startPos.innerRadius, endPos.innerRadius);
+                    const interpolateOuterRadius = d3.interpolate(startPos.outerRadius, endPos.outerRadius);
+
+                    return function(t) {
+                        const currentArc = d3.arc()
+                            .startAngle(interpolateStartAngle(t))
+                            .endAngle(interpolateEndAngle(t))
+                            .innerRadius(interpolateInnerRadius(t))
+                            .outerRadius(interpolateOuterRadius(t));
+
+                        return currentArc(node);
+                    };
+                })
+                .styleTween('opacity', function() {
+                    // Get current opacity
+                    const currentOpacity = parseFloat(d3.select(this).style('opacity')) || 0;
+
+                    // Interpolate to full opacity
+                    return d3.interpolate(currentOpacity, 0.95);
+                })
+                .on('end', function() {
+                    // Restore pointer events
+                    d3.select(this).style('pointer-events', 'auto');
+                });
+        });
 
         centerText.text('Parcours Utilisateurs');
     }
