@@ -179,10 +179,16 @@ function createSunburst(data) {
 
             path.transition(t)
                 .attrTween('d', function() {
-                    // Calculate start position (from previous focus) - same logic for all zooms
-                    const startPos = arcPosition(node, previousFocusedNode);
+                    // Calculate start position
+                    // For first zoom from root, use actual original arc coordinates
+                    const startPos = previousFocusedNode === root ? {
+                        startAngle: node.x0,
+                        endAngle: node.x1,
+                        innerRadius: node.y0,
+                        outerRadius: node.y1
+                    } : arcPosition(node, previousFocusedNode);
 
-                    // Calculate end position (to new focus)
+                    // Calculate end position (to new focus) - always calculated
                     const endPos = arcPosition(node, focusedNode);
 
                     // Create interpolators for each coordinate
