@@ -170,7 +170,7 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
     if (viewMode === 'category') {
       // Try to find category for this URL
       const categoryName = await getCategoryForUrl(row.page_url, categories);
-      pageName = categoryName || row.page_url; // fallback to URL if no category
+      pageName = categoryName || 'Non catégorisé'; // fallback to "Non catégorisé" if no category
     } else {
       pageName = row.page_title || row.page_url;
     }
