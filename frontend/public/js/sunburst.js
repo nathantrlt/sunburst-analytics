@@ -146,7 +146,7 @@ function createSunburst(data) {
 
     // Helper: calculate arc coordinates for a node given a focus
     function arcPosition(node, focus) {
-        const ZOOM_SCALE = 0.6; // Reduce zoom intensity (0.6 = 60% size)
+        const ZOOM_SCALE = 0.5; // Reduce zoom intensity (0.5 = 50% size)
         const xScale = (focus.x1 - focus.x0) || 0.01; // Avoid division by zero
         const yScale = (focus.y1 - focus.y0) || 0.01;
 
