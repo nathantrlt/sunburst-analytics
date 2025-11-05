@@ -146,14 +146,24 @@ function createSunburst(data) {
 
     // Helper: calculate arc coordinates for a node given a focus
     function arcPosition(node, focus) {
+        const ZOOM_SCALE = 0.75; // Reduce zoom intensity (0.75 = 75% zoom)
         const xScale = (focus.x1 - focus.x0) || 0.01; // Avoid division by zero
         const yScale = (focus.y1 - focus.y0) || 0.01;
 
+        // Calculate normalized position (0 to 1)
+        const normalizedStart = (node.x0 - focus.x0) / xScale;
+        const normalizedEnd = (node.x1 - focus.x0) / xScale;
+
+        // Apply zoom scale with centering
+        const margin = (1 - ZOOM_SCALE) / 2;
+        const scaledStart = normalizedStart * ZOOM_SCALE + margin;
+        const scaledEnd = normalizedEnd * ZOOM_SCALE + margin;
+
         return {
-            startAngle: Math.max(0, Math.min(2 * Math.PI, (node.x0 - focus.x0) / xScale * 2 * Math.PI)),
-            endAngle: Math.max(0, Math.min(2 * Math.PI, (node.x1 - focus.x0) / xScale * 2 * Math.PI)),
-            innerRadius: Math.max(0, (node.y0 - focus.y0) / yScale * radius),
-            outerRadius: Math.max(0, (node.y1 - focus.y0) / yScale * radius)
+            startAngle: Math.max(0, Math.min(2 * Math.PI, scaledStart * 2 * Math.PI)),
+            endAngle: Math.max(0, Math.min(2 * Math.PI, scaledEnd * 2 * Math.PI)),
+            innerRadius: Math.max(0, (node.y0 - focus.y0) / yScale * radius * ZOOM_SCALE),
+            outerRadius: Math.max(0, (node.y1 - focus.y0) / yScale * radius * ZOOM_SCALE)
         };
     }
 
