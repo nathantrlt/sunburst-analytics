@@ -56,6 +56,9 @@ function createSunburst(data) {
 
     partition(root);
 
+    // Track currently focused node
+    let focusedNode = root;
+
     // Arc generator
     const arc = d3.arc()
         .startAngle(d => d.x0)
@@ -127,26 +130,63 @@ function createSunburst(data) {
     function handleClick(event, d) {
         event.stopPropagation();
 
-        // Calculate new domain
-        const transition = svg.transition()
-            .duration(750)
-            .tween('scale', () => {
-                const xd = d3.interpolate([d.x0, d.x1], [0, 2 * Math.PI]);
-                const yd = d3.interpolate([d.y0, 1], [0, 1]);
-                return t => {
-                    const x = xd(t);
-                    const y = yd(t);
+        // Update focused node
+        focusedNode = d;
 
-                    // Update arc
-                    const newArc = d3.arc()
-                        .startAngle(n => Math.max(0, Math.min(2 * Math.PI, (n.x0 - x[0]) / (x[1] - x[0]) * 2 * Math.PI)))
-                        .endAngle(n => Math.max(0, Math.min(2 * Math.PI, (n.x1 - x[0]) / (x[1] - x[0]) * 2 * Math.PI)))
-                        .innerRadius(n => Math.max(0, (n.y0 - y[0]) / (y[1] - y[0]) * radius))
-                        .outerRadius(n => Math.max(0, (n.y1 - y[0]) / (y[1] - y[0]) * radius));
+        // Helper: check if target is a descendant of source (or equal)
+        function isVisible(target, source) {
+            let current = target;
+            while (current) {
+                if (current === source) return true;
+                current = current.parent;
+            }
+            return false;
+        }
 
-                    paths.attr('d', newArc);
-                };
-            });
+        // Transition for zoom animation
+        const t = svg.transition()
+            .duration(750);
+
+        // Update each path
+        paths.each(function(node) {
+            const path = d3.select(this);
+
+            // Check if this node should be visible
+            const visible = isVisible(node, d);
+
+            // Animate opacity
+            path.transition(t)
+                .style('opacity', visible ? 0.95 : 0)
+                .style('pointer-events', visible ? 'auto' : 'none');
+
+            // Animate arc transformation if visible
+            if (visible) {
+                path.transition(t)
+                    .attrTween('d', () => {
+                        const xd = d3.interpolate(
+                            [(node.x0 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI,
+                             (node.x1 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI],
+                            [(node.x0 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI,
+                             (node.x1 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI]
+                        );
+                        const yd = d3.interpolate(
+                            [(node.y0 - d.y0) / (d.y1 - d.y0) * radius,
+                             (node.y1 - d.y0) / (d.y1 - d.y0) * radius],
+                            [(node.y0 - d.y0) / (d.y1 - d.y0) * radius,
+                             (node.y1 - d.y0) / (d.y1 - d.y0) * radius]
+                        );
+
+                        return () => {
+                            const zoomArc = d3.arc()
+                                .startAngle(Math.max(0, Math.min(2 * Math.PI, (node.x0 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI)))
+                                .endAngle(Math.max(0, Math.min(2 * Math.PI, (node.x1 - d.x0) / (d.x1 - d.x0) * 2 * Math.PI)))
+                                .innerRadius(Math.max(0, (node.y0 - d.y0) / (d.y1 - d.y0) * radius))
+                                .outerRadius(Math.max(0, (node.y1 - d.y0) / (d.y1 - d.y0) * radius));
+                            return zoomArc(node);
+                        };
+                    });
+            }
+        });
 
         // Update center text
         centerText.text(truncateText(d.data.name, 20));
@@ -154,15 +194,23 @@ function createSunburst(data) {
 
     // Reset zoom
     function resetZoom() {
-        const transition = svg.transition()
-            .duration(750)
-            .tween('scale', () => {
-                const xd = d3.interpolate([0, 2 * Math.PI], [0, 2 * Math.PI]);
-                const yd = d3.interpolate([0, 1], [0, 1]);
-                return t => {
-                    paths.attr('d', arc);
-                };
-            });
+        // Reset to root
+        focusedNode = root;
+
+        // Transition
+        const t = svg.transition()
+            .duration(750);
+
+        // Restore all paths
+        paths.each(function(node) {
+            const path = d3.select(this);
+
+            // Make all nodes visible again
+            path.transition(t)
+                .style('opacity', 0.95)
+                .style('pointer-events', 'auto')
+                .attr('d', arc);
+        });
 
         centerText.text('Parcours Utilisateurs');
     }
