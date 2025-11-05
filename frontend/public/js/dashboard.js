@@ -330,7 +330,7 @@ function renderCategoryStats(categories) {
     }
 
     container.innerHTML = categories.map(cat => {
-        // All categories are clickable now, including Uncategorized
+        // All categories are clickable now, including Non catégorisé
         const categoryId = cat.id !== null ? cat.id : 'uncategorized';
         return `
             <div class="category-stat-card clickable"
@@ -404,7 +404,7 @@ const CATEGORY_COLOR_PALETTE = [
 
 // Get color for a specific category (deterministic based on category name)
 function getCategoryColor(categoryName) {
-    if (categoryName === 'Uncategorized') {
+    if (categoryName === 'Non catégorisé') {
         return '#6b7280'; // gray for uncategorized
     }
 

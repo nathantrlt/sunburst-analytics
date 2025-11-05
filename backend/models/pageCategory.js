@@ -101,7 +101,7 @@ class PageCategory {
       }
     }
 
-    return 'Uncategorized';
+    return 'Non catégorisé';
   }
 
   // Calculate metrics for a URL
@@ -342,7 +342,7 @@ class PageCategory {
 
       for (const pv of pageviews) {
         const matchingRule = await this.getMatchingRule(clientId, pv.page_url, rules);
-        const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
+        const categoryName = matchingRule ? matchingRule.name : 'Non catégorisé';
 
         // If category filter is set, only include matching category
         if (filters.category && categoryName !== filters.category) {

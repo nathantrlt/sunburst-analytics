@@ -232,34 +232,7 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
 
   cleanupTree(root);
 
-  // Group first-level children with less than 1% into "Autres"
-  if (root.children && root.children.length > 0) {
-    const totalValue = root.children.reduce((sum, child) => sum + child.value, 0);
-    const threshold = totalValue * 0.01; // 1% threshold
-
-    const mainChildren = [];
-    const otherChildren = [];
-
-    root.children.forEach(child => {
-      if (child.value >= threshold) {
-        mainChildren.push(child);
-      } else {
-        otherChildren.push(child);
-      }
-    });
-
-    // If there are children to group
-    if (otherChildren.length > 0) {
-      const autresNode = {
-        name: 'Autres',
-        value: otherChildren.reduce((sum, child) => sum + child.value, 0),
-        children: otherChildren
-      };
-      mainChildren.push(autresNode);
-    }
-
-    root.children = mainChildren;
-  }
+  // All URLs are visible, no grouping into "Autres"
 
   return root;
 }
@@ -309,7 +282,7 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
     if (categoryIdParam === 'uncategorized') {
       category = {
         id: null,
-        name: 'Uncategorized',
+        name: 'Non catégorisé',
         condition_type: null,
         condition_value: null
       };
@@ -422,7 +395,7 @@ router.get('/category-distribution/:clientId', verifyClientAccess, async (req, r
       if (!pageUrlMap.has(pv.page_url)) {
         // Determine category for this page
         const matchingRule = await PageCategory.getMatchingRule(req.clientId, pv.page_url, categories);
-        const categoryName = matchingRule ? matchingRule.name : 'Uncategorized';
+        const categoryName = matchingRule ? matchingRule.name : 'Non catégorisé';
 
         pageUrlMap.set(pv.page_url, {
           category: categoryName,

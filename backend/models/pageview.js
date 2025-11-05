@@ -311,7 +311,7 @@ class Pageview {
     const filtered = [];
     for (const pv of pageviews) {
       const matchingRule = await PageCategory.getMatchingRule(clientId, pv.page_url, rules);
-      const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
+      const pageCategory = matchingRule ? matchingRule.name : 'Non catégorisé';
       if (pageCategory === categoryName) {
         filtered.push(pv);
       }
@@ -327,7 +327,7 @@ class Pageview {
     const filtered = [];
     for (const page of pageStats) {
       const matchingRule = await PageCategory.getMatchingRule(clientId, page.page_url, rules);
-      const pageCategory = matchingRule ? matchingRule.name : 'Uncategorized';
+      const pageCategory = matchingRule ? matchingRule.name : 'Non catégorisé';
       if (pageCategory === categoryName) {
         filtered.push(page);
       }
