@@ -322,6 +322,36 @@ h2, h3 {
     color: var(--text-secondary);
 }
 
+.client-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 6px;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.client-select:hover {
+    border-color: var(--primary-color);
+}
+
+.client-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(252, 209, 22, 0.05);
+}
+
+.client-select option {
+    padding: 10px;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
 .empty-state {
     text-align: center;
     color: var(--text-secondary);

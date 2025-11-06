@@ -95,28 +95,35 @@ async function loadClients() {
 
 // Render clients list
 function renderClientsList() {
-    const container = document.getElementById('clientsList');
+    const select = document.getElementById('clientSelect');
 
     if (clients.length === 0) {
-        container.innerHTML = '<p class="empty-state">Aucun site pour le moment. Ajoutez-en un pour commencer !</p>';
+        select.innerHTML = '<option value="">Aucun site disponible</option><option value="add-new">+ Ajouter un Nouveau Site</option>';
         return;
     }
 
-    container.innerHTML = clients.map(client => `
-        <div class="client-item ${currentClient && currentClient.id === client.id ? 'active' : ''}"
-             data-client-id="${client.id}">
-            <div class="client-name">${client.site_name}</div>
-            <div class="client-url">${new URL(client.site_url).hostname}</div>
-        </div>
-    `).join('');
+    const options = clients.map(client =>
+        `<option value="${client.id}" ${currentClient && currentClient.id === client.id ? 'selected' : ''}>
+            ${client.site_name}
+        </option>`
+    ).join('');
 
-    // Add click handlers
-    document.querySelectorAll('.client-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const clientId = parseInt(item.dataset.clientId);
-            selectClient(clientId);
-        });
-    });
+    select.innerHTML = `
+        <option value="">-- Sélectionner un site --</option>
+        ${options}
+        <option value="add-new">+ Ajouter un Nouveau Site</option>
+    `;
+
+    // Add change handler
+    select.onchange = function() {
+        const value = this.value;
+        if (value === 'add-new') {
+            showAddClientModal();
+            this.value = currentClient ? currentClient.id : '';
+        } else if (value) {
+            selectClient(parseInt(value));
+        }
+    };
 }
 
 // Select a client
@@ -1103,6 +1110,14 @@ async function handleRemoveCollaborator(collaboratorId) {
     }
 }
 
+// Show add client modal
+function showAddClientModal() {
+    document.getElementById('addSiteModal').style.display = 'flex';
+    document.getElementById('addSiteForm').reset();
+    document.getElementById('snippetDisplay').style.display = 'none';
+    document.getElementById('addSiteForm').style.display = 'block';
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Logout
@@ -1112,13 +1127,8 @@ function setupEventListeners() {
         window.location.href = '/index.html';
     });
 
-    // Add client
-    document.getElementById('addClientBtn').addEventListener('click', () => {
-        document.getElementById('addSiteModal').style.display = 'flex';
-        document.getElementById('addSiteForm').reset();
-        document.getElementById('snippetDisplay').style.display = 'none';
-        document.getElementById('addSiteForm').style.display = 'block';
-    });
+    // Show add client modal (called from select dropdown)
+    // No event listener needed - handled in renderClientsList()
 
     // Close modal
     document.getElementById('closeAddSiteModal').addEventListener('click', () => {
