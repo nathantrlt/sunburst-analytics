@@ -211,37 +211,37 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
           url: page.url,
           path: currentPath,
           value: 0,
-          exits: 0,
           children: []
         };
         currentLevel.children.push(child);
       }
 
       child.value += 1;
-
-      // Check if this is truly the last page in the session
-      if (page.isLastPage) {
-        child.exits += 1;
-      }
-
       currentLevel = child;
     });
   });
 
   // Remove empty children arrays and sort by value
   function cleanupTree(node) {
-    // Calculate exit rate for this node
-    if (node.value && node.value > 0) {
-      node.exitRate = parseFloat(((node.exits / node.value) * 100).toFixed(1));
-    }
-    delete node.exits; // Remove the exits counter
-
+    // Process children first
     if (node.children && node.children.length > 0) {
       node.children.forEach(cleanupTree);
       node.children.sort((a, b) => b.value - a.value);
+
+      // Calculate exits: total views - views that continued to children
+      const childrenViews = node.children.reduce((sum, child) => sum + child.value, 0);
+      const exits = node.value - childrenViews;
+
+      // Calculate exit rate
+      if (node.value && node.value > 0) {
+        node.exitRate = parseFloat(((exits / node.value) * 100).toFixed(1));
+      }
     } else {
+      // Leaf node: 100% exit rate
+      node.exitRate = 100;
       delete node.children;
     }
+
     delete node.path;
   }
 
