@@ -90,15 +90,8 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
       categories = await PageCategory.findByClientId(req.clientId);
     }
 
-    // Get exit rates for all pages
-    const pagePositions = await Pageview.getPagePositions(req.clientId, filters);
-    const exitRateMap = {};
-    pagePositions.forEach(page => {
-      exitRateMap[page.page_url] = parseFloat(page.exit_rate) || 0;
-    });
-
     // Transform data into hierarchical structure for sunburst
-    const sunburstData = await transformToSunburst(journeyData, maxDepth, viewMode, categories, exitRateMap);
+    const sunburstData = await transformToSunburst(journeyData, maxDepth, viewMode, categories);
 
     res.json({ data: sunburstData });
   } catch (error) {
@@ -161,7 +154,7 @@ async function getCategoryForUrl(url, categories) {
 }
 
 // Helper function to transform journey data to sunburst format
-async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', categories = [], exitRateMap = {}) {
+async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', categories = []) {
   if (!journeyData || journeyData.length === 0) {
     return { name: 'root', children: [] };
   }
@@ -186,8 +179,7 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
     sessions[row.session_id].push({
       url: row.page_url,
       name: pageName,
-      sequence: row.sequence_number,
-      exitRate: exitRateMap[row.page_url] || 0
+      sequence: row.sequence_number
     });
   }
 
@@ -218,19 +210,32 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
           url: page.url,
           path: currentPath,
           value: 0,
-          exitRate: page.exitRate,
+          exits: 0,
           children: []
         };
         currentLevel.children.push(child);
       }
 
       child.value += 1;
+
+      // Check if this is the last page in the session (within maxDepth)
+      const isLastPage = index === session.length - 1 || index === maxDepth - 1;
+      if (isLastPage) {
+        child.exits += 1;
+      }
+
       currentLevel = child;
     });
   });
 
   // Remove empty children arrays and sort by value
   function cleanupTree(node) {
+    // Calculate exit rate for this node
+    if (node.value && node.value > 0) {
+      node.exitRate = parseFloat(((node.exits / node.value) * 100).toFixed(1));
+    }
+    delete node.exits; // Remove the exits counter
+
     if (node.children && node.children.length > 0) {
       node.children.forEach(cleanupTree);
       node.children.sort((a, b) => b.value - a.value);
