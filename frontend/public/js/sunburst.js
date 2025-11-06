@@ -93,15 +93,8 @@ function createSunburst(data) {
         .on('mouseout', handleMouseOut)
         .on('click', handleClick);
 
-    // Add center text
-    const centerText = svg.append('text')
-        .attr('class', 'sunburst-center-text')
-        .attr('text-anchor', 'middle')
-        .attr('dy', '0.35em')
-        .style('font-size', '16px')
-        .style('font-weight', 'bold')
-        .style('fill', '#333')
-        .text('Parcours Utilisateurs');
+    // Center text removed - keeping variable for compatibility
+    const centerText = { text: () => {} };
 
     // Add center circle for reset
     svg.append('circle')
