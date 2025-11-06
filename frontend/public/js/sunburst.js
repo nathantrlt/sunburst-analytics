@@ -96,12 +96,7 @@ function createSunburst(data) {
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
 
-    // Add center circle for reset
-    svg.append('circle')
-        .attr('r', 60)
-        .attr('fill', 'transparent')
-        .style('cursor', 'pointer')
-        .on('click', () => resetZoom());
+    // Center circle removed - click on empty space (SVG background) now resets zoom
 
     // Mouse over handler
     function handleMouseOver(event, d) {
