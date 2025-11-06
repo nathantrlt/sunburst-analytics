@@ -305,7 +305,6 @@ function createSunburst(data) {
                 <div><strong>Vues :</strong> ${d.value.toLocaleString()}</div>
                 <div><strong>Pourcentage :</strong> ${percentage}%</div>
                 <div><strong>Profondeur :</strong> ${d.depth}</div>
-                ${d.data.exitRate !== undefined ? `<div><strong>Taux de Sortie :</strong> ${d.data.exitRate}%</div>` : ''}
                 ${d.data.url ? `<div><strong>URL :</strong> ${truncateText(d.data.url, 40)}</div>` : ''}
             </div>
             <div class="tooltip-path">
