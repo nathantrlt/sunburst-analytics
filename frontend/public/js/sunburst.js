@@ -15,7 +15,7 @@ function createSunburst(data) {
 
     // Dimensions
     const width = container.clientWidth || 800;
-    const height = 600;
+    const height = 500;
     const radius = Math.min(width, height) / 2;
 
     // Color function using category colors if available
