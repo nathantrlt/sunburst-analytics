@@ -1769,5 +1769,29 @@ function setupCategorySortHandlers() {
     });
 }
 
+// Navigation menu handler
+function initNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Remove active class from all items
+            navItems.forEach(nav => nav.classList.remove('active'));
+
+            // Add active class to clicked item
+            item.classList.add('active');
+
+            // Get section name
+            const section = item.dataset.section;
+            console.log(`Navigating to: ${section}`);
+
+            // TODO: Show/hide corresponding content sections
+        });
+    });
+}
+
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+    initNavigation();
+});
