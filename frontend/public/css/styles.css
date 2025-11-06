@@ -43,7 +43,6 @@ html {
 }
 
 /* Ensure containers don't overflow */
-.dashboard-container,
 .dashboard-main,
 .table-container {
     max-width: 100%;
@@ -258,11 +257,11 @@ h2, h3 {
 }
 
 .header-content {
-    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 20px;
 }
 
 .header-content h1 {
@@ -284,8 +283,6 @@ h2, h3 {
 .dashboard-container {
     display: flex;
     flex: 1;
-    max-width: 1400px;
-    margin: 0 auto;
     width: 100%;
 }
 
