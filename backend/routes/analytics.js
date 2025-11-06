@@ -90,8 +90,15 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
       categories = await PageCategory.findByClientId(req.clientId);
     }
 
+    // Get exit rates for all pages
+    const pagePositions = await Pageview.getPagePositions(req.clientId, filters);
+    const exitRateMap = {};
+    pagePositions.forEach(page => {
+      exitRateMap[page.page_url] = parseFloat(page.exit_rate) || 0;
+    });
+
     // Transform data into hierarchical structure for sunburst
-    const sunburstData = await transformToSunburst(journeyData, maxDepth, viewMode, categories);
+    const sunburstData = await transformToSunburst(journeyData, maxDepth, viewMode, categories, exitRateMap);
 
     res.json({ data: sunburstData });
   } catch (error) {
@@ -115,7 +122,8 @@ router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => 
       title: page.page_title || page.page_url,
       totalViews: parseInt(page.total_views) || 0,
       avgPosition: Math.round(parseFloat(page.avg_position) || 0),
-      avgTimeSpent: Math.round(parseFloat(page.avg_time_spent) || 0)
+      avgTimeSpent: Math.round(parseFloat(page.avg_time_spent) || 0),
+      exitRate: parseFloat(page.exit_rate) || 0
     }));
 
     res.json({ pages: formattedData });
@@ -153,7 +161,7 @@ async function getCategoryForUrl(url, categories) {
 }
 
 // Helper function to transform journey data to sunburst format
-async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', categories = []) {
+async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', categories = [], exitRateMap = {}) {
   if (!journeyData || journeyData.length === 0) {
     return { name: 'root', children: [] };
   }
@@ -178,7 +186,8 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
     sessions[row.session_id].push({
       url: row.page_url,
       name: pageName,
-      sequence: row.sequence_number
+      sequence: row.sequence_number,
+      exitRate: exitRateMap[row.page_url] || 0
     });
   }
 
@@ -209,6 +218,7 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
           url: page.url,
           path: currentPath,
           value: 0,
+          exitRate: page.exitRate,
           children: []
         };
         currentLevel.children.push(child);

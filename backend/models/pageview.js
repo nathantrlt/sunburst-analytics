@@ -196,45 +196,63 @@ class Pageview {
     try {
       let query = `
         SELECT
-          page_url,
-          page_title,
+          p.page_url,
+          p.page_title,
           COUNT(*) as total_views,
-          AVG(sequence_number) as avg_position,
-          AVG(time_spent) as avg_time_spent
-        FROM pageviews
-        WHERE client_id = ?
+          AVG(p.sequence_number) as avg_position,
+          AVG(p.time_spent) as avg_time_spent,
+          COALESCE(exits.exit_count, 0) as exit_count
+        FROM pageviews p
+        LEFT JOIN (
+          SELECT page_url, COUNT(*) as exit_count
+          FROM pageviews p1
+          WHERE client_id = ?
+          AND NOT EXISTS (
+            SELECT 1 FROM pageviews p2
+            WHERE p2.session_id = p1.session_id
+            AND p2.sequence_number > p1.sequence_number
+          )
+          GROUP BY page_url
+        ) exits ON p.page_url = exits.page_url
+        WHERE p.client_id = ?
       `;
-      const params = [clientId];
+      const params = [clientId, clientId];
 
       if (filters.startDate) {
-        query += ' AND DATE(timestamp) >= ?';
+        query += ' AND DATE(p.timestamp) >= ?';
         params.push(filters.startDate);
       }
 
       if (filters.endDate) {
-        query += ' AND DATE(timestamp) <= ?';
+        query += ' AND DATE(p.timestamp) <= ?';
         params.push(filters.endDate);
       }
 
       if (filters.deviceType) {
-        query += ' AND device_type = ?';
+        query += ' AND p.device_type = ?';
         params.push(filters.deviceType);
       }
 
       if (filters.trafficSource) {
-        query += this.buildTrafficSourceCondition(filters.trafficSource);
+        query += this.buildTrafficSourceCondition(filters.trafficSource).replace(/referrer/g, 'p.referrer');
       }
 
-      query += ' GROUP BY page_url, page_title ORDER BY total_views DESC';
+      query += ' GROUP BY p.page_url, p.page_title, exits.exit_count ORDER BY total_views DESC';
 
       const [rows] = await pool.query(query, params);
 
+      // Calculate exit rate percentage
+      const rowsWithExitRate = rows.map(row => ({
+        ...row,
+        exit_rate: row.total_views > 0 ? ((row.exit_count / row.total_views) * 100).toFixed(1) : 0
+      }));
+
       // Apply category filter if specified
       if (filters.category) {
-        return await this.filterPageStatsByCategory(rows, clientId, filters.category);
+        return await this.filterPageStatsByCategory(rowsWithExitRate, clientId, filters.category);
       }
 
-      return rows;
+      return rowsWithExitRate;
     } catch (error) {
       throw error;
     }

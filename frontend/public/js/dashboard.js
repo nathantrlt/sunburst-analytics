@@ -268,7 +268,7 @@ function renderPagesTable() {
     const tbody = document.getElementById('pagesTableBody');
 
     if (pagesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucune donnée de page disponible pour le moment.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucune donnée de page disponible pour le moment.</td></tr>';
         document.getElementById('paginationControls').style.display = 'none';
         return;
     }
@@ -284,6 +284,7 @@ function renderPagesTable() {
             <td>${page.totalViews.toLocaleString()}</td>
             <td>${page.avgPosition}</td>
             <td>${page.avgTimeSpent}s</td>
+            <td>${page.exitRate}%</td>
         </tr>
     `).join('');
 
