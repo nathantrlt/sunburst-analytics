@@ -179,7 +179,8 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
     sessions[row.session_id].push({
       url: row.page_url,
       name: pageName,
-      sequence: row.sequence_number
+      sequence: row.sequence_number,
+      isLastPage: row.is_last_page === 1 || row.is_last_page === true
     });
   }
 
@@ -218,9 +219,8 @@ async function transformToSunburst(journeyData, maxDepth, viewMode = 'url', cate
 
       child.value += 1;
 
-      // Check if this is the last page in the session (within maxDepth)
-      const isLastPage = index === session.length - 1 || index === maxDepth - 1;
-      if (isLastPage) {
+      // Check if this is truly the last page in the session
+      if (page.isLastPage) {
         child.exits += 1;
       }
 

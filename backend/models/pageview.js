@@ -148,35 +148,40 @@ class Pageview {
     try {
       let query = `
         SELECT
-          session_id,
-          page_url,
-          page_title,
-          sequence_number
-        FROM pageviews
-        WHERE client_id = ? AND sequence_number <= ?
+          p.session_id,
+          p.page_url,
+          p.page_title,
+          p.sequence_number,
+          NOT EXISTS (
+            SELECT 1 FROM pageviews p2
+            WHERE p2.session_id = p.session_id
+            AND p2.sequence_number > p.sequence_number
+          ) as is_last_page
+        FROM pageviews p
+        WHERE p.client_id = ? AND p.sequence_number <= ?
       `;
       const params = [clientId, depth];
 
       if (filters.startDate) {
-        query += ' AND DATE(timestamp) >= ?';
+        query += ' AND DATE(p.timestamp) >= ?';
         params.push(filters.startDate);
       }
 
       if (filters.endDate) {
-        query += ' AND DATE(timestamp) <= ?';
+        query += ' AND DATE(p.timestamp) <= ?';
         params.push(filters.endDate);
       }
 
       if (filters.deviceType) {
-        query += ' AND device_type = ?';
+        query += ' AND p.device_type = ?';
         params.push(filters.deviceType);
       }
 
       if (filters.trafficSource) {
-        query += this.buildTrafficSourceCondition(filters.trafficSource);
+        query += this.buildTrafficSourceCondition(filters.trafficSource).replace(/referrer/g, 'p.referrer');
       }
 
-      query += ' ORDER BY session_id, sequence_number ASC';
+      query += ' ORDER BY p.session_id, p.sequence_number ASC';
 
       const [rows] = await pool.query(query, params);
 
