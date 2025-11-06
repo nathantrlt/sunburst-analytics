@@ -95,35 +95,75 @@ async function loadClients() {
 
 // Render clients list
 function renderClientsList() {
-    const select = document.getElementById('clientSelect');
+    const buttonText = document.getElementById('selectedClientText');
+    const dropdown = document.getElementById('clientSelectDropdown');
+    const optionsContainer = dropdown.querySelector('.custom-select-options');
 
-    if (clients.length === 0) {
-        select.innerHTML = '<option value="">Aucun site disponible</option><option value="add-new">+ Ajouter un Nouveau Site</option>';
-        return;
+    // Update button text
+    if (currentClient) {
+        buttonText.textContent = currentClient.site_name;
+    } else {
+        buttonText.textContent = clients.length === 0 ? 'Aucun site disponible' : '-- Sélectionner un site --';
     }
 
-    const options = clients.map(client =>
-        `<option value="${client.id}" ${currentClient && currentClient.id === client.id ? 'selected' : ''}>
-            ${client.site_name}
-        </option>`
-    ).join('');
+    // Build options
+    let optionsHTML = '';
 
-    select.innerHTML = `
-        <option value="">-- Sélectionner un site --</option>
-        ${options}
-        <option value="add-new">+ Ajouter un Nouveau Site</option>
-    `;
+    if (clients.length === 0) {
+        optionsHTML = '<div class="custom-option disabled">Aucun site disponible</div>';
+    } else {
+        optionsHTML = '<div class="custom-option placeholder">-- Sélectionner un site --</div>';
+        optionsHTML += clients.map(client =>
+            `<div class="custom-option ${currentClient && currentClient.id === client.id ? 'selected' : ''}" data-client-id="${client.id}">
+                <div class="option-name">${client.site_name}</div>
+                <div class="option-url">${new URL(client.site_url).hostname}</div>
+            </div>`
+        ).join('');
+    }
 
-    // Add change handler
-    select.onchange = function() {
-        const value = this.value;
-        if (value === 'add-new') {
-            showAddClientModal();
-            this.value = currentClient ? currentClient.id : '';
-        } else if (value) {
-            selectClient(parseInt(value));
-        }
-    };
+    optionsHTML += '<div class="custom-option add-new" data-action="add-new">+ Ajouter un Nouveau Site</div>';
+
+    optionsContainer.innerHTML = optionsHTML;
+
+    // Add click handlers to options
+    optionsContainer.querySelectorAll('.custom-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            if (option.classList.contains('disabled') || option.classList.contains('placeholder')) {
+                return;
+            }
+
+            if (option.dataset.action === 'add-new') {
+                showAddClientModal();
+                closeCustomDropdown();
+            } else if (option.dataset.clientId) {
+                selectClient(parseInt(option.dataset.clientId));
+                closeCustomDropdown();
+            }
+        });
+    });
+}
+
+// Toggle custom dropdown
+function toggleCustomDropdown() {
+    const dropdown = document.getElementById('clientSelectDropdown');
+    const button = document.getElementById('clientSelectButton');
+
+    if (dropdown.style.display === 'none') {
+        dropdown.style.display = 'block';
+        button.classList.add('open');
+    } else {
+        closeCustomDropdown();
+    }
+}
+
+// Close custom dropdown
+function closeCustomDropdown() {
+    const dropdown = document.getElementById('clientSelectDropdown');
+    const button = document.getElementById('clientSelectButton');
+    dropdown.style.display = 'none';
+    button.classList.remove('open');
 }
 
 // Select a client
@@ -1127,8 +1167,19 @@ function setupEventListeners() {
         window.location.href = '/index.html';
     });
 
-    // Show add client modal (called from select dropdown)
-    // No event listener needed - handled in renderClientsList()
+    // Custom select dropdown
+    document.getElementById('clientSelectButton').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCustomDropdown();
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const wrapper = document.querySelector('.custom-select-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            closeCustomDropdown();
+        }
+    });
 
     // Close modal
     document.getElementById('closeAddSiteModal').addEventListener('click', () => {
