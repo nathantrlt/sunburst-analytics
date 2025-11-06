@@ -337,6 +337,11 @@ h2, h3 {
     font-size: 15px;
 }
 
+/* Content Sections */
+.content-section {
+    width: 100%;
+}
+
 .clients-list {
     margin-bottom: 20px;
     max-height: calc(100vh - 300px);

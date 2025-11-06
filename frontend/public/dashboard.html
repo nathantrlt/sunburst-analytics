@@ -97,34 +97,6 @@
                     </div>
                 </div>
 
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3>Pages Vues Totales</h3>
-                            <p class="stat-value" id="statPageviews">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3>Utilisateurs Uniques</h3>
-                            <p class="stat-value" id="statUsers">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3>Pages/Session Moy.</h3>
-                            <p class="stat-value" id="statAvgPages">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-content">
-                            <h3>Temps Moy. (secondes)</h3>
-                            <p class="stat-value" id="statAvgTime">0</p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Filters -->
                 <div class="filters-section">
                     <h3>Filtres</h3>
@@ -179,81 +151,115 @@
                     </div>
                 </div>
 
-                <!-- Sunburst Visualization -->
-                <div class="visualization-section">
-                    <h3>Visualisation du Parcours Utilisateur</h3>
-                    <div class="sunburst-view-toggle">
-                        <button id="viewByUrlBtn" class="view-toggle-btn active">Par URL</button>
-                        <button id="viewByCategoryBtn" class="view-toggle-btn">Par Catégorie</button>
-                    </div>
-                    <div id="sunburstContainer" class="sunburst-container">
-                        <div id="sunburstChart"></div>
-                        <div id="sunburstTooltip" class="sunburst-tooltip" style="display: none;"></div>
-                    </div>
-                    <div id="sunburstLoading" class="loading-message" style="display: none;">
-                        Chargement de la visualisation...
-                    </div>
-                    <div id="sunburstEmpty" class="empty-message" style="display: none;">
-                        Aucune donnée de parcours disponible. Commencez le suivi pour voir les parcours utilisateur !
-                    </div>
-                </div>
-
-                <!-- Category Stats -->
-                <div class="category-stats-section" style="margin-bottom: 30px;">
-                    <h3>Catégories de Pages</h3>
-                    <div id="categoryStatsContainer" class="category-stats-grid">
-                        <p class="empty-state">Chargement des catégories...</p>
-                    </div>
-                </div>
-
-                <!-- Category Distribution Bars -->
-                <div class="category-bars-section">
-                    <div class="category-bar-container">
-                        <h4>Répartition des Pages par Catégorie</h4>
-                        <div class="category-bar-wrapper">
-                            <div id="pagesCategoryBar" class="category-bar">
-                                <div class="bar-loading">Chargement...</div>
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="content-section">
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3>Pages Vues Totales</h3>
+                                <p class="stat-value" id="statPageviews">0</p>
                             </div>
                         </div>
-                        <div id="pagesCategoryLegend" class="category-legend"></div>
-                    </div>
-
-                    <div class="category-bar-container">
-                        <h4>Répartition des Vues par Catégorie</h4>
-                        <div class="category-bar-wrapper">
-                            <div id="viewsCategoryBar" class="category-bar">
-                                <div class="bar-loading">Chargement...</div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3>Utilisateurs Uniques</h3>
+                                <p class="stat-value" id="statUsers">0</p>
                             </div>
                         </div>
-                        <div id="viewsCategoryLegend" class="category-legend"></div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3>Pages/Session Moy.</h3>
+                                <p class="stat-value" id="statAvgPages">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-content">
+                                <h3>Temps Moy. (secondes)</h3>
+                                <p class="stat-value" id="statAvgTime">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pages Table -->
+                    <div class="table-section">
+                        <h3>Analytique des Pages</h3>
+                        <div class="table-container">
+                            <table id="pagesTable" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="url">URL</th>
+                                        <th class="sortable" data-sort="title">Titre</th>
+                                        <th class="sortable" data-sort="views">Vues Totales</th>
+                                        <th class="sortable" data-sort="position">Profondeur Moy.</th>
+                                        <th class="sortable" data-sort="time">Temps Moy. (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pagesTableBody">
+                                    <tr>
+                                        <td colspan="5" class="table-loading">Chargement des pages...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginationControls" class="pagination-controls" style="display: none;">
+                            <button id="prevPageBtn" class="btn btn-secondary btn-small">Précédent</button>
+                            <span id="pageInfo">Page 1 sur 1</span>
+                            <button id="nextPageBtn" class="btn btn-secondary btn-small">Suivant</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Pages Table -->
-                <div class="table-section">
-                    <h3>Analytique des Pages</h3>
-                    <div class="table-container">
-                        <table id="pagesTable" class="data-table">
-                            <thead>
-                                <tr>
-                                    <th class="sortable" data-sort="url">URL</th>
-                                    <th class="sortable" data-sort="title">Titre</th>
-                                    <th class="sortable" data-sort="views">Vues Totales</th>
-                                    <th class="sortable" data-sort="position">Profondeur Moy.</th>
-                                    <th class="sortable" data-sort="time">Temps Moy. (s)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pagesTableBody">
-                                <tr>
-                                    <td colspan="5" class="table-loading">Chargement des pages...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Cartographie Section -->
+                <div id="cartographieSection" class="content-section" style="display: none;">
+                    <!-- Sunburst Visualization -->
+                    <div class="visualization-section">
+                        <h3>Visualisation du Parcours Utilisateur</h3>
+                        <div class="sunburst-view-toggle">
+                            <button id="viewByUrlBtn" class="view-toggle-btn active">Par URL</button>
+                            <button id="viewByCategoryBtn" class="view-toggle-btn">Par Catégorie</button>
+                        </div>
+                        <div id="sunburstContainer" class="sunburst-container">
+                            <div id="sunburstChart"></div>
+                            <div id="sunburstTooltip" class="sunburst-tooltip" style="display: none;"></div>
+                        </div>
+                        <div id="sunburstLoading" class="loading-message" style="display: none;">
+                            Chargement de la visualisation...
+                        </div>
+                        <div id="sunburstEmpty" class="empty-message" style="display: none;">
+                            Aucune donnée de parcours disponible. Commencez le suivi pour voir les parcours utilisateur !
+                        </div>
                     </div>
-                    <div id="paginationControls" class="pagination-controls" style="display: none;">
-                        <button id="prevPageBtn" class="btn btn-secondary btn-small">Précédent</button>
-                        <span id="pageInfo">Page 1 sur 1</span>
-                        <button id="nextPageBtn" class="btn btn-secondary btn-small">Suivant</button>
+
+                    <!-- Category Stats -->
+                    <div class="category-stats-section" style="margin-bottom: 30px;">
+                        <h3>Catégories de Pages</h3>
+                        <div id="categoryStatsContainer" class="category-stats-grid">
+                            <p class="empty-state">Chargement des catégories...</p>
+                        </div>
+                    </div>
+
+                    <!-- Category Distribution Bars -->
+                    <div class="category-bars-section">
+                        <div class="category-bar-container">
+                            <h4>Répartition des Pages par Catégorie</h4>
+                            <div class="category-bar-wrapper">
+                                <div id="pagesCategoryBar" class="category-bar">
+                                    <div class="bar-loading">Chargement...</div>
+                                </div>
+                            </div>
+                            <div id="pagesCategoryLegend" class="category-legend"></div>
+                        </div>
+
+                        <div class="category-bar-container">
+                            <h4>Répartition des Vues par Catégorie</h4>
+                            <div class="category-bar-wrapper">
+                                <div id="viewsCategoryBar" class="category-bar">
+                                    <div class="bar-loading">Chargement...</div>
+                                </div>
+                            </div>
+                            <div id="viewsCategoryLegend" class="category-legend"></div>
+                        </div>
                     </div>
                 </div>
             </div>

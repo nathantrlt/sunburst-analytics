@@ -1783,9 +1783,19 @@ function initNavigation() {
 
             // Get section name
             const section = item.dataset.section;
-            console.log(`Navigating to: ${section}`);
 
-            // TODO: Show/hide corresponding content sections
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.style.display = 'none';
+            });
+
+            // Show the selected section
+            if (section === 'dashboard') {
+                document.getElementById('dashboardSection').style.display = 'block';
+            } else if (section === 'cartographie') {
+                document.getElementById('cartographieSection').style.display = 'block';
+            }
+            // TODO: Add other sections (documentation, parametres)
         });
     });
 }
