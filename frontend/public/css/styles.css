@@ -287,17 +287,7 @@ h2, h3 {
 }
 
 .dashboard-sidebar {
-    width: 280px;
-    background: var(--card-bg);
-    border-right: 2px solid var(--border-color);
-    padding: 24px;
-    overflow-y: auto;
-}
-
-.dashboard-sidebar h3 {
-    font-size: 16px;
-    margin-bottom: 16px;
-    color: var(--text-primary);
+    display: none;
 }
 
 .clients-list {
@@ -345,6 +335,11 @@ h2, h3 {
     margin-bottom: 20px;
 }
 
+.custom-select-wrapper.header-select {
+    width: 250px;
+    margin-bottom: 0;
+}
+
 .custom-select-button {
     width: 100%;
     padding: 14px 16px;
@@ -362,6 +357,11 @@ h2, h3 {
     justify-content: space-between;
     align-items: center;
     user-select: none;
+}
+
+.header-select .custom-select-button {
+    padding: 8px 12px;
+    font-size: 14px;
 }
 
 .custom-select-button:hover {
@@ -1161,17 +1161,6 @@ h2, h3 {
         font-size: 14px;
     }
 
-    .dashboard-container {
-        flex-direction: column;
-    }
-
-    .dashboard-sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 2px solid var(--border-color);
-        padding: 16px;
-    }
-
     .dashboard-main {
         padding: 16px;
     }
@@ -1220,6 +1209,13 @@ h2, h3 {
     .header-user {
         width: 100%;
         justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .header-select {
+        width: 100%;
+        order: -1;
+        margin-bottom: 12px;
     }
 
     /* Tables responsive */

@@ -17,29 +17,25 @@
             <h1>Sunburst Analytics</h1>
             <div class="header-user">
                 <span id="userName">Chargement...</span>
+                <div class="custom-select-wrapper header-select">
+                    <div id="clientSelectButton" class="custom-select-button">
+                        <span id="selectedClientText">Chargement...</span>
+                        <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12">
+                            <path fill="#FCD116" d="M6 9L1 4h10z"/>
+                        </svg>
+                    </div>
+                    <div id="clientSelectDropdown" class="custom-select-dropdown" style="display: none;">
+                        <div class="custom-select-options">
+                            <div class="custom-option loading">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
                 <button id="logoutBtn" class="btn btn-secondary btn-small">Déconnexion</button>
             </div>
         </div>
     </header>
 
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
-            <h3>Sélectionner un Site</h3>
-            <div class="custom-select-wrapper">
-                <div id="clientSelectButton" class="custom-select-button">
-                    <span id="selectedClientText">Chargement...</span>
-                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12">
-                        <path fill="#FCD116" d="M6 9L1 4h10z"/>
-                    </svg>
-                </div>
-                <div id="clientSelectDropdown" class="custom-select-dropdown" style="display: none;">
-                    <div class="custom-select-options">
-                        <div class="custom-option loading">Chargement...</div>
-                    </div>
-                </div>
-            </div>
-        </aside>
 
         <!-- Main Content -->
         <main class="dashboard-main">
