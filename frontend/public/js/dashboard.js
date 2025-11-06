@@ -1219,8 +1219,7 @@ function setupEventListeners() {
 
     // Apply filters
     document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-        currentFilters.startDate = document.getElementById('startDate').value || null;
-        currentFilters.endDate = document.getElementById('endDate').value || null;
+        // Don't touch startDate and endDate - they are managed by the calendar modal
         currentFilters.depth = parseInt(document.getElementById('depthSelect').value);
         currentFilters.deviceType = document.getElementById('deviceFilter').value || null;
         currentFilters.trafficSource = document.getElementById('trafficSourceFilter').value || null;
