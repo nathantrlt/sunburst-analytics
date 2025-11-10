@@ -14,8 +14,9 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
+    // Container is 480px high, we need the sunburst to fit entirely within it
     const containerWidth = container.clientWidth || 800;
-    const size = Math.min(containerWidth - 40, 450); // 40px margin, max 450px
+    const size = Math.min(containerWidth - 60, 440); // Leave margin for safety
     const width = size;
     const height = size;
     const radius = size / 2;
