@@ -17,11 +17,11 @@ function createSunburst(data) {
     // CRITICAL: Container height is fixed at 480px
     // Sunburst must NEVER exceed this height, regardless of width available
     const containerHeight = 480; // Fixed container height from CSS
-    const maxSunburstSize = containerHeight - 60; // Leave 60px margin (30px top + 30px bottom)
+    const maxSunburstSize = 210; // DIVIDED BY 2: was 420px, now 210px
 
     // Size can adapt to width but must never exceed maxSunburstSize
     const containerWidth = container.clientWidth || 800;
-    const size = Math.min(maxSunburstSize, containerWidth - 60); // 420px max height
+    const size = Math.min(maxSunburstSize, containerWidth - 60);
 
     const width = size;
     const height = size;
