@@ -14,15 +14,11 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
-    // CRITICAL: Container height is fixed at 480px
-    // Sunburst must NEVER exceed this height, regardless of width available
-    const containerHeight = 480; // Fixed container height from CSS
-    const maxSunburstSize = 210; // DIVIDED BY 2: was 420px, now 210px
+    // CRITICAL: Container height is fixed at 480px - sunburst must fit inside
+    const containerHeight = 480;
 
-    // Size can adapt to width but must never exceed maxSunburstSize
-    const containerWidth = container.clientWidth || 800;
-    const size = Math.min(maxSunburstSize, containerWidth - 60);
-
+    // Fixed size: 360px should fit in 480px container with margins
+    const size = 360;
     const width = size;
     const height = size;
     const radius = size / 2;
