@@ -743,8 +743,26 @@ h2, h3 {
 
 .filters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
+    align-items: end;
+}
+
+.filters-grid .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filters-grid .form-group label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.filters-grid select,
+.filters-grid .date-range-selector,
+.filters-grid .btn {
+    height: 44px;
 }
 
 /* Date Range Selector Button */
