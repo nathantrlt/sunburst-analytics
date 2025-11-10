@@ -36,7 +36,7 @@ function createSunburst(data) {
     // Create SVG
     const svgElement = d3.select('#sunburstChart')
         .append('svg')
-        .attr('width', '100%')
+        .attr('width', width)
         .attr('height', height)
         .attr('viewBox', `0 0 ${width} ${height}`)
         .style('display', 'block')
