@@ -14,14 +14,13 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
-    // CRITICAL: Container height is fixed at 480px - sunburst must fit inside
-    const containerHeight = 480;
-
-    // Fixed size: 360px should fit in 480px container with margins
-    const size = 360;
+    // TEST: Setting to 200px to verify changes are applied
+    const size = 200;
     const width = size;
     const height = size;
     const radius = size / 2;
+
+    console.log('SUNBURST SIZE:', size); // Debug log
 
     // Color function using category colors if available
     const getColor = (name) => {
