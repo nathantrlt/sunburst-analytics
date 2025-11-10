@@ -13,10 +13,12 @@ function createSunburst(data) {
     const container = document.getElementById('sunburstChart');
     container.innerHTML = '';
 
-    // Dimensions
-    const width = container.clientWidth || 800;
-    const height = 550;
-    const radius = Math.min(width, height) / 2;
+    // Dimensions - use square aspect ratio for proper sunburst display
+    const containerWidth = container.clientWidth || 800;
+    const size = Math.min(containerWidth, 600);
+    const width = size;
+    const height = size;
+    const radius = size / 2;
 
     // Color function using category colors if available
     const getColor = (name) => {
