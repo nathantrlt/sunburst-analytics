@@ -17,7 +17,7 @@ let currentFilters = {
     deviceType: null,
     trafficSource: null,
     category: null,
-    viewMode: 'url' // 'url' or 'category'
+    viewMode: 'category' // 'url' or 'category' - default to category
 };
 
 // Authentication

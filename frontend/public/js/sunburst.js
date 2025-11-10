@@ -14,8 +14,8 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
-    // Fixed size at 450px to fit nicely in 480px container
-    const size = 450;
+    // Fixed size at 470px to fit nicely in 480px container
+    const size = 470;
     const width = size;
     const height = size;
     const radius = size / 2;
