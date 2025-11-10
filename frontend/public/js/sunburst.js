@@ -14,9 +14,10 @@ function createSunburst(data) {
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
-    // Container is 480px high, we need the sunburst to fit entirely within it
+    // Container is 480px high, we need the sunburst circle to fit entirely within it
+    // Circle needs diameter + margins, so max 400px for the circle itself
     const containerWidth = container.clientWidth || 800;
-    const size = Math.min(containerWidth - 60, 440); // Leave margin for safety
+    const size = Math.min(containerWidth - 80, 400); // 400px max to fit in 480px container
     const width = size;
     const height = size;
     const radius = size / 2;
