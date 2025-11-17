@@ -2151,6 +2151,12 @@ body[data-theme="light"] .code-example pre {
     min-width: 300px;
 }
 
+.cartography-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 /* Responsive Cartography Header */
 @media (max-width: 768px) {
     .cartography-header {
