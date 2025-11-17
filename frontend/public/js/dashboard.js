@@ -1537,6 +1537,51 @@ function setupEventListeners() {
             sortPagesData(sortBy);
         });
     });
+
+    // Settings page event listeners
+    // Theme toggle
+    document.getElementById('lightThemeBtn').addEventListener('click', () => {
+        setTheme('light');
+    });
+
+    document.getElementById('darkThemeBtn').addEventListener('click', () => {
+        setTheme('dark');
+    });
+
+    // Copy snippet from settings
+    document.getElementById('copySettingsSnippetBtn').addEventListener('click', () => {
+        const snippet = document.getElementById('settingsTrackingSnippet').textContent;
+        navigator.clipboard.writeText(snippet);
+        alert('Code de suivi copié dans le presse-papiers !');
+    });
+
+    // Settings logout
+    document.getElementById('settingsLogoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/index.html';
+    });
+
+    // Settings manage collaborators
+    document.getElementById('settingsManageCollaboratorsBtn').addEventListener('click', () => {
+        document.getElementById('collaboratorsModal').style.display = 'flex';
+        document.getElementById('collaboratorError').style.display = 'none';
+        document.getElementById('collaboratorSuccess').style.display = 'none';
+        document.getElementById('addCollaboratorForm').reset();
+        loadCollaborators();
+    });
+
+    // Settings manage categories
+    document.getElementById('settingsManageCategoriesBtn').addEventListener('click', () => {
+        document.getElementById('categoriesModal').style.display = 'flex';
+        document.getElementById('categoryError').style.display = 'none';
+        document.getElementById('categorySuccess').style.display = 'none';
+        document.getElementById('addCategoryForm').reset();
+        loadCategories();
+    });
+
+    // Settings delete site
+    document.getElementById('settingsDeleteSiteBtn').addEventListener('click', handleDeleteSite);
 }
 
 // Handle add site
@@ -1808,14 +1853,68 @@ function initNavigation() {
                 document.getElementById('dashboardSection').style.display = 'block';
             } else if (section === 'cartographie') {
                 document.getElementById('cartographieSection').style.display = 'block';
+            } else if (section === 'parametres') {
+                document.getElementById('parametresSection').style.display = 'block';
+                loadSettingsPage();
             }
-            // TODO: Add other sections (documentation, parametres)
+            // TODO: Add documentation section
         });
     });
 }
 
+// Load settings page data
+function loadSettingsPage() {
+    // Load user info
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    document.getElementById('settingsUserName').textContent = user.name || '-';
+    document.getElementById('settingsUserEmail').textContent = user.email || '-';
+
+    // Update tracking snippet if a client is selected
+    if (currentClient) {
+        const snippet = generateSnippet(currentClient.api_key);
+        document.getElementById('settingsTrackingSnippet').textContent = snippet;
+        document.getElementById('copySettingsSnippetBtn').disabled = false;
+
+        // Show/hide management options based on access
+        const isOwner = currentClient.access_type === 'owner';
+        document.getElementById('siteSettingsCard').style.display = isOwner ? 'block' : 'none';
+        document.getElementById('dangerZoneCard').style.display = isOwner ? 'block' : 'none';
+    } else {
+        document.getElementById('settingsTrackingSnippet').textContent = 'Sélectionnez un site pour voir le code de suivi';
+        document.getElementById('copySettingsSnippetBtn').disabled = true;
+        document.getElementById('siteSettingsCard').style.display = 'none';
+        document.getElementById('dangerZoneCard').style.display = 'none';
+    }
+
+    // Update theme button states
+    updateThemeButtons();
+}
+
+// Theme Management
+function getTheme() {
+    return localStorage.getItem('theme') || 'light';
+}
+
+function setTheme(theme) {
+    localStorage.setItem('theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    updateThemeButtons();
+}
+
+function updateThemeButtons() {
+    const currentTheme = getTheme();
+    document.getElementById('lightThemeBtn').classList.toggle('active', currentTheme === 'light');
+    document.getElementById('darkThemeBtn').classList.toggle('active', currentTheme === 'dark');
+}
+
+function initTheme() {
+    const savedTheme = getTheme();
+    setTheme(savedTheme);
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initDashboard();
     initNavigation();
 });

@@ -1588,3 +1588,218 @@ h2, h3 {
     height: 42px;
     padding: 0 15px;
 }
+
+/* ==================== THEME SYSTEM ==================== */
+
+/* Light Theme */
+body[data-theme="light"] {
+    --bg-color: #f5f5f5;
+    --card-bg: #ffffff;
+    --text-primary: #0C090A;
+    --text-secondary: #666666;
+    --border-color: #e0e0e0;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body[data-theme="light"] .dashboard-header {
+    background: #ffffff;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+body[data-theme="light"] .navigation-sidebar {
+    background: #ffffff;
+    border-right: 2px solid var(--primary-color);
+}
+
+body[data-theme="light"] .nav-item:hover {
+    background: rgba(252, 209, 22, 0.1);
+}
+
+body[data-theme="light"] .nav-item.active {
+    background: rgba(252, 209, 22, 0.2);
+}
+
+body[data-theme="light"] h1,
+body[data-theme="light"] h2,
+body[data-theme="light"] h3 {
+    color: var(--text-primary);
+}
+
+body[data-theme="light"] .stat-card,
+body[data-theme="light"] .table-section,
+body[data-theme="light"] .visualization-section,
+body[data-theme="light"] .filters-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+body[data-theme="light"] input,
+body[data-theme="light"] select,
+body[data-theme="light"] textarea {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+body[data-theme="light"] .modal-content {
+    background: #ffffff;
+}
+
+/* ==================== SETTINGS PAGE ==================== */
+
+#parametresSection {
+    max-width: 900px;
+}
+
+#parametresSection h2 {
+    color: var(--primary-color);
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.settings-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+}
+
+.settings-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-card-header h3 {
+    color: var(--primary-color);
+    font-size: 20px;
+    margin: 0;
+}
+
+.settings-card-body {
+    padding: 24px;
+}
+
+.settings-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-item:first-child {
+    padding-top: 0;
+}
+
+.settings-item-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+.settings-item-value {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.settings-item-info {
+    flex: 1;
+}
+
+.settings-item-description {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+.theme-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #0C090A;
+}
+
+.theme-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Danger Zone */
+.danger-zone {
+    border-color: var(--danger-color);
+}
+
+.danger-zone .settings-card-header {
+    border-bottom-color: var(--danger-color);
+}
+
+.danger-zone .settings-card-header h3 {
+    color: var(--danger-color);
+}
+
+/* Code Block in Settings */
+.settings-card .code-block {
+    margin-top: 0;
+}
+
+/* Responsive Settings */
+@media (max-width: 768px) {
+    .settings-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .theme-toggle {
+        width: 100%;
+    }
+
+    .theme-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    #parametresSection h2 {
+        font-size: 24px;
+    }
+}
