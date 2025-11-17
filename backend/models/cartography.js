@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const { pool } = require('../config/database');
 
 const Cartography = {
     // Create a new cartography
@@ -8,7 +8,7 @@ const Cartography = {
             VALUES (?, ?, ?, ?, NOW())
         `;
 
-        const [result] = await db.execute(query, [
+        const [result] = await pool.execute(query, [
             clientId,
             name,
             description || null,
@@ -27,7 +27,7 @@ const Cartography = {
             ORDER BY created_at DESC
         `;
 
-        const [rows] = await db.execute(query, [clientId]);
+        const [rows] = await pool.execute(query, [clientId]);
 
         // Parse filters JSON for each cartography
         return rows.map(row => ({
@@ -44,7 +44,7 @@ const Cartography = {
             WHERE id = ? AND client_id = ?
         `;
 
-        const [rows] = await db.execute(query, [id, clientId]);
+        const [rows] = await pool.execute(query, [id, clientId]);
 
         if (rows.length === 0) {
             return null;
@@ -64,7 +64,7 @@ const Cartography = {
             WHERE id = ? AND client_id = ?
         `;
 
-        const [result] = await db.execute(query, [
+        const [result] = await pool.execute(query, [
             name,
             description || null,
             JSON.stringify(filters),
@@ -82,7 +82,7 @@ const Cartography = {
             WHERE id = ? AND client_id = ?
         `;
 
-        const [result] = await db.execute(query, [id, clientId]);
+        const [result] = await pool.execute(query, [id, clientId]);
 
         return result.affectedRows > 0;
     },
@@ -103,7 +103,7 @@ const Cartography = {
             )
         `;
 
-        await db.execute(query);
+        await pool.execute(query);
     }
 };
 
