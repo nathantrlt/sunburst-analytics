@@ -1772,6 +1772,7 @@ function setupCategorySortHandlers() {
 // Navigation menu handler
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
+    const filtersSection = document.querySelector('.filters-section');
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -1788,6 +1789,19 @@ function initNavigation() {
             document.querySelectorAll('.content-section').forEach(s => {
                 s.style.display = 'none';
             });
+
+            // Show/hide filters based on section
+            if (section === 'documentation' || section === 'parametres') {
+                // Hide filters for documentation and parametres sections
+                if (filtersSection) {
+                    filtersSection.style.display = 'none';
+                }
+            } else {
+                // Show filters for dashboard and cartographie sections
+                if (filtersSection) {
+                    filtersSection.style.display = 'block';
+                }
+            }
 
             // Show the selected section
             if (section === 'dashboard') {
