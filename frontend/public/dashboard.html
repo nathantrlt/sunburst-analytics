@@ -341,28 +341,10 @@
                                         <h5>Ajouter le code dans votre site</h5>
                                         <p>Ouvrez le fichier HTML de votre site et collez le code juste avant <code>&lt;/head&gt;</code> :</p>
                                         <div class="code-example">
-<pre>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;Mon Site&lt;/title&gt;
-
-    <span class="highlight">&lt;!-- Code de Suivi Sunburst Analytics --&gt;
-    &lt;script&gt;
-    (function() {
-      window.SUNBURST_API_KEY = 'votre_cle_api';
-      window.SUNBURST_ENDPOINT = 'https://...';
-
-      var script = document.createElement('script');
-      script.src = 'https://.../tracker.js';
-      script.async = true;
-      document.head.appendChild(script);
-    })();
-    &lt;/script&gt;</span>
-&lt;/head&gt;
-&lt;body&gt;
-    ...
-&lt;/body&gt;
-&lt;/html&gt;</pre>
+                                            <div class="code-block">
+                                                <pre id="docTrackingSnippetDirect">Sélectionnez un site pour voir le code de suivi</pre>
+                                                <button class="btn btn-secondary btn-small copy-snippet-btn" data-target="docTrackingSnippetDirect">Copier</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -396,17 +378,10 @@
                                         <h5>Coller le code de suivi</h5>
                                         <p>Collez votre code de suivi Sunburst dans le champ HTML :</p>
                                         <div class="code-example">
-<pre>&lt;script&gt;
-(function() {
-  window.SUNBURST_API_KEY = 'votre_cle_api';
-  window.SUNBURST_ENDPOINT = 'https://...';
-
-  var script = document.createElement('script');
-  script.src = 'https://.../tracker.js';
-  script.async = true;
-  document.head.appendChild(script);
-})();
-&lt;/script&gt;</pre>
+                                            <div class="code-block">
+                                                <pre id="docTrackingSnippetGTM">Sélectionnez un site pour voir le code de suivi</pre>
+                                                <button class="btn btn-secondary btn-small copy-snippet-btn" data-target="docTrackingSnippetGTM">Copier</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

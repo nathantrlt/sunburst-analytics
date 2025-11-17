@@ -193,6 +193,9 @@ async function selectClient(clientId) {
     // Load cartographies
     await window.cartographyModule.loadCartographies();
 
+    // Update tracking snippets everywhere
+    updateAllTrackingSnippets();
+
     // Load category filter options and analytics data
     await loadCategoryFilterOptions();
     await loadAnalytics();
@@ -1642,6 +1645,53 @@ function generateSnippet(apiKey) {
   document.head.appendChild(script);
 })();
 </script>`;
+}
+
+// Update all tracking snippets in the UI
+function updateAllTrackingSnippets() {
+    if (!currentClient) return;
+
+    const snippet = generateSnippet(currentClient.api_key);
+
+    // Update settings snippet
+    const settingsSnippet = document.getElementById('settingsTrackingSnippet');
+    if (settingsSnippet) {
+        settingsSnippet.textContent = snippet;
+    }
+
+    // Update documentation snippets
+    const docSnippetDirect = document.getElementById('docTrackingSnippetDirect');
+    if (docSnippetDirect) {
+        docSnippetDirect.textContent = snippet;
+    }
+
+    const docSnippetGTM = document.getElementById('docTrackingSnippetGTM');
+    if (docSnippetGTM) {
+        docSnippetGTM.textContent = snippet;
+    }
+
+    // Enable copy buttons
+    const copySettingsBtn = document.getElementById('copySettingsSnippetBtn');
+    if (copySettingsBtn) {
+        copySettingsBtn.disabled = false;
+    }
+
+    // Add copy functionality to all snippet copy buttons
+    document.querySelectorAll('.copy-snippet-btn').forEach(btn => {
+        btn.disabled = false;
+        btn.onclick = () => {
+            const targetId = btn.getAttribute('data-target');
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                navigator.clipboard.writeText(targetElement.textContent);
+                const originalText = btn.textContent;
+                btn.textContent = 'Copié !';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }
+        };
+    });
 }
 
 // Handle delete site
