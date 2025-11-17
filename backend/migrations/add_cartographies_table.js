@@ -1,11 +1,11 @@
-const db = require('../config/database');
+const { pool } = require('../config/database');
 
 async function migrate() {
     try {
         console.log('Running migration: add_cartographies_table');
 
         // Check if table already exists
-        const [tables] = await db.execute(`
+        const [tables] = await pool.execute(`
             SELECT COUNT(*) as count
             FROM information_schema.tables
             WHERE table_schema = DATABASE()
@@ -18,7 +18,7 @@ async function migrate() {
         }
 
         // Create cartographies table
-        await db.execute(`
+        await pool.execute(`
             CREATE TABLE cartographies (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 client_id INT NOT NULL,
