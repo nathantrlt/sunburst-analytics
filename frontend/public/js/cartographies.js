@@ -15,10 +15,47 @@ async function loadCartographies() {
     try {
         const data = await apiRequest(`/cartographies/${currentClient.id}`);
         cartographies = data.cartographies || [];
+
+        // If no cartographies exist, create a default one "Cartographie 1"
+        if (cartographies.length === 0) {
+            await createDefaultCartography();
+            // Reload after creating default
+            const reloadData = await apiRequest(`/cartographies/${currentClient.id}`);
+            cartographies = reloadData.cartographies || [];
+        }
+
         renderCartographiesList();
     } catch (error) {
         console.error('Failed to load cartographies:', error);
         cartographies = [];
+    }
+}
+
+// Create default cartography with current filters
+async function createDefaultCartography() {
+    try {
+        const defaultFilters = {
+            startDate: currentFilters.startDate || null,
+            endDate: currentFilters.endDate || null,
+            deviceType: currentFilters.deviceType || null,
+            trafficSource: currentFilters.trafficSource || null,
+            category: currentFilters.category || null,
+            depth: currentFilters.depth || 5,
+            viewMode: currentFilters.viewMode || 'category'
+        };
+
+        await apiRequest(`/cartographies/${currentClient.id}`, {
+            method: 'POST',
+            body: JSON.stringify({
+                name: 'Cartographie 1',
+                description: 'Cartographie par défaut',
+                filters: defaultFilters
+            })
+        });
+
+        console.log('Default cartography "Cartographie 1" created');
+    } catch (error) {
+        console.error('Failed to create default cartography:', error);
     }
 }
 
@@ -28,15 +65,19 @@ function renderCartographiesList() {
     const dropdown = document.getElementById('cartographySelectDropdown');
     const optionsContainer = dropdown.querySelector('.custom-select-options');
 
-    // Update button text
+    // Update button text - select first cartography by default if exists
     if (currentCartography) {
         buttonText.textContent = currentCartography.name;
+    } else if (cartographies.length > 0) {
+        // Auto-select first cartography
+        selectCartography(cartographies[0].id);
+        return; // Exit and let the selection re-render
     } else {
-        buttonText.textContent = cartographies.length === 0 ? 'Aucune cartographie' : 'Vue par défaut';
+        buttonText.textContent = 'Aucune cartographie';
     }
 
     // Build options
-    let optionsHTML = '<div class="custom-option" data-carto-id="default">Vue par défaut</div>';
+    let optionsHTML = '';
 
     cartographies.forEach(carto => {
         const isSelected = currentCartography && currentCartography.id === carto.id;
@@ -64,12 +105,8 @@ function renderCartographiesList() {
                 return;
             }
 
-            const cartoId = option.dataset.cartoId;
-            if (cartoId === 'default') {
-                selectCartography(null);
-            } else {
-                selectCartography(parseInt(cartoId));
-            }
+            const cartoId = parseInt(option.dataset.cartoId);
+            selectCartography(cartoId);
             closeCartographyDropdown();
         });
     });
@@ -77,35 +114,21 @@ function renderCartographiesList() {
 
 // Select a cartography and apply its filters
 async function selectCartography(cartoId) {
-    if (cartoId === null) {
-        // Reset to default view
-        currentCartography = null;
-        currentFilters = {
-            startDate: null,
-            endDate: null,
-            depth: 5,
-            deviceType: null,
-            trafficSource: null,
-            category: null,
-            viewMode: 'category'
-        };
-    } else {
-        const carto = cartographies.find(c => c.id === cartoId);
-        if (!carto) return;
+    const carto = cartographies.find(c => c.id === cartoId);
+    if (!carto) return;
 
-        currentCartography = carto;
+    currentCartography = carto;
 
-        // Apply cartography filters
-        currentFilters = {
-            startDate: carto.filters.startDate || null,
-            endDate: carto.filters.endDate || null,
-            depth: carto.filters.depth || 5,
-            deviceType: carto.filters.deviceType || null,
-            trafficSource: carto.filters.trafficSource || null,
-            category: carto.filters.category || null,
-            viewMode: carto.filters.viewMode || 'category'
-        };
-    }
+    // Apply cartography filters
+    currentFilters = {
+        startDate: carto.filters.startDate || null,
+        endDate: carto.filters.endDate || null,
+        depth: carto.filters.depth || 5,
+        deviceType: carto.filters.deviceType || null,
+        trafficSource: carto.filters.trafficSource || null,
+        category: carto.filters.category || null,
+        viewMode: carto.filters.viewMode || 'category'
+    };
 
     // Update UI
     renderCartographiesList();
