@@ -88,6 +88,50 @@ class Client {
       throw error;
     }
   }
+
+  // Check if user has access to a client (as owner or collaborator)
+  static async userHasAccess(userId, clientId) {
+    try {
+      // Check if user is owner
+      const [ownerRows] = await pool.query(
+        'SELECT COUNT(*) as count FROM clients WHERE id = ? AND user_id = ?',
+        [clientId, userId]
+      );
+      if (ownerRows[0].count > 0) return true;
+
+      // Check if user is collaborator
+      const [collabRows] = await pool.query(
+        'SELECT COUNT(*) as count FROM collaborators WHERE client_id = ? AND user_id = ?',
+        [clientId, userId]
+      );
+      return collabRows[0].count > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get user's access type for a client
+  static async getUserAccessType(userId, clientId) {
+    try {
+      // Check if user is owner
+      const [ownerRows] = await pool.query(
+        'SELECT COUNT(*) as count FROM clients WHERE id = ? AND user_id = ?',
+        [clientId, userId]
+      );
+      if (ownerRows[0].count > 0) return 'owner';
+
+      // Check if user is collaborator
+      const [collabRows] = await pool.query(
+        'SELECT access_type FROM collaborators WHERE client_id = ? AND user_id = ?',
+        [clientId, userId]
+      );
+      if (collabRows.length > 0) return collabRows[0].access_type;
+
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = Client;
