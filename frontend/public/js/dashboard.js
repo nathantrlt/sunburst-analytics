@@ -1853,11 +1853,12 @@ function initNavigation() {
                 document.getElementById('dashboardSection').style.display = 'block';
             } else if (section === 'cartographie') {
                 document.getElementById('cartographieSection').style.display = 'block';
+            } else if (section === 'documentation') {
+                document.getElementById('documentationSection').style.display = 'block';
             } else if (section === 'parametres') {
                 document.getElementById('parametresSection').style.display = 'block';
                 loadSettingsPage();
             }
-            // TODO: Add documentation section
         });
     });
 }

@@ -263,6 +263,418 @@
                     </div>
                 </div>
 
+                <!-- Documentation Section -->
+                <div id="documentationSection" class="content-section" style="display: none;">
+                    <h2>Documentation</h2>
+
+                    <!-- Table of Contents -->
+                    <div class="doc-toc">
+                        <h3>Sommaire</h3>
+                        <ul>
+                            <li><a href="#doc-snippet">1. Installation du Code de Suivi</a></li>
+                            <li><a href="#doc-categories">2. Créer et Gérer des Catégories</a></li>
+                            <li><a href="#doc-collaborators">3. Gestion des Collaborateurs</a></li>
+                            <li><a href="#doc-analytics">4. Comprendre les Analytics</a></li>
+                            <li><a href="#doc-sunburst">5. Visualisation Sunburst</a></li>
+                            <li><a href="#doc-faq">6. FAQ</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- 1. Installation du Snippet -->
+                    <div class="doc-section" id="doc-snippet">
+                        <h3>1. Installation du Code de Suivi</h3>
+
+                        <p class="doc-intro">Le code de suivi permet à Sunburst Analytics de collecter les données de navigation de vos visiteurs. Voici deux méthodes d'installation.</p>
+
+                        <div class="doc-subsection">
+                            <h4>Méthode 1 : Installation Directe (Recommandée)</h4>
+                            <p>Ajoutez le code de suivi directement dans votre site web, <strong>juste avant la balise <code>&lt;/head&gt;</code></strong> de toutes vos pages.</p>
+
+                            <div class="doc-steps">
+                                <div class="doc-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5>Récupérer votre code de suivi</h5>
+                                        <p>Allez dans <strong>Paramètres</strong> ou cliquez sur <strong>"Voir le Code de Suivi"</strong> depuis le dashboard, puis copiez le code fourni.</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5>Ajouter le code dans votre site</h5>
+                                        <p>Ouvrez le fichier HTML de votre site et collez le code juste avant <code>&lt;/head&gt;</code> :</p>
+                                        <div class="code-example">
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Mon Site&lt;/title&gt;
+
+    <span class="highlight">&lt;!-- Code de Suivi Sunburst Analytics --&gt;
+    &lt;script&gt;
+    (function() {
+      window.SUNBURST_API_KEY = 'votre_cle_api';
+      window.SUNBURST_ENDPOINT = 'https://...';
+
+      var script = document.createElement('script');
+      script.src = 'https://.../tracker.js';
+      script.async = true;
+      document.head.appendChild(script);
+    })();
+    &lt;/script&gt;</span>
+&lt;/head&gt;
+&lt;body&gt;
+    ...
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5>Vérifier l'installation</h5>
+                                        <p>Visitez votre site et vérifiez dans le dashboard que les données commencent à apparaître (peut prendre quelques minutes).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Méthode 2 : Installation via Google Tag Manager (GTM)</h4>
+                            <p>Si vous utilisez déjà Google Tag Manager, vous pouvez installer le tracker via un tag personnalisé.</p>
+
+                            <div class="doc-steps">
+                                <div class="doc-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5>Créer un nouveau tag</h5>
+                                        <p>Dans GTM, allez dans <strong>Balises → Nouveau → Configuration de la balise → HTML personnalisé</strong></p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5>Coller le code de suivi</h5>
+                                        <p>Collez votre code de suivi Sunburst dans le champ HTML :</p>
+                                        <div class="code-example">
+<pre>&lt;script&gt;
+(function() {
+  window.SUNBURST_API_KEY = 'votre_cle_api';
+  window.SUNBURST_ENDPOINT = 'https://...';
+
+  var script = document.createElement('script');
+  script.src = 'https://.../tracker.js';
+  script.async = true;
+  document.head.appendChild(script);
+})();
+&lt;/script&gt;</pre>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5>Configurer le déclencheur</h5>
+                                        <p>Dans <strong>Déclenchement</strong>, sélectionnez <strong>"Toutes les pages"</strong> pour tracker toutes les visites.</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h5>Nommer et publier</h5>
+                                        <p>Nommez votre tag (ex: "Sunburst Analytics"), sauvegardez et <strong>publiez</strong> le conteneur GTM.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="doc-note info">
+                            <strong>💡 Astuce :</strong> Le tracker fonctionne automatiquement avec les Single Page Applications (SPA) comme React, Vue, Angular.
+                        </div>
+                    </div>
+
+                    <!-- 2. Créer des Catégories -->
+                    <div class="doc-section" id="doc-categories">
+                        <h3>2. Créer et Gérer des Catégories</h3>
+
+                        <p class="doc-intro">Les catégories permettent d'organiser vos pages par type de contenu pour une meilleure analyse.</p>
+
+                        <div class="doc-subsection">
+                            <h4>Accéder à la gestion des catégories</h4>
+                            <p>Cliquez sur <strong>"Gérer les Catégories"</strong> depuis le dashboard ou depuis les Paramètres.</p>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Types de règles de catégorisation</h4>
+
+                            <h5>Règles basées sur l'URL</h5>
+                            <ul class="doc-list">
+                                <li><strong>L'URL contient</strong> : Si l'URL contient "/blog", catégoriser comme "Article"</li>
+                                <li><strong>L'URL commence par</strong> : Si l'URL commence par "/produit/", catégoriser comme "Produit"</li>
+                                <li><strong>L'URL se termine par</strong> : Si l'URL se termine par ".pdf", catégoriser comme "Document"</li>
+                                <li><strong>L'URL est égale à</strong> : Pour une page spécifique exacte</li>
+                                <li><strong>Expression régulière</strong> : Pour des règles complexes (ex: <code>/blog/[0-9]+</code>)</li>
+                            </ul>
+
+                            <h5>Règles basées sur les métriques</h5>
+                            <ul class="doc-list">
+                                <li><strong>Nombre de vues &gt; que</strong> : Pages populaires (ex: &gt; 1000 vues = "Populaire")</li>
+                                <li><strong>Position moyenne &gt; que</strong> : Pages en fin de parcours (ex: &gt; 5 = "Conversion")</li>
+                                <li><strong>Temps moyen &gt; que</strong> : Pages engageantes (ex: &gt; 120s = "Contenu Long")</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Créer une catégorie simple</h4>
+                            <div class="doc-steps">
+                                <div class="doc-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h5>Nom de la catégorie</h5>
+                                        <p>Donnez un nom descriptif (ex: "Articles", "Produits", "Page d'accueil")</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h5>Type de condition</h5>
+                                        <p>Sélectionnez le type de règle (ex: "L'URL contient")</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h5>Valeur de la condition</h5>
+                                        <p>Entrez la valeur (ex: "/blog")</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h5>Priorité</h5>
+                                        <p>Définissez la priorité (0-100). Les priorités plus élevées sont vérifiées en premier.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Créer une catégorie avec conditions multiples</h4>
+                            <p>Activez le <strong>Mode Avancé</strong> pour combiner plusieurs conditions avec ET/OU.</p>
+
+                            <div class="doc-example">
+                                <strong>Exemple :</strong> Catégorie "Article Populaire"
+                                <ul>
+                                    <li>L'URL contient "/blog" <strong>ET</strong></li>
+                                    <li>Nombre de vues &gt; 500</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="doc-note warning">
+                            <strong>⚠️ Important :</strong> Les catégories sont vérifiées par ordre de priorité. Une page correspond à la première catégorie dont elle remplit les conditions.
+                        </div>
+                    </div>
+
+                    <!-- 3. Gestion des Collaborateurs -->
+                    <div class="doc-section" id="doc-collaborators">
+                        <h3>3. Gestion des Collaborateurs</h3>
+
+                        <p class="doc-intro">Invitez des membres de votre équipe à accéder à vos analytics.</p>
+
+                        <div class="doc-subsection">
+                            <h4>Rôles disponibles</h4>
+                            <div class="role-cards">
+                                <div class="role-card">
+                                    <h5>👑 Propriétaire (Owner)</h5>
+                                    <ul>
+                                        <li>Tous les droits</li>
+                                        <li>Gérer les collaborateurs</li>
+                                        <li>Gérer les catégories</li>
+                                        <li>Supprimer le site</li>
+                                    </ul>
+                                </div>
+
+                                <div class="role-card">
+                                    <h5>✏️ Éditeur (Editor)</h5>
+                                    <ul>
+                                        <li>Voir les analytics</li>
+                                        <li>Gérer les catégories</li>
+                                        <li>Voir le code de suivi</li>
+                                    </ul>
+                                </div>
+
+                                <div class="role-card">
+                                    <h5>👁️ Lecteur (Viewer)</h5>
+                                    <ul>
+                                        <li>Voir les analytics uniquement</li>
+                                        <li>Aucune modification</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Ajouter un collaborateur</h4>
+                            <div class="doc-steps">
+                                <div class="doc-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <p>Cliquez sur <strong>"Gérer les Collaborateurs"</strong></p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <p>Entrez l'adresse email du collaborateur (il doit avoir un compte Sunburst)</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <p>Sélectionnez le rôle (Lecteur ou Éditeur)</p>
+                                    </div>
+                                </div>
+
+                                <div class="doc-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <p>Cliquez sur <strong>"Ajouter"</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Comprendre les Analytics -->
+                    <div class="doc-section" id="doc-analytics">
+                        <h3>4. Comprendre les Analytics</h3>
+
+                        <div class="doc-subsection">
+                            <h4>Statistiques principales</h4>
+                            <ul class="doc-list">
+                                <li><strong>Pages Vues Totales</strong> : Nombre total de pages consultées</li>
+                                <li><strong>Utilisateurs Uniques</strong> : Nombre de visiteurs différents</li>
+                                <li><strong>Pages/Session Moy.</strong> : Nombre moyen de pages vues par visite</li>
+                                <li><strong>Temps Moy.</strong> : Durée moyenne passée sur une page (en secondes)</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Tableau des pages</h4>
+                            <p>Le tableau affiche pour chaque page :</p>
+                            <ul class="doc-list">
+                                <li><strong>URL</strong> : L'adresse de la page</li>
+                                <li><strong>Titre</strong> : Le titre de la page</li>
+                                <li><strong>Vues Totales</strong> : Nombre de fois où la page a été vue</li>
+                                <li><strong>Profondeur Moy.</strong> : Position moyenne de la page dans le parcours (1 = page d'entrée)</li>
+                                <li><strong>Temps Moy.</strong> : Temps moyen passé sur cette page</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Utiliser les filtres</h4>
+                            <p>Affinez vos analyses avec les filtres disponibles :</p>
+                            <ul class="doc-list">
+                                <li><strong>Période</strong> : Analysez une plage de dates spécifique</li>
+                                <li><strong>Type d'appareil</strong> : Desktop, Mobile ou Tablet</li>
+                                <li><strong>Source de trafic</strong> : Direct, Moteurs de recherche, Réseaux sociaux, Sites référents</li>
+                                <li><strong>Catégorie</strong> : Filtrer par catégorie de pages</li>
+                                <li><strong>Profondeur du parcours</strong> : Nombre de pages à afficher dans le sunburst</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 5. Visualisation Sunburst -->
+                    <div class="doc-section" id="doc-sunburst">
+                        <h3>5. Visualisation Sunburst</h3>
+
+                        <p class="doc-intro">Le diagramme Sunburst permet de visualiser les parcours utilisateurs de manière intuitive.</p>
+
+                        <div class="doc-subsection">
+                            <h4>Comment lire le Sunburst</h4>
+                            <ul class="doc-list">
+                                <li><strong>Centre</strong> : Point de départ (pages d'entrée)</li>
+                                <li><strong>Anneaux intérieurs</strong> : Premières pages du parcours</li>
+                                <li><strong>Anneaux extérieurs</strong> : Pages plus avancées dans le parcours</li>
+                                <li><strong>Taille des segments</strong> : Proportionnelle au nombre de vues</li>
+                                <li><strong>Couleurs</strong> : Représentent différentes catégories ou chemins</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Interactions</h4>
+                            <ul class="doc-list">
+                                <li><strong>Survoler</strong> : Affiche les détails de la page (nom, nombre de vues)</li>
+                                <li><strong>Cliquer</strong> : Zoome sur ce chemin spécifique</li>
+                                <li><strong>Cliquer au centre</strong> : Revenir à la vue complète</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-subsection">
+                            <h4>Modes d'affichage</h4>
+                            <ul class="doc-list">
+                                <li><strong>Par URL</strong> : Affiche les URLs exactes des pages</li>
+                                <li><strong>Par Catégorie</strong> : Regroupe les pages par catégorie pour une vue d'ensemble</li>
+                            </ul>
+                        </div>
+
+                        <div class="doc-note info">
+                            <strong>💡 Astuce :</strong> Utilisez la vue "Par Catégorie" pour identifier les parcours types, et "Par URL" pour analyser en détail.
+                        </div>
+                    </div>
+
+                    <!-- 6. FAQ -->
+                    <div class="doc-section" id="doc-faq">
+                        <h3>6. Questions Fréquentes (FAQ)</h3>
+
+                        <div class="faq-item">
+                            <h4>Le tracker fonctionne-t-il avec les SPA (Single Page Applications) ?</h4>
+                            <p>Oui ! Le tracker détecte automatiquement les changements d'URL et enregistre les nouvelles pages visitées, même sans rechargement complet.</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Les données sont-elles en temps réel ?</h4>
+                            <p>Les données peuvent prendre quelques minutes pour apparaître dans le dashboard. Rafraîchissez la page pour voir les dernières mises à jour.</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Puis-je tracker plusieurs sites avec un seul compte ?</h4>
+                            <p>Oui ! Cliquez sur "Ajouter un Nouveau Site" depuis le sélecteur de sites en haut. Chaque site a sa propre clé API.</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Comment supprimer une catégorie ?</h4>
+                            <p>Dans la gestion des catégories, cliquez sur le bouton "Retirer" à côté de la catégorie. Les pages concernées seront reclassées comme "Non catégorisé".</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Les utilisateurs sont-ils identifiés de manière unique ?</h4>
+                            <p>Oui, le tracker génère un identifiant unique anonyme pour chaque visiteur, stocké dans le localStorage du navigateur.</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Le tracker impacte-t-il les performances de mon site ?</h4>
+                            <p>Non. Le script se charge de manière asynchrone et n'impacte pas le temps de chargement de vos pages.</p>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Puis-je exporter les données ?</h4>
+                            <p>Actuellement, l'export de données n'est pas disponible, mais cette fonctionnalité est prévue dans une prochaine mise à jour.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Parametres Section -->
                 <div id="parametresSection" class="content-section" style="display: none;">
                     <h2>Paramètres</h2>
