@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 const Cartography = require('../models/cartography');
 const Client = require('../models/client');
 
 // Get all cartographies for a client
-router.get('/:clientId', authMiddleware, async (req, res) => {
+router.get('/:clientId', authenticateToken, async (req, res) => {
     try {
         const { clientId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         // Check if user has access to this client
         const hasAccess = await Client.userHasAccess(userId, clientId);
@@ -26,10 +26,10 @@ router.get('/:clientId', authMiddleware, async (req, res) => {
 });
 
 // Get a specific cartography
-router.get('/:clientId/:cartographyId', authMiddleware, async (req, res) => {
+router.get('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
     try {
         const { clientId, cartographyId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         // Check if user has access to this client
         const hasAccess = await Client.userHasAccess(userId, clientId);
@@ -51,10 +51,10 @@ router.get('/:clientId/:cartographyId', authMiddleware, async (req, res) => {
 });
 
 // Create a new cartography
-router.post('/:clientId', authMiddleware, async (req, res) => {
+router.post('/:clientId', authenticateToken, async (req, res) => {
     try {
         const { clientId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId;
         const { name, description, filters } = req.body;
 
         // Validate input
@@ -92,10 +92,10 @@ router.post('/:clientId', authMiddleware, async (req, res) => {
 });
 
 // Update a cartography
-router.put('/:clientId/:cartographyId', authMiddleware, async (req, res) => {
+router.put('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
     try {
         const { clientId, cartographyId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId;
         const { name, description, filters } = req.body;
 
         // Validate input
@@ -138,10 +138,10 @@ router.put('/:clientId/:cartographyId', authMiddleware, async (req, res) => {
 });
 
 // Delete a cartography
-router.delete('/:clientId/:cartographyId', authMiddleware, async (req, res) => {
+router.delete('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
     try {
         const { clientId, cartographyId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         // Check if user has access (must be owner or editor)
         const accessType = await Client.getUserAccessType(userId, clientId);
