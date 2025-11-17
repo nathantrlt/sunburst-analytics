@@ -359,6 +359,15 @@ function setupCartographyEventListeners() {
     // Create button
     document.getElementById('createCartographyBtn').addEventListener('click', openCreateCartographyModal);
 
+    // Edit current cartography button
+    document.getElementById('editCurrentCartographyBtn').addEventListener('click', () => {
+        if (currentCartography) {
+            openEditCartographyModal(currentCartography.id);
+        } else {
+            alert('Aucune cartographie sélectionnée');
+        }
+    });
+
     // Close modal
     document.getElementById('closeCartographyModal').addEventListener('click', () => {
         document.getElementById('cartographyModal').style.display = 'none';
