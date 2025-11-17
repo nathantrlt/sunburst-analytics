@@ -8,12 +8,14 @@ const { testConnection, initDatabase } = require('./config/database');
 const { migrate: migrateMetricCategories } = require('./migrations/add_metric_categories');
 const { migrate: migrateMultiConditions } = require('./migrations/add_multi_conditions');
 const { migrate: migrateAllowNullConditions } = require('./migrations/allow_null_legacy_conditions');
+const { migrate: migrateCartographies } = require('./migrations/add_cartographies_table');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
 const analyticsRoutes = require('./routes/analytics');
 const collaboratorRoutes = require('./routes/collaborators');
 const pageCategoryRoutes = require('./routes/pageCategories');
+const cartographyRoutes = require('./routes/cartographies');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,6 +56,7 @@ app.use('/api/track', trackingRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/collaborators', collaboratorRoutes);
 app.use('/api/page-categories', pageCategoryRoutes);
+app.use('/api/cartographies', cartographyRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -93,6 +96,7 @@ const startServer = async () => {
     await migrateMetricCategories();
     await migrateMultiConditions();
     await migrateAllowNullConditions();
+    await migrateCartographies();
 
     // Start listening
     app.listen(PORT, () => {

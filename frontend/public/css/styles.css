@@ -2121,3 +2121,55 @@ body[data-theme="light"] .code-example pre {
         padding: 12px;
     }
 }
+
+/* ==================== CARTOGRAPHY SELECTOR ==================== */
+
+.cartography-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.cartography-selector-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cartography-selector-wrapper label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.cartography-select .custom-select-button {
+    min-width: 300px;
+}
+
+/* Responsive Cartography Header */
+@media (max-width: 768px) {
+    .cartography-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .cartography-selector-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cartography-select .custom-select-button {
+        min-width: 100%;
+    }
+
+    #createCartographyBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}

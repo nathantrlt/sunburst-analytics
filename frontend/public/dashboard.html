@@ -212,6 +212,33 @@
 
                 <!-- Cartographie Section -->
                 <div id="cartographieSection" class="content-section" style="display: none;">
+                    <!-- Cartography Header with Selector -->
+                    <div class="cartography-header">
+                        <div class="cartography-selector-wrapper">
+                            <label for="cartographySelect">Cartographie :</label>
+                            <div class="custom-select-wrapper cartography-select">
+                                <div id="cartographySelectButton" class="custom-select-button">
+                                    <span id="selectedCartographyText">Chargement...</span>
+                                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12">
+                                        <path fill="#FCD116" d="M6 9L1 4h10z"/>
+                                    </svg>
+                                </div>
+                                <div id="cartographySelectDropdown" class="custom-select-dropdown" style="display: none;">
+                                    <div class="custom-select-options">
+                                        <div class="custom-option loading">Chargement...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="createCartographyBtn" class="btn btn-primary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Créer une Cartographie
+                        </button>
+                    </div>
+
                     <!-- Sunburst Visualization -->
                     <div class="visualization-section">
                         <h3>Visualisation du Parcours Utilisateur</h3>
@@ -1082,6 +1109,113 @@
         </div>
     </div>
 
+    <!-- Create/Edit Cartography Modal -->
+    <div id="cartographyModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="cartographyModalTitle">Créer une Cartographie</h2>
+                <button class="modal-close" id="closeCartographyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cartographyError" class="error-message" style="display: none;"></div>
+                <div id="cartographySuccess" class="success-message" style="display: none;"></div>
+
+                <form id="cartographyForm">
+                    <div class="form-group">
+                        <label for="cartographyName">Nom de la Cartographie *</label>
+                        <input type="text" id="cartographyName" required placeholder="Ma cartographie personnalisée">
+                        <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                            Donnez un nom descriptif (ex: "Mobile uniquement", "Trafic organique")
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cartographyDescription">Description (optionnel)</label>
+                        <textarea id="cartographyDescription" rows="3" placeholder="Décrivez l'objectif de cette cartographie..."></textarea>
+                    </div>
+
+                    <h4 style="margin: 24px 0 16px 0; color: var(--primary-color);">Filtres de la Cartographie</h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
+                        Configurez les filtres qui seront automatiquement appliqués lorsque vous sélectionnez cette cartographie.
+                    </p>
+
+                    <!-- Date Range -->
+                    <div class="form-group">
+                        <label>Période</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="date" id="cartoStartDate" placeholder="Date de début">
+                            <input type="date" id="cartoEndDate" placeholder="Date de fin">
+                        </div>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                            Laissez vide pour toutes les dates
+                        </small>
+                    </div>
+
+                    <!-- Device Type -->
+                    <div class="form-group">
+                        <label for="cartoDeviceFilter">Type d'Appareil</label>
+                        <select id="cartoDeviceFilter">
+                            <option value="">Tous les appareils</option>
+                            <option value="desktop">Desktop</option>
+                            <option value="mobile">Mobile</option>
+                            <option value="tablet">Tablet</option>
+                        </select>
+                    </div>
+
+                    <!-- Traffic Source -->
+                    <div class="form-group">
+                        <label for="cartoTrafficSourceFilter">Source de Trafic</label>
+                        <select id="cartoTrafficSourceFilter">
+                            <option value="">Toutes les sources</option>
+                            <option value="direct">Direct</option>
+                            <option value="search">Moteurs de recherche</option>
+                            <option value="social">Réseaux sociaux</option>
+                            <option value="referral">Sites référents</option>
+                        </select>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group">
+                        <label for="cartoCategoryFilter">Catégorie de Page</label>
+                        <select id="cartoCategoryFilter">
+                            <option value="">Toutes les catégories</option>
+                        </select>
+                    </div>
+
+                    <!-- Depth -->
+                    <div class="form-group">
+                        <label for="cartoDepthSelect">Profondeur du Parcours</label>
+                        <select id="cartoDepthSelect">
+                            <option value="3">3 pages</option>
+                            <option value="5" selected>5 pages</option>
+                            <option value="7">7 pages</option>
+                            <option value="10">10 pages</option>
+                        </select>
+                    </div>
+
+                    <!-- View Mode -->
+                    <div class="form-group">
+                        <label for="cartoViewMode">Mode d'Affichage</label>
+                        <select id="cartoViewMode">
+                            <option value="category">Par Catégorie</option>
+                            <option value="url">Par URL</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;" id="saveCartographyBtn">
+                            <span class="btn-text">Créer la Cartographie</span>
+                            <span class="btn-loader" style="display: none;">Création...</span>
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deleteCartographyBtn" style="display: none;">
+                            Supprimer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Date Range Picker Modal -->
     <div id="dateRangeModal" class="date-range-modal" style="display: none;">
         <div class="date-range-modal-content">
@@ -1120,6 +1254,7 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+    <script src="js/cartographies.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/sunburst.js"></script>
 </body>

@@ -190,6 +190,9 @@ async function selectClient(clientId) {
     document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
     document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
 
+    // Load cartographies
+    await window.cartographyModule.loadCartographies();
+
     // Load category filter options and analytics data
     await loadCategoryFilterOptions();
     await loadAnalytics();
@@ -1918,4 +1921,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initDashboard();
     initNavigation();
+    window.cartographyModule.setupCartographyEventListeners();
 });
