@@ -29,11 +29,8 @@ const Cartography = {
 
         const [rows] = await pool.execute(query, [clientId]);
 
-        // Parse filters JSON for each cartography
-        return rows.map(row => ({
-            ...row,
-            filters: JSON.parse(row.filters)
-        }));
+        // Filters are already parsed by MySQL JSON column type
+        return rows;
     },
 
     // Get a specific cartography
@@ -50,10 +47,8 @@ const Cartography = {
             return null;
         }
 
-        return {
-            ...rows[0],
-            filters: JSON.parse(rows[0].filters)
-        };
+        // Filters are already parsed by MySQL JSON column type
+        return rows[0];
     },
 
     // Update a cartography
