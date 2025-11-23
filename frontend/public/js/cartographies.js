@@ -142,6 +142,11 @@ async function selectCartography(cartoId) {
         document.getElementById('viewByUrlBtn').classList.remove('active');
     }
 
+    // Reload category filter options for this cartography
+    if (typeof loadCategoryFilterOptions === 'function') {
+        await loadCategoryFilterOptions();
+    }
+
     // Reload analytics with new filters
     await loadSunburstData();
 }

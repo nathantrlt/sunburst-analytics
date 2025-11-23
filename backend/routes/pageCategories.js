@@ -21,6 +21,7 @@ async function isOwnerOrEditor(clientId, userId) {
 router.get('/:clientId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
+    const cartographyId = req.query.cartographyId ? parseInt(req.query.cartographyId) : null;
 
     if (isNaN(clientId)) {
       return res.status(400).json({ error: 'Invalid client ID' });
@@ -32,7 +33,14 @@ router.get('/:clientId', async (req, res) => {
       return res.status(403).json({ error: 'Only owners and editors can manage categories' });
     }
 
-    const categories = await PageCategory.findByClientId(clientId);
+    // If cartographyId is provided, get categories for that specific cartography
+    let categories;
+    if (cartographyId) {
+      categories = await PageCategory.findByCartographyId(cartographyId);
+    } else {
+      categories = await PageCategory.findByClientId(clientId);
+    }
+
     res.json({ categories });
   } catch (error) {
     console.error('Get categories error:', error);
@@ -44,7 +52,7 @@ router.get('/:clientId', async (req, res) => {
 router.post('/:clientId', async (req, res) => {
   try {
     const clientId = parseInt(req.params.clientId);
-    const { name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson } = req.body;
+    const { name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJson, cartographyId } = req.body;
 
     console.log('Create category request:', { name, conditionType, conditionValue, priority, conditionsJson });
 
@@ -101,7 +109,8 @@ router.post('/:clientId', async (req, res) => {
       conditionValue || null,
       priority || 0,
       conditionPeriodDays || null,
-      conditionsJson || null
+      conditionsJson || null,
+      cartographyId || null
     );
 
     res.status(201).json({

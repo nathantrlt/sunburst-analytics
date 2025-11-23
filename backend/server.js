@@ -9,6 +9,7 @@ const { migrate: migrateMetricCategories } = require('./migrations/add_metric_ca
 const { migrate: migrateMultiConditions } = require('./migrations/add_multi_conditions');
 const { migrate: migrateAllowNullConditions } = require('./migrations/allow_null_legacy_conditions');
 const { migrate: migrateCartographies } = require('./migrations/add_cartographies_table');
+const { migrate: migrateCartographyCategories } = require('./migrations/add_cartography_to_categories');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
 const trackingRoutes = require('./routes/tracking');
@@ -97,6 +98,7 @@ const startServer = async () => {
     await migrateMultiConditions();
     await migrateAllowNullConditions();
     await migrateCartographies();
+    await migrateCartographyCategories();
 
     // Start listening
     app.listen(PORT, () => {

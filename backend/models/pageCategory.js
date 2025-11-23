@@ -2,7 +2,7 @@ const { pool } = require('../config/database');
 
 class PageCategory {
   // Create a new category rule
-  static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null, conditionsJson = null) {
+  static async create(clientId, name, conditionType, conditionValue, priority = 0, conditionPeriodDays = null, conditionsJson = null, cartographyId = null) {
     try {
       // Ensure conditionsJson is properly stringified
       let conditionsJsonStr = null;
@@ -11,8 +11,8 @@ class PageCategory {
       }
 
       const [result] = await pool.query(
-        'INSERT INTO page_categories (client_id, name, condition_type, condition_value, priority, condition_period_days, conditions_json) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [clientId, name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJsonStr]
+        'INSERT INTO page_categories (client_id, cartography_id, name, condition_type, condition_value, priority, condition_period_days, conditions_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [clientId, cartographyId, name, conditionType, conditionValue, priority, conditionPeriodDays, conditionsJsonStr]
       );
       return result.insertId;
     } catch (error) {
@@ -21,12 +21,25 @@ class PageCategory {
     }
   }
 
-  // Get all category rules for a client
+  // Get all category rules for a client (legacy - without cartography filter)
   static async findByClientId(clientId) {
     try {
       const [rows] = await pool.query(
         'SELECT * FROM page_categories WHERE client_id = ? ORDER BY priority DESC, id ASC',
         [clientId]
+      );
+      return rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get all category rules for a specific cartography
+  static async findByCartographyId(cartographyId) {
+    try {
+      const [rows] = await pool.query(
+        'SELECT * FROM page_categories WHERE cartography_id = ? ORDER BY priority DESC, id ASC',
+        [cartographyId]
       );
       return rows;
     } catch (error) {
@@ -299,11 +312,16 @@ class PageCategory {
     }
   }
 
-  // Get category statistics for a client
+  // Get category statistics for a client (with optional cartography filter)
   static async getCategoryStats(clientId, filters = {}) {
     try {
-      // First get all rules
-      const rules = await this.findByClientId(clientId);
+      // First get all rules - use cartography-specific rules if cartographyId is provided
+      let rules;
+      if (filters.cartographyId) {
+        rules = await this.findByCartographyId(filters.cartographyId);
+      } else {
+        rules = await this.findByClientId(clientId);
+      }
 
       // Then get all pageviews
       let query = `

@@ -73,6 +73,7 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
     const filters = extractFilters(req.query);
     const maxDepth = parseInt(req.query.depth) || 5;
     const viewMode = req.query.viewMode || 'url'; // 'url' or 'category'
+    const cartographyId = req.query.cartographyId ? parseInt(req.query.cartographyId) : null;
 
     if (maxDepth < 1 || maxDepth > 20) {
       return res.status(400).json({ error: 'Depth must be between 1 and 20' });
@@ -84,10 +85,14 @@ router.get('/sunburst/:clientId', verifyClientAccess, async (req, res) => {
       filters
     );
 
-    // Load categories if needed
+    // Load categories if needed - use cartography-specific categories if cartographyId is provided
     let categories = [];
     if (viewMode === 'category') {
-      categories = await PageCategory.findByClientId(req.clientId);
+      if (cartographyId) {
+        categories = await PageCategory.findByCartographyId(cartographyId);
+      } else {
+        categories = await PageCategory.findByClientId(req.clientId);
+      }
     }
 
     // Transform data into hierarchical structure for sunburst
@@ -130,6 +135,11 @@ router.get('/page-positions/:clientId', verifyClientAccess, async (req, res) => 
 router.get('/category-stats/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const filters = extractFilters(req.query);
+
+    // Add cartographyId to filters if provided
+    if (req.query.cartographyId) {
+      filters.cartographyId = parseInt(req.query.cartographyId);
+    }
 
     const categoryStats = await PageCategory.getCategoryStats(
       req.clientId,

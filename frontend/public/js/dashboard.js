@@ -225,20 +225,30 @@ function buildFilterParams() {
     return params;
 }
 
-// Build filter params for sunburst (includes depth and viewMode)
+// Build filter params for sunburst (includes depth, viewMode and cartographyId)
 function buildSunburstParams() {
     const params = buildFilterParams();
     params.append('depth', currentFilters.depth);
     params.append('viewMode', currentFilters.viewMode);
+    // Add cartographyId if a cartography is selected
+    if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+        params.append('cartographyId', currentCartography.id);
+    }
     return params;
 }
 
-// Load categories for filter dropdown
+// Load categories for filter dropdown (based on current cartography)
 async function loadCategoryFilterOptions() {
     if (!currentClient) return;
 
     try {
-        const data = await apiRequest(`/page-categories/${currentClient.id}`);
+        // Build URL with cartographyId if available
+        let url = `/page-categories/${currentClient.id}`;
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            url += `?cartographyId=${currentCartography.id}`;
+        }
+
+        const data = await apiRequest(url);
         const select = document.getElementById('categoryFilter');
 
         // Clear existing options except first
@@ -595,7 +605,13 @@ async function loadCategories() {
     if (!currentClient) return;
 
     try {
-        const data = await apiRequest(`/page-categories/${currentClient.id}`);
+        // Build URL with cartographyId if available
+        let url = `/page-categories/${currentClient.id}`;
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            url += `?cartographyId=${currentCartography.id}`;
+        }
+
+        const data = await apiRequest(url);
         renderCategoriesList(data.categories);
     } catch (error) {
         console.error('Failed to load categories:', error);
@@ -961,7 +977,8 @@ async function handleAddCategory(e) {
             requestBody = {
                 name,
                 priority,
-                conditionsJson
+                conditionsJson,
+                cartographyId: (typeof currentCartography !== 'undefined' && currentCartography) ? currentCartography.id : null
             };
         } else {
             // Use legacy single condition
@@ -976,7 +993,8 @@ async function handleAddCategory(e) {
                 conditionType,
                 conditionValue,
                 priority,
-                conditionPeriodDays
+                conditionPeriodDays,
+                cartographyId: (typeof currentCartography !== 'undefined' && currentCartography) ? currentCartography.id : null
             };
         }
 
