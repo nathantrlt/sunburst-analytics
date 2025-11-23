@@ -406,9 +406,15 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
 router.get('/category-distribution/:clientId', verifyClientAccess, async (req, res) => {
   try {
     const filters = extractFilters(req.query);
+    const cartographyId = req.query.cartographyId ? parseInt(req.query.cartographyId) : null;
 
-    // Load categories
-    const categories = await PageCategory.findByClientId(req.clientId);
+    // Load categories - use cartography-specific categories if cartographyId is provided
+    let categories;
+    if (cartographyId) {
+      categories = await PageCategory.findByCartographyId(cartographyId);
+    } else {
+      categories = await PageCategory.findByClientId(req.clientId);
+    }
 
     // Get all pageviews
     const pageviews = await Pageview.getAllPageviews(req.clientId, filters);

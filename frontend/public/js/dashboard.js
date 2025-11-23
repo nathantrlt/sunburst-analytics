@@ -374,6 +374,10 @@ async function loadCategoryStats() {
 
     try {
         const params = buildFilterParams();
+        // Add cartographyId if available
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            params.append('cartographyId', currentCartography.id);
+        }
 
         const data = await apiRequest(`/analytics/category-stats/${currentClient.id}?${params}`);
         renderCategoryStats(data.categories);
@@ -420,6 +424,11 @@ async function loadCategoryDistribution() {
 
     try {
         const params = buildFilterParams();
+        // Add cartographyId if available
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            params.append('cartographyId', currentCartography.id);
+        }
+
         const data = await apiRequest(`/analytics/category-distribution/${currentClient.id}?${params}`);
 
         renderCategoryDistributionBars(data);
