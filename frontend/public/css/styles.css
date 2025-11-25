@@ -1179,6 +1179,7 @@ h2, h3 {
     border-radius: 6px;
     font-size: 14px;
     font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
     background: var(--card-bg);
     color: var(--text-primary);
     cursor: pointer;
