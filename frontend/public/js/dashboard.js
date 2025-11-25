@@ -1200,6 +1200,45 @@ function showAddClientModal() {
     document.getElementById('addSiteForm').style.display = 'block';
 }
 
+// Update filter UI with current filter values
+function updateFilterUI() {
+    // Update depth label and selected state
+    const depthValue = currentFilters.depth || 5;
+    document.getElementById('depthFilterLabel').textContent = depthValue + ' pages';
+    document.querySelectorAll('#depthFilterMenu .filter-dropdown-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.value == depthValue);
+    });
+
+    // Update device label and selected state
+    const deviceValue = currentFilters.deviceType || '';
+    const deviceLabels = { '': 'Tous les appareils', 'desktop': 'Desktop', 'mobile': 'Mobile', 'tablet': 'Tablet' };
+    document.getElementById('deviceFilterLabel').textContent = deviceLabels[deviceValue] || 'Tous les appareils';
+    document.querySelectorAll('#deviceFilterMenu .filter-dropdown-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.value === deviceValue);
+    });
+
+    // Update traffic source label and selected state
+    const trafficValue = currentFilters.trafficSource || '';
+    const trafficLabels = { '': 'Toutes les sources', 'direct': 'Direct', 'search': 'Moteurs de recherche', 'social': 'Réseaux sociaux', 'referral': 'Sites référents' };
+    document.getElementById('trafficSourceFilterLabel').textContent = trafficLabels[trafficValue] || 'Toutes les sources';
+    document.querySelectorAll('#trafficSourceFilterMenu .filter-dropdown-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.value === trafficValue);
+    });
+
+    // Update category label and selected state
+    const categoryValue = currentFilters.category || '';
+    const categoryLabel = categoryValue || 'Toutes les catégories';
+    document.getElementById('categoryFilterLabel').textContent = categoryLabel;
+    document.querySelectorAll('#categoryFilterMenu .filter-dropdown-item').forEach(item => {
+        item.classList.toggle('selected', item.dataset.value === categoryValue);
+    });
+
+    // Update date range label
+    if (typeof updateDateRangeLabel === 'function') {
+        updateDateRangeLabel();
+    }
+}
+
 // Setup filter buttons with custom dropdowns
 function setupFilterButtons() {
     // Helper function to setup a dropdown

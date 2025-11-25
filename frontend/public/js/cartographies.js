@@ -147,6 +147,11 @@ async function selectCartography(cartoId) {
         await loadCategoryFilterOptions();
     }
 
+    // Update filter UI with new values
+    if (typeof updateFilterUI === 'function') {
+        updateFilterUI();
+    }
+
     // Reload analytics with new filters
     await loadSunburstData();
 
