@@ -1180,6 +1180,7 @@ h2, h3 {
     font-size: 14px;
     font-weight: 400;
     background: transparent;
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
