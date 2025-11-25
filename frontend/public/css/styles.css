@@ -2746,6 +2746,7 @@ body[data-theme="light"] .code-example pre {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 12px;
+    min-height: 80px;
 }
 
 .cartography-selector-wrapper {
@@ -2767,6 +2768,7 @@ body[data-theme="light"] .code-example pre {
 .cartography-select {
     display: flex;
     align-items: center;
+    margin-bottom: 0 !important;
 }
 
 .cartography-select .custom-select-button {
