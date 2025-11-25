@@ -268,11 +268,47 @@ async function loadCategoryFilterOptions() {
             menu.appendChild(item);
         });
 
-        // Re-setup event listeners for new items
-        setupFilterButtons();
+        // Attach event listeners to new items
+        attachCategoryFilterEvents();
     } catch (error) {
         console.error('Failed to load category filter options:', error);
     }
+}
+
+// Attach event listeners to category filter items
+function attachCategoryFilterEvents() {
+    const menu = document.getElementById('categoryFilterMenu');
+    const btn = document.getElementById('categoryFilterBtn');
+    const label = document.getElementById('categoryFilterLabel');
+
+    if (!menu || !btn || !label) return;
+
+    menu.querySelectorAll('.filter-dropdown-item').forEach(item => {
+        // Remove old listeners by cloning
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+
+        newItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            const value = newItem.dataset.value;
+            const text = newItem.textContent;
+
+            // Update selected state
+            menu.querySelectorAll('.filter-dropdown-item').forEach(i => i.classList.remove('selected'));
+            newItem.classList.add('selected');
+
+            // Update label
+            label.textContent = text;
+
+            // Update currentFilters
+            currentFilters.category = value || null;
+
+            // Close dropdown
+            menu.classList.remove('show');
+            btn.classList.remove('open');
+        });
+    });
 }
 
 // Load statistics
