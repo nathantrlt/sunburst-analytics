@@ -592,6 +592,7 @@ h2, h3 {
 }
 
 .custom-select-dropdown {
+    display: none;
     position: absolute;
     top: 100%;
     left: 0;
