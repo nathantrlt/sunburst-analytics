@@ -1948,8 +1948,11 @@ function initNavigation() {
                 if (manageCategoriesBtn) manageCategoriesBtn.style.display = 'inline-block';
                 if (manageCollaboratorsBtn) manageCollaboratorsBtn.style.display = 'none';
                 if (deleteSiteBtn) deleteSiteBtn.style.display = 'none';
+            } else if (section === 'documentation') {
+                // Hide all buttons on Aide section
+                if (siteManagementButtons) siteManagementButtons.style.display = 'none';
             } else {
-                // Show all buttons on other sections
+                // Show all buttons on other sections (Paramètres)
                 if (siteManagementButtons) siteManagementButtons.style.display = 'block';
                 if (viewSnippetBtn) viewSnippetBtn.style.display = 'inline-block';
                 if (manageCategoriesBtn) manageCategoriesBtn.style.display = 'inline-block';
