@@ -79,7 +79,10 @@ async function initDashboard() {
 // Load user info
 function loadUserInfo() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    document.getElementById('userName').textContent = user.name || 'Utilisateur';
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+        userNameElement.textContent = user.name || 'Utilisateur';
+    }
 }
 
 // Load clients list
@@ -150,17 +153,11 @@ function toggleCustomDropdown() {
     const dropdown = document.getElementById('clientSelectDropdown');
     const button = document.getElementById('clientSelectButton');
 
-    console.log('Toggle dropdown clicked');
-    console.log('Current display:', dropdown.style.display);
-    console.log('Dropdown element:', dropdown);
-
     if (dropdown.style.display === 'none' || dropdown.style.display === '') {
         dropdown.style.display = 'block';
         button.classList.add('open');
-        console.log('Dropdown should now be visible');
     } else {
         closeCustomDropdown();
-        console.log('Dropdown closed');
     }
 }
 
