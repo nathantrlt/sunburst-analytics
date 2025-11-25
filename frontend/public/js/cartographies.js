@@ -84,10 +84,7 @@ function renderCartographiesList() {
         optionsHTML += `
             <div class="custom-option ${isSelected ? 'selected' : ''}" data-carto-id="${carto.id}">
                 <div class="option-name">${carto.name}</div>
-                ${carto.description ? `<div class="option-url" style="font-size: 12px;">${carto.description}</div>` : ''}
-                <button class="edit-carto-btn" data-carto-id="${carto.id}" style="margin-left: auto;">
-                    ✏️
-                </button>
+                ${carto.description ? `<div class="option-url" style="font-size: 12px; color: var(--text-secondary);">${carto.description}</div>` : ''}
             </div>
         `;
     });
@@ -97,14 +94,6 @@ function renderCartographiesList() {
     // Add click handlers
     optionsContainer.querySelectorAll('.custom-option').forEach(option => {
         option.addEventListener('click', (e) => {
-            // Check if edit button was clicked
-            if (e.target.classList.contains('edit-carto-btn')) {
-                e.stopPropagation();
-                const cartoId = parseInt(e.target.dataset.cartoId);
-                openEditCartographyModal(cartoId);
-                return;
-            }
-
             const cartoId = parseInt(option.dataset.cartoId);
             selectCartography(cartoId);
             closeCartographyDropdown();

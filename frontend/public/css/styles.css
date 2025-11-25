@@ -791,16 +791,15 @@ h2, h3 {
 .custom-select-button {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 26, 0.8) 100%);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    background: var(--card-bg);
     color: var(--text-primary);
     font-size: 15px;
     font-weight: 500;
     font-family: 'Montserrat', sans-serif;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -813,15 +812,11 @@ h2, h3 {
 }
 
 .custom-select-button:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(252, 209, 22, 0.1);
-    transform: translateY(-1px);
+    background: rgba(252, 209, 22, 0.05);
 }
 
 .custom-select-button.open {
-    border-color: var(--primary-color);
-    background: linear-gradient(135deg, rgba(252, 209, 22, 0.08) 0%, var(--card-bg) 100%);
-    box-shadow: 0 0 0 4px rgba(252, 209, 22, 0.15), var(--shadow-lg);
+    background: rgba(252, 209, 22, 0.1);
 }
 
 .custom-select-button .select-arrow {
@@ -835,14 +830,13 @@ h2, h3 {
 .custom-select-dropdown {
     display: none;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 4px);
     left: 0;
     width: 100%;
-    margin-top: 8px;
     background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 99999;
     max-height: 400px;
     overflow-y: auto;
@@ -855,20 +849,20 @@ h2, h3 {
 }
 
 .custom-option {
-    padding: 12px 14px;
+    padding: 10px 14px;
     cursor: pointer;
     transition: all 0.2s ease;
-    border-radius: 6px;
+    border-radius: 4px;
     margin-bottom: 2px;
+    color: var(--text-primary);
 }
 
 .custom-option:hover:not(.disabled):not(.placeholder) {
-    background: rgba(252, 209, 22, 0.15);
+    background: rgba(252, 209, 22, 0.1);
 }
 
 .custom-option.selected {
-    background: rgba(252, 209, 22, 0.2);
-    border-left: 3px solid var(--primary-color);
+    background: rgba(252, 209, 22, 0.15);
 }
 
 .custom-option.disabled {
