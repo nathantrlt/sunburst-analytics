@@ -2752,6 +2752,9 @@ body[data-theme="light"] .code-example pre {
     font-weight: 600;
     font-size: 14px;
     white-space: nowrap;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .cartography-select .custom-select-button {
@@ -2769,6 +2772,9 @@ body[data-theme="light"] .code-example pre {
     color: #000;
     border-color: var(--primary-color);
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cartography-actions .btn:hover {
