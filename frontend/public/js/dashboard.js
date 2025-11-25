@@ -2066,6 +2066,7 @@ function initNavigation() {
     const navItems = document.querySelectorAll('.sidebar-item, .nav-item');
     const filtersSection = document.querySelector('.filters-section');
     const siteManagementButtons = document.querySelector('.site-header > div:last-child');
+    const statsGrid = document.querySelector('.stats-grid');
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -2093,6 +2094,17 @@ function initNavigation() {
                 // Show filters for dashboard and cartographie sections
                 if (filtersSection) {
                     filtersSection.style.display = 'block';
+                }
+            }
+
+            // Show/hide stats metrics based on section
+            if (statsGrid) {
+                if (section === 'documentation' || section === 'parametres') {
+                    // Hide stats for Aide and Paramètres sections
+                    statsGrid.style.display = 'none';
+                } else {
+                    // Show stats for Accueil and Mes Scores sections
+                    statsGrid.style.display = 'grid';
                 }
             }
 
