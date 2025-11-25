@@ -1901,6 +1901,7 @@ function setupCategorySortHandlers() {
 function initNavigation() {
     const navItems = document.querySelectorAll('.sidebar-item, .nav-item');
     const filtersSection = document.querySelector('.filters-section');
+    const siteManagementButtons = document.querySelector('.site-header > div:last-child');
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -1928,6 +1929,17 @@ function initNavigation() {
                 // Show filters for dashboard and cartographie sections
                 if (filtersSection) {
                     filtersSection.style.display = 'block';
+                }
+            }
+
+            // Show/hide site management buttons based on section
+            if (siteManagementButtons) {
+                if (section === 'dashboard') {
+                    // Hide buttons on Accueil section
+                    siteManagementButtons.style.display = 'none';
+                } else {
+                    // Show buttons on other sections
+                    siteManagementButtons.style.display = 'block';
                 }
             }
 

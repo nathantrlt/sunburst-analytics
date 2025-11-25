@@ -187,6 +187,11 @@ body {
     min-height: 100vh;
 }
 
+/* Hide site management buttons by default (Accueil section is default) */
+.site-header > div:last-child {
+    display: none;
+}
+
 /* === HEADER DE PAGE === */
 .page-header {
     display: flex;
