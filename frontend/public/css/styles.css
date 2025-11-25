@@ -2764,10 +2764,16 @@ body[data-theme="light"] .code-example pre {
     align-items: center;
 }
 
+.cartography-select {
+    display: flex;
+    align-items: center;
+}
+
 .cartography-select .custom-select-button {
     min-width: 300px;
     height: 40px;
     padding: 8px 12px;
+    line-height: 1;
 }
 
 .cartography-actions {
@@ -2785,10 +2791,13 @@ body[data-theme="light"] .code-example pre {
     align-items: center;
     justify-content: center;
     height: 40px;
+    line-height: 1;
+    padding: 0 12px;
 }
 
 .cartography-actions .btn svg {
     flex-shrink: 0;
+    vertical-align: middle;
 }
 
 .cartography-actions .btn:hover {
