@@ -1159,6 +1159,119 @@ h2, h3 {
     opacity: 0.9;
 }
 
+/* === CONTENEUR DES FILTRES === */
+.filters-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+/* === BOUTONS DE FILTRE === */
+.filter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Effet hover - juste une légère transformation */
+.filter-button:hover {
+    transform: translateY(-1px);
+    opacity: 0.8;
+}
+
+/* Quand le filtre est actif/sélectionné */
+.filter-button.active {
+    font-weight: 500;
+    border-width: 2px;
+}
+
+/* Icône de dropdown (flèche) */
+.filter-button-icon {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+}
+
+/* Rotation de la flèche quand ouvert */
+.filter-button.open .filter-button-icon {
+    transform: rotate(180deg);
+}
+
+/* === SECTION RÉSULTATS (à droite) === */
+.filters-results {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-left: auto;
+}
+
+.results-count {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.results-count-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+}
+
+/* === DROPDOWN DE TRI === */
+.sort-dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    font-size: 14px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sort-dropdown:hover {
+    transform: translateY(-1px);
+    opacity: 0.8;
+}
+
+/* === RESPONSIVE FILTRES === */
+@media (max-width: 1024px) {
+    .filters-container {
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .filter-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-results {
+        width: 100%;
+        justify-content: space-between;
+        margin-left: 0;
+        margin-top: 12px;
+    }
+}
+
+/* === ANCIENNE GRILLE DE FILTRES (conservée pour compatibilité) === */
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
