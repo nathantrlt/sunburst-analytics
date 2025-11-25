@@ -542,6 +542,7 @@ h2, h3 {
 .custom-select-wrapper.header-select {
     width: 250px;
     margin-bottom: 0;
+    z-index: 9998;
 }
 
 .custom-select-button {
@@ -597,9 +598,14 @@ h2, h3 {
     border: 2px solid var(--border-color);
     border-radius: 8px;
     box-shadow: var(--shadow-lg);
-    z-index: 1000;
+    z-index: 9999;
     max-height: 400px;
     overflow-y: auto;
+    display: none;
+}
+
+.custom-select-dropdown[style*="display: block"] {
+    display: block !important;
 }
 
 .custom-select-options {
