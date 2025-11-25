@@ -2062,11 +2062,33 @@ h2, h3 {
 }
 
 /* Category Styles */
+.category-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.category-stats-header h3 {
+    margin: 0;
+}
+
+.category-stats-header .btn {
+    background: var(--primary-color);
+    color: #000;
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
+
+.category-stats-header .btn:hover {
+    background: rgba(252, 209, 22, 0.9);
+    border-color: var(--primary-color);
+}
+
 .category-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    margin-top: 15px;
 }
 
 .category-stat-card {
@@ -2729,6 +2751,7 @@ body[data-theme="light"] .code-example pre {
     color: var(--text-primary);
     font-weight: 600;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .cartography-select .custom-select-button {
@@ -2739,6 +2762,18 @@ body[data-theme="light"] .code-example pre {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.cartography-actions .btn {
+    background: var(--primary-color);
+    color: #000;
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
+
+.cartography-actions .btn:hover {
+    background: rgba(252, 209, 22, 0.9);
+    border-color: var(--primary-color);
 }
 
 /* Responsive Cartography Header */
