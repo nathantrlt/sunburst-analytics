@@ -11,17 +11,79 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dashboard-page">
-    <!-- Header -->
-    <header class="dashboard-header">
-        <div class="header-content">
-            <h1>Sunburst Analytics</h1>
-            <div class="header-user">
-                <span id="userName">Chargement...</span>
+    <!-- Sidebar fixe à gauche -->
+    <aside class="sidebar-left">
+        <!-- Logo + Titre -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+            </div>
+            <h2 class="sidebar-title">Sunburst Analytics</h2>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" data-section="dashboard">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Accueil</span>
+                </li>
+                <li class="sidebar-item" data-section="cartographie">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2v20M2 12h20"></path>
+                    </svg>
+                    <span>Mes Scores</span>
+                </li>
+                <li class="sidebar-item" data-section="documentation">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>Aide</span>
+                </li>
+                <li class="sidebar-item" data-section="parametres">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6"></path>
+                        <path d="M17.8 17.8l-4.2-4.2m0 0L9.4 9.4"></path>
+                    </svg>
+                    <span>Paramètres</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Déconnexion en bas -->
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="sidebar-logout">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Déconnexion</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Contenu principal à droite -->
+    <div class="main-wrapper">
+        <!-- Header avec titre + bouton -->
+        <header class="main-header">
+            <h1 class="main-title">Tableau de bord</h1>
+            <div class="header-actions">
                 <div class="custom-select-wrapper header-select">
                     <div id="clientSelectButton" class="custom-select-button">
-                        <span id="selectedClientText">Chargement...</span>
+                        <span id="selectedClientText">Sélectionner un site</span>
                         <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12">
-                            <path fill="#FCD116" d="M6 9L1 4h10z"/>
+                            <path fill="#000" d="M6 9L1 4h10z"/>
                         </svg>
                     </div>
                     <div id="clientSelectDropdown" class="custom-select-dropdown" style="display: none;">
@@ -30,51 +92,11 @@
                         </div>
                     </div>
                 </div>
-                <button id="logoutBtn" class="btn btn-secondary btn-small">Déconnexion</button>
             </div>
-        </div>
-    </header>
-
-    <div class="dashboard-container">
-        <!-- Navigation Sidebar -->
-        <nav class="navigation-sidebar">
-            <ul class="nav-menu">
-                <li class="nav-item active" data-section="dashboard">
-                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    <span>Dashboard</span>
-                </li>
-                <li class="nav-item" data-section="cartographie">
-                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    <span>Cartographie</span>
-                </li>
-                <li class="nav-item" data-section="documentation">
-                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                    </svg>
-                    <span>Documentation</span>
-                </li>
-                <li class="nav-item" data-section="parametres">
-                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M12 1v6m0 6v6m-8-8h6m6 0h6"></path>
-                        <path d="M20.5 8.5l-4.5 4.5m0-9l4.5 4.5M8.5 20.5l4.5-4.5m-9 0l4.5 4.5"></path>
-                    </svg>
-                    <span>Paramètres</span>
-                </li>
-            </ul>
-        </nav>
+        </header>
 
         <!-- Main Content -->
-        <main class="dashboard-main">
+        <main class="main-content">
             <!-- Welcome Message (shown when no site selected) -->
             <div id="welcomeMessage" class="welcome-message">
                 <h2>Bienvenue sur Sunburst Analytics</h2>
