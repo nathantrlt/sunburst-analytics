@@ -152,27 +152,40 @@
 
                 <!-- Filters -->
                 <div class="filters-section">
-                    <h3>Filtres</h3>
-                    <div class="filters-grid">
-                        <div class="form-group">
-                            <label>Période</label>
-                            <button type="button" id="dateRangeBtn" class="date-range-selector">
-                                <span id="dateRangeLabel">Toutes les dates</span>
-                                <span class="calendar-icon">📅</span>
+                    <div class="filters-container">
+                        <!-- Période Filter Button -->
+                        <button type="button" id="dateRangeBtn" class="filter-button">
+                            <span id="dateRangeLabel">Toutes les dates</span>
+                            <svg class="filter-button-icon" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 9L1 4h10z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Device Filter Button with Dropdown -->
+                        <div class="filter-dropdown-wrapper">
+                            <button type="button" class="filter-button" id="deviceFilterBtn">
+                                <span id="deviceFilterLabel">Tous les appareils</span>
+                                <svg class="filter-button-icon" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 9L1 4h10z"/>
+                                </svg>
                             </button>
-                        </div>
-                        <div class="form-group">
-                            <label for="deviceFilter">Type d'Appareil</label>
-                            <select id="deviceFilter">
+                            <select id="deviceFilter" style="display: none;">
                                 <option value="">Tous les appareils</option>
                                 <option value="desktop">Desktop</option>
                                 <option value="mobile">Mobile</option>
                                 <option value="tablet">Tablet</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="trafficSourceFilter">Source de Trafic</label>
-                            <select id="trafficSourceFilter">
+
+                        <!-- Traffic Source Filter Button -->
+                        <div class="filter-dropdown-wrapper">
+                            <button type="button" class="filter-button" id="trafficSourceFilterBtn">
+                                <span id="trafficSourceFilterLabel">Toutes les sources</span>
+                                <svg class="filter-button-icon" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 9L1 4h10z"/>
+                                </svg>
+                            </button>
+                            <select id="trafficSourceFilter" style="display: none;">
                                 <option value="">Toutes les sources</option>
                                 <option value="direct">Direct</option>
                                 <option value="search">Moteurs de recherche</option>
@@ -180,27 +193,39 @@
                                 <option value="referral">Sites référents</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="categoryFilter">Catégorie de Page</label>
-                            <select id="categoryFilter">
+
+                        <!-- Category Filter Button -->
+                        <div class="filter-dropdown-wrapper">
+                            <button type="button" class="filter-button" id="categoryFilterBtn">
+                                <span id="categoryFilterLabel">Toutes les catégories</span>
+                                <svg class="filter-button-icon" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 9L1 4h10z"/>
+                                </svg>
+                            </button>
+                            <select id="categoryFilter" style="display: none;">
                                 <option value="">Toutes les catégories</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="depthSelect">Profondeur du Parcours</label>
-                            <select id="depthSelect">
+
+                        <!-- Depth Filter Button -->
+                        <div class="filter-dropdown-wrapper">
+                            <button type="button" class="filter-button" id="depthFilterBtn">
+                                <span id="depthFilterLabel">5 pages</span>
+                                <svg class="filter-button-icon" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 9L1 4h10z"/>
+                                </svg>
+                            </button>
+                            <select id="depthSelect" style="display: none;">
                                 <option value="3">3 pages</option>
                                 <option value="5" selected>5 pages</option>
                                 <option value="7">7 pages</option>
                                 <option value="10">10 pages</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <button id="applyFiltersBtn" class="btn btn-primary btn-block">Appliquer les Filtres</button>
-                        </div>
-                        <div class="form-group">
-                            <button id="resetFiltersBtn" class="btn btn-secondary btn-block">Réinitialiser</button>
-                        </div>
+
+                        <!-- Action Buttons -->
+                        <button id="applyFiltersBtn" class="filter-button active">Appliquer</button>
+                        <button id="resetFiltersBtn" class="filter-button">Réinitialiser</button>
                     </div>
                 </div>
 

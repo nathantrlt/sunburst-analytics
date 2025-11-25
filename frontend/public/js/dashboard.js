@@ -1194,6 +1194,134 @@ function showAddClientModal() {
     document.getElementById('addSiteForm').style.display = 'block';
 }
 
+// Setup filter buttons
+function setupFilterButtons() {
+    // Device filter button
+    const deviceFilterBtn = document.getElementById('deviceFilterBtn');
+    const deviceFilter = document.getElementById('deviceFilter');
+    const deviceFilterLabel = document.getElementById('deviceFilterLabel');
+
+    if (deviceFilterBtn && deviceFilter) {
+        deviceFilterBtn.addEventListener('click', () => {
+            deviceFilterBtn.classList.toggle('open');
+            // Toggle select visibility
+            if (deviceFilter.style.display === 'none') {
+                deviceFilter.style.display = 'block';
+                deviceFilter.focus();
+            } else {
+                deviceFilter.style.display = 'none';
+            }
+        });
+
+        deviceFilter.addEventListener('change', (e) => {
+            const value = e.target.value;
+            deviceFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Tous les appareils';
+            deviceFilter.style.display = 'none';
+            deviceFilterBtn.classList.remove('open');
+        });
+
+        deviceFilter.addEventListener('blur', () => {
+            setTimeout(() => {
+                deviceFilter.style.display = 'none';
+                deviceFilterBtn.classList.remove('open');
+            }, 200);
+        });
+    }
+
+    // Traffic source filter button
+    const trafficSourceFilterBtn = document.getElementById('trafficSourceFilterBtn');
+    const trafficSourceFilter = document.getElementById('trafficSourceFilter');
+    const trafficSourceFilterLabel = document.getElementById('trafficSourceFilterLabel');
+
+    if (trafficSourceFilterBtn && trafficSourceFilter) {
+        trafficSourceFilterBtn.addEventListener('click', () => {
+            trafficSourceFilterBtn.classList.toggle('open');
+            if (trafficSourceFilter.style.display === 'none') {
+                trafficSourceFilter.style.display = 'block';
+                trafficSourceFilter.focus();
+            } else {
+                trafficSourceFilter.style.display = 'none';
+            }
+        });
+
+        trafficSourceFilter.addEventListener('change', (e) => {
+            const value = e.target.value;
+            trafficSourceFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Toutes les sources';
+            trafficSourceFilter.style.display = 'none';
+            trafficSourceFilterBtn.classList.remove('open');
+        });
+
+        trafficSourceFilter.addEventListener('blur', () => {
+            setTimeout(() => {
+                trafficSourceFilter.style.display = 'none';
+                trafficSourceFilterBtn.classList.remove('open');
+            }, 200);
+        });
+    }
+
+    // Category filter button
+    const categoryFilterBtn = document.getElementById('categoryFilterBtn');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const categoryFilterLabel = document.getElementById('categoryFilterLabel');
+
+    if (categoryFilterBtn && categoryFilter) {
+        categoryFilterBtn.addEventListener('click', () => {
+            categoryFilterBtn.classList.toggle('open');
+            if (categoryFilter.style.display === 'none') {
+                categoryFilter.style.display = 'block';
+                categoryFilter.focus();
+            } else {
+                categoryFilter.style.display = 'none';
+            }
+        });
+
+        categoryFilter.addEventListener('change', (e) => {
+            const value = e.target.value;
+            categoryFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Toutes les catégories';
+            categoryFilter.style.display = 'none';
+            categoryFilterBtn.classList.remove('open');
+        });
+
+        categoryFilter.addEventListener('blur', () => {
+            setTimeout(() => {
+                categoryFilter.style.display = 'none';
+                categoryFilterBtn.classList.remove('open');
+            }, 200);
+        });
+    }
+
+    // Depth filter button
+    const depthFilterBtn = document.getElementById('depthFilterBtn');
+    const depthSelect = document.getElementById('depthSelect');
+    const depthFilterLabel = document.getElementById('depthFilterLabel');
+
+    if (depthFilterBtn && depthSelect) {
+        depthFilterBtn.addEventListener('click', () => {
+            depthFilterBtn.classList.toggle('open');
+            if (depthSelect.style.display === 'none') {
+                depthSelect.style.display = 'block';
+                depthSelect.focus();
+            } else {
+                depthSelect.style.display = 'none';
+            }
+        });
+
+        depthSelect.addEventListener('change', (e) => {
+            const value = e.target.value;
+            depthFilterLabel.textContent = value + ' pages';
+            depthSelect.style.display = 'none';
+            depthFilterBtn.classList.remove('open');
+        });
+
+        depthSelect.addEventListener('blur', () => {
+            setTimeout(() => {
+                depthSelect.style.display = 'none';
+                depthFilterBtn.classList.remove('open');
+            }, 200);
+        });
+    }
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Logout
@@ -1314,6 +1442,9 @@ function setupEventListeners() {
     // Add collaborator form
     document.getElementById('addCollaboratorForm').addEventListener('submit', handleAddCollaborator);
 
+    // Filter button handlers
+    setupFilterButtons();
+
     // Apply filters
     document.getElementById('applyFiltersBtn').addEventListener('click', () => {
         // Don't touch startDate and endDate - they are managed by the calendar modal
@@ -1339,6 +1470,13 @@ function setupEventListeners() {
         document.getElementById('deviceFilter').value = '';
         document.getElementById('trafficSourceFilter').value = '';
         document.getElementById('categoryFilter').value = '';
+
+        // Update button labels
+        document.getElementById('depthFilterLabel').textContent = '5 pages';
+        document.getElementById('deviceFilterLabel').textContent = 'Tous les appareils';
+        document.getElementById('trafficSourceFilterLabel').textContent = 'Toutes les sources';
+        document.getElementById('categoryFilterLabel').textContent = 'Toutes les catégories';
+
         loadAnalytics();
     });
 
