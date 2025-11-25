@@ -1199,6 +1199,21 @@ h2, h3 {
     border-width: 2px;
 }
 
+/* Boutons d'action (Appliquer et Réinitialiser) */
+#applyFiltersBtn,
+#resetFiltersBtn {
+    background: var(--primary-color);
+    color: #000;
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
+
+#applyFiltersBtn:hover,
+#resetFiltersBtn:hover {
+    background: #ffe033;
+    border-color: #ffe033;
+}
+
 /* Icône de dropdown (flèche) */
 .filter-button-icon {
     width: 12px;
