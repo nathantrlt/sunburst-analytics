@@ -606,16 +606,7 @@ h2, h3 {
     overflow-y: auto;
 }
 
-/* Par défaut caché, affiché via JS avec display: block */
-#clientSelectDropdown[style*="display: none"],
-#cartographySelectDropdown[style*="display: none"] {
-    display: none !important;
-}
-
-#clientSelectDropdown[style*="display: block"],
-#cartographySelectDropdown[style*="display: block"] {
-    display: block !important;
-}
+/* Le dropdown est contrôlé via l'attribut style en JavaScript */
 
 .custom-select-options {
     padding: 4px;
