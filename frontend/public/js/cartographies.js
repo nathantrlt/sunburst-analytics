@@ -149,6 +149,14 @@ async function selectCartography(cartoId) {
 
     // Reload analytics with new filters
     await loadSunburstData();
+
+    // Reload category stats and distribution
+    if (typeof loadCategoryStats === 'function') {
+        await loadCategoryStats();
+    }
+    if (typeof loadCategoryDistribution === 'function') {
+        await loadCategoryDistribution();
+    }
 }
 
 // Toggle cartography dropdown
