@@ -2081,15 +2081,30 @@ h2, h3 {
 }
 
 .category-stats-header .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
     background: var(--primary-color);
     color: #000;
     border-color: var(--primary-color);
-    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    height: 40px;
+    line-height: 1;
 }
 
 .category-stats-header .btn:hover {
-    background: rgba(252, 209, 22, 0.9);
-    border-color: var(--primary-color);
+    background: #ffe033;
+    border-color: #ffe033;
+    transform: translateY(-1px);
 }
 
 .category-stats-grid {
