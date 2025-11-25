@@ -170,6 +170,7 @@ body {
     display: flex;
     gap: 16px;
     align-items: center;
+    position: relative;
 }
 
 .main-content {
@@ -540,6 +541,7 @@ h2, h3 {
 }
 
 .custom-select-wrapper.header-select {
+    position: relative;
     width: 250px;
     margin-bottom: 0;
     z-index: 9998;
@@ -591,20 +593,27 @@ h2, h3 {
 
 .custom-select-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    top: 100%;
     left: 0;
-    right: 0;
+    width: 100%;
+    margin-top: 8px;
     background: var(--card-bg);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    box-shadow: var(--shadow-lg);
-    z-index: 9999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 99999;
     max-height: 400px;
     overflow-y: auto;
-    display: none;
 }
 
-.custom-select-dropdown[style*="display: block"] {
+/* Par défaut caché, affiché via JS avec display: block */
+#clientSelectDropdown[style*="display: none"],
+#cartographySelectDropdown[style*="display: none"] {
+    display: none !important;
+}
+
+#clientSelectDropdown[style*="display: block"],
+#cartographySelectDropdown[style*="display: block"] {
     display: block !important;
 }
 
