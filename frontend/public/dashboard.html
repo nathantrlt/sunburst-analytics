@@ -169,12 +169,12 @@
                                     <path d="M6 9L1 4h10z"/>
                                 </svg>
                             </button>
-                            <select id="deviceFilter" style="display: none;">
-                                <option value="">Tous les appareils</option>
-                                <option value="desktop">Desktop</option>
-                                <option value="mobile">Mobile</option>
-                                <option value="tablet">Tablet</option>
-                            </select>
+                            <div class="filter-dropdown-menu" id="deviceFilterMenu">
+                                <div class="filter-dropdown-item selected" data-value="">Tous les appareils</div>
+                                <div class="filter-dropdown-item" data-value="desktop">Desktop</div>
+                                <div class="filter-dropdown-item" data-value="mobile">Mobile</div>
+                                <div class="filter-dropdown-item" data-value="tablet">Tablet</div>
+                            </div>
                         </div>
 
                         <!-- Traffic Source Filter Button -->
@@ -185,13 +185,13 @@
                                     <path d="M6 9L1 4h10z"/>
                                 </svg>
                             </button>
-                            <select id="trafficSourceFilter" style="display: none;">
-                                <option value="">Toutes les sources</option>
-                                <option value="direct">Direct</option>
-                                <option value="search">Moteurs de recherche</option>
-                                <option value="social">Réseaux sociaux</option>
-                                <option value="referral">Sites référents</option>
-                            </select>
+                            <div class="filter-dropdown-menu" id="trafficSourceFilterMenu">
+                                <div class="filter-dropdown-item selected" data-value="">Toutes les sources</div>
+                                <div class="filter-dropdown-item" data-value="direct">Direct</div>
+                                <div class="filter-dropdown-item" data-value="search">Moteurs de recherche</div>
+                                <div class="filter-dropdown-item" data-value="social">Réseaux sociaux</div>
+                                <div class="filter-dropdown-item" data-value="referral">Sites référents</div>
+                            </div>
                         </div>
 
                         <!-- Category Filter Button -->
@@ -202,9 +202,9 @@
                                     <path d="M6 9L1 4h10z"/>
                                 </svg>
                             </button>
-                            <select id="categoryFilter" style="display: none;">
-                                <option value="">Toutes les catégories</option>
-                            </select>
+                            <div class="filter-dropdown-menu" id="categoryFilterMenu">
+                                <div class="filter-dropdown-item selected" data-value="">Toutes les catégories</div>
+                            </div>
                         </div>
 
                         <!-- Depth Filter Button -->
@@ -215,12 +215,12 @@
                                     <path d="M6 9L1 4h10z"/>
                                 </svg>
                             </button>
-                            <select id="depthSelect" style="display: none;">
-                                <option value="3">3 pages</option>
-                                <option value="5" selected>5 pages</option>
-                                <option value="7">7 pages</option>
-                                <option value="10">10 pages</option>
-                            </select>
+                            <div class="filter-dropdown-menu" id="depthFilterMenu">
+                                <div class="filter-dropdown-item" data-value="3">3 pages</div>
+                                <div class="filter-dropdown-item selected" data-value="5">5 pages</div>
+                                <div class="filter-dropdown-item" data-value="7">7 pages</div>
+                                <div class="filter-dropdown-item" data-value="10">10 pages</div>
+                            </div>
                         </div>
 
                         <!-- Action Buttons -->

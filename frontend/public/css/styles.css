@@ -1249,6 +1249,48 @@ h2, h3 {
     opacity: 0.8;
 }
 
+/* === DROPDOWN PERSONNALISÉ === */
+.filter-dropdown-wrapper {
+    position: relative;
+}
+
+.filter-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 200px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.filter-dropdown-menu.show {
+    display: block;
+}
+
+.filter-dropdown-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: background-color 0.2s;
+}
+
+.filter-dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filter-dropdown-item.selected {
+    background-color: rgba(255, 215, 0, 0.1);
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
 /* === RESPONSIVE FILTRES === */
 @media (max-width: 1024px) {
     .filters-container {

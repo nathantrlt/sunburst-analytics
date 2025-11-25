@@ -252,18 +252,24 @@ async function loadCategoryFilterOptions() {
         }
 
         const data = await apiRequest(url);
-        const select = document.getElementById('categoryFilter');
+        const menu = document.getElementById('categoryFilterMenu');
 
-        // Clear existing options except first
-        select.innerHTML = '<option value="">Toutes les catégories</option>';
+        if (!menu) return;
 
-        // Add category options
+        // Clear existing items
+        menu.innerHTML = '<div class="filter-dropdown-item selected" data-value="">Toutes les catégories</div>';
+
+        // Add category items
         data.categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.name;
-            option.textContent = cat.name;
-            select.appendChild(option);
+            const item = document.createElement('div');
+            item.className = 'filter-dropdown-item';
+            item.dataset.value = cat.name;
+            item.textContent = cat.name;
+            menu.appendChild(item);
         });
+
+        // Re-setup event listeners for new items
+        setupFilterButtons();
     } catch (error) {
         console.error('Failed to load category filter options:', error);
     }
@@ -1194,132 +1200,77 @@ function showAddClientModal() {
     document.getElementById('addSiteForm').style.display = 'block';
 }
 
-// Setup filter buttons
+// Setup filter buttons with custom dropdowns
 function setupFilterButtons() {
-    // Device filter button
-    const deviceFilterBtn = document.getElementById('deviceFilterBtn');
-    const deviceFilter = document.getElementById('deviceFilter');
-    const deviceFilterLabel = document.getElementById('deviceFilterLabel');
+    // Helper function to setup a dropdown
+    function setupDropdown(btnId, menuId, labelId, filterKey) {
+        const btn = document.getElementById(btnId);
+        const menu = document.getElementById(menuId);
+        const label = document.getElementById(labelId);
 
-    if (deviceFilterBtn && deviceFilter) {
-        deviceFilterBtn.addEventListener('click', () => {
-            deviceFilterBtn.classList.toggle('open');
-            // Toggle select visibility
-            if (deviceFilter.style.display === 'none') {
-                deviceFilter.style.display = 'block';
-                deviceFilter.focus();
-            } else {
-                deviceFilter.style.display = 'none';
-            }
+        if (!btn || !menu || !label) return;
+
+        // Toggle dropdown on button click
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Close all other dropdowns
+            document.querySelectorAll('.filter-dropdown-menu.show').forEach(m => {
+                if (m !== menu) m.classList.remove('show');
+            });
+            document.querySelectorAll('.filter-button.open').forEach(b => {
+                if (b !== btn) b.classList.remove('open');
+            });
+
+            // Toggle current dropdown
+            menu.classList.toggle('show');
+            btn.classList.toggle('open');
         });
 
-        deviceFilter.addEventListener('change', (e) => {
-            const value = e.target.value;
-            deviceFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Tous les appareils';
-            deviceFilter.style.display = 'none';
-            deviceFilterBtn.classList.remove('open');
-        });
+        // Handle item selection
+        menu.querySelectorAll('.filter-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
 
-        deviceFilter.addEventListener('blur', () => {
-            setTimeout(() => {
-                deviceFilter.style.display = 'none';
-                deviceFilterBtn.classList.remove('open');
-            }, 200);
-        });
-    }
+                const value = item.dataset.value;
+                const text = item.textContent;
 
-    // Traffic source filter button
-    const trafficSourceFilterBtn = document.getElementById('trafficSourceFilterBtn');
-    const trafficSourceFilter = document.getElementById('trafficSourceFilter');
-    const trafficSourceFilterLabel = document.getElementById('trafficSourceFilterLabel');
+                // Update selected state
+                menu.querySelectorAll('.filter-dropdown-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
 
-    if (trafficSourceFilterBtn && trafficSourceFilter) {
-        trafficSourceFilterBtn.addEventListener('click', () => {
-            trafficSourceFilterBtn.classList.toggle('open');
-            if (trafficSourceFilter.style.display === 'none') {
-                trafficSourceFilter.style.display = 'block';
-                trafficSourceFilter.focus();
-            } else {
-                trafficSourceFilter.style.display = 'none';
-            }
-        });
+                // Update label
+                label.textContent = text;
 
-        trafficSourceFilter.addEventListener('change', (e) => {
-            const value = e.target.value;
-            trafficSourceFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Toutes les sources';
-            trafficSourceFilter.style.display = 'none';
-            trafficSourceFilterBtn.classList.remove('open');
-        });
+                // Update currentFilters
+                if (filterKey) {
+                    currentFilters[filterKey] = value || null;
+                }
 
-        trafficSourceFilter.addEventListener('blur', () => {
-            setTimeout(() => {
-                trafficSourceFilter.style.display = 'none';
-                trafficSourceFilterBtn.classList.remove('open');
-            }, 200);
+                // Close dropdown
+                menu.classList.remove('show');
+                btn.classList.remove('open');
+            });
         });
     }
 
-    // Category filter button
-    const categoryFilterBtn = document.getElementById('categoryFilterBtn');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const categoryFilterLabel = document.getElementById('categoryFilterLabel');
+    // Setup each filter
+    setupDropdown('deviceFilterBtn', 'deviceFilterMenu', 'deviceFilterLabel', 'deviceType');
+    setupDropdown('trafficSourceFilterBtn', 'trafficSourceFilterMenu', 'trafficSourceFilterLabel', 'trafficSource');
+    setupDropdown('categoryFilterBtn', 'categoryFilterMenu', 'categoryFilterLabel', 'category');
+    setupDropdown('depthFilterBtn', 'depthFilterMenu', 'depthFilterLabel', 'depth');
 
-    if (categoryFilterBtn && categoryFilter) {
-        categoryFilterBtn.addEventListener('click', () => {
-            categoryFilterBtn.classList.toggle('open');
-            if (categoryFilter.style.display === 'none') {
-                categoryFilter.style.display = 'block';
-                categoryFilter.focus();
-            } else {
-                categoryFilter.style.display = 'none';
-            }
-        });
-
-        categoryFilter.addEventListener('change', (e) => {
-            const value = e.target.value;
-            categoryFilterLabel.textContent = value ? e.target.options[e.target.selectedIndex].text : 'Toutes les catégories';
-            categoryFilter.style.display = 'none';
-            categoryFilterBtn.classList.remove('open');
-        });
-
-        categoryFilter.addEventListener('blur', () => {
-            setTimeout(() => {
-                categoryFilter.style.display = 'none';
-                categoryFilterBtn.classList.remove('open');
-            }, 200);
-        });
-    }
-
-    // Depth filter button
-    const depthFilterBtn = document.getElementById('depthFilterBtn');
-    const depthSelect = document.getElementById('depthSelect');
-    const depthFilterLabel = document.getElementById('depthFilterLabel');
-
-    if (depthFilterBtn && depthSelect) {
-        depthFilterBtn.addEventListener('click', () => {
-            depthFilterBtn.classList.toggle('open');
-            if (depthSelect.style.display === 'none') {
-                depthSelect.style.display = 'block';
-                depthSelect.focus();
-            } else {
-                depthSelect.style.display = 'none';
-            }
-        });
-
-        depthSelect.addEventListener('change', (e) => {
-            const value = e.target.value;
-            depthFilterLabel.textContent = value + ' pages';
-            depthSelect.style.display = 'none';
-            depthFilterBtn.classList.remove('open');
-        });
-
-        depthSelect.addEventListener('blur', () => {
-            setTimeout(() => {
-                depthSelect.style.display = 'none';
-                depthFilterBtn.classList.remove('open');
-            }, 200);
-        });
-    }
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.filter-dropdown-wrapper')) {
+            document.querySelectorAll('.filter-dropdown-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+            document.querySelectorAll('.filter-button.open').forEach(btn => {
+                btn.classList.remove('open');
+            });
+        }
+    });
 }
 
 // Setup event listeners
@@ -1447,11 +1398,8 @@ function setupEventListeners() {
 
     // Apply filters
     document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-        // Don't touch startDate and endDate - they are managed by the calendar modal
-        currentFilters.depth = parseInt(document.getElementById('depthSelect').value);
-        currentFilters.deviceType = document.getElementById('deviceFilter').value || null;
-        currentFilters.trafficSource = document.getElementById('trafficSourceFilter').value || null;
-        currentFilters.category = document.getElementById('categoryFilter').value || null;
+        // Filters are already updated in currentFilters by the dropdown selections
+        // Just load analytics with current filters
         loadAnalytics();
     });
 
@@ -1466,16 +1414,19 @@ function setupEventListeners() {
             category: null
         };
         updateDateRangeLabel();
-        document.getElementById('depthSelect').value = '5';
-        document.getElementById('deviceFilter').value = '';
-        document.getElementById('trafficSourceFilter').value = '';
-        document.getElementById('categoryFilter').value = '';
 
         // Update button labels
         document.getElementById('depthFilterLabel').textContent = '5 pages';
         document.getElementById('deviceFilterLabel').textContent = 'Tous les appareils';
         document.getElementById('trafficSourceFilterLabel').textContent = 'Toutes les sources';
         document.getElementById('categoryFilterLabel').textContent = 'Toutes les catégories';
+
+        // Reset selected states in dropdowns
+        document.querySelectorAll('.filter-dropdown-item').forEach(item => item.classList.remove('selected'));
+        document.querySelector('#deviceFilterMenu [data-value=""]').classList.add('selected');
+        document.querySelector('#trafficSourceFilterMenu [data-value=""]').classList.add('selected');
+        document.querySelector('#categoryFilterMenu [data-value=""]').classList.add('selected');
+        document.querySelector('#depthFilterMenu [data-value="5"]').classList.add('selected');
 
         loadAnalytics();
     });
