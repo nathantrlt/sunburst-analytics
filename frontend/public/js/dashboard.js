@@ -150,11 +150,17 @@ function toggleCustomDropdown() {
     const dropdown = document.getElementById('clientSelectDropdown');
     const button = document.getElementById('clientSelectButton');
 
-    if (dropdown.style.display === 'none') {
+    console.log('Toggle dropdown clicked');
+    console.log('Current display:', dropdown.style.display);
+    console.log('Dropdown element:', dropdown);
+
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
         dropdown.style.display = 'block';
         button.classList.add('open');
+        console.log('Dropdown should now be visible');
     } else {
         closeCustomDropdown();
+        console.log('Dropdown closed');
     }
 }
 
