@@ -2766,6 +2766,8 @@ body[data-theme="light"] .code-example pre {
 
 .cartography-select .custom-select-button {
     min-width: 300px;
+    height: 40px;
+    padding: 8px 12px;
 }
 
 .cartography-actions {
@@ -2782,6 +2784,11 @@ body[data-theme="light"] .code-example pre {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    height: 40px;
+}
+
+.cartography-actions .btn svg {
+    flex-shrink: 0;
 }
 
 .cartography-actions .btn:hover {
