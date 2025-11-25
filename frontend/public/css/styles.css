@@ -1015,7 +1015,7 @@ h2, h3 {
     background: var(--card-bg);
     padding: 24px;
     border-radius: 8px;
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--card-border);
     box-shadow: var(--shadow);
     margin-bottom: 24px;
 }
@@ -2112,7 +2112,7 @@ h2, h3 {
     align-items: center;
     padding: 15px;
     background: var(--bg-color);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     margin-bottom: 10px;
 }
