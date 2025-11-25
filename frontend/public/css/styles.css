@@ -2794,11 +2794,11 @@ body[data-theme="light"] .code-example pre {
     border: 1px solid var(--card-border);
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
+    font-family: 'Montserrat', sans-serif;
     background: var(--primary-color);
     color: #000;
     border-color: var(--primary-color);
-    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
