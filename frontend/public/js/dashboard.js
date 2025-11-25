@@ -1933,14 +1933,28 @@ function initNavigation() {
             }
 
             // Show/hide site management buttons based on section
-            if (siteManagementButtons) {
-                if (section === 'dashboard') {
-                    // Hide buttons on Accueil section
-                    siteManagementButtons.style.display = 'none';
-                } else {
-                    // Show buttons on other sections
-                    siteManagementButtons.style.display = 'block';
-                }
+            const viewSnippetBtn = document.getElementById('viewSnippetBtn');
+            const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+            const manageCollaboratorsBtn = document.getElementById('manageCollaboratorsBtn');
+            const deleteSiteBtn = document.getElementById('deleteSiteBtn');
+
+            if (section === 'dashboard') {
+                // Hide all buttons on Accueil section
+                if (siteManagementButtons) siteManagementButtons.style.display = 'none';
+            } else if (section === 'cartographie') {
+                // On Mes Scores section: show only "Gérer les Catégories"
+                if (siteManagementButtons) siteManagementButtons.style.display = 'block';
+                if (viewSnippetBtn) viewSnippetBtn.style.display = 'none';
+                if (manageCategoriesBtn) manageCategoriesBtn.style.display = 'inline-block';
+                if (manageCollaboratorsBtn) manageCollaboratorsBtn.style.display = 'none';
+                if (deleteSiteBtn) deleteSiteBtn.style.display = 'none';
+            } else {
+                // Show all buttons on other sections
+                if (siteManagementButtons) siteManagementButtons.style.display = 'block';
+                if (viewSnippetBtn) viewSnippetBtn.style.display = 'inline-block';
+                if (manageCategoriesBtn) manageCategoriesBtn.style.display = 'inline-block';
+                if (manageCollaboratorsBtn) manageCollaboratorsBtn.style.display = 'inline-block';
+                if (deleteSiteBtn) deleteSiteBtn.style.display = 'inline-block';
             }
 
             // Show the selected section
