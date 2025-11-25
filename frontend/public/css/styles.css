@@ -1175,11 +1175,11 @@ h2, h3 {
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    border: 1px solid currentColor;
+    border: 1px solid var(--card-border);
     border-radius: 6px;
     font-size: 14px;
     font-weight: 400;
-    background: transparent;
+    background: var(--card-bg);
     color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s ease;
