@@ -2480,7 +2480,7 @@ function loadSettingsPage() {
 
 // Theme Management
 function getTheme() {
-    return localStorage.getItem('theme') || 'light';
+    return localStorage.getItem('theme') || 'dark';
 }
 
 function setTheme(theme) {
