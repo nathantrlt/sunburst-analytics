@@ -2362,8 +2362,15 @@ function setTheme(theme) {
 
 function updateThemeButtons() {
     const currentTheme = getTheme();
-    document.getElementById('lightThemeBtn').classList.toggle('active', currentTheme === 'light');
-    document.getElementById('darkThemeBtn').classList.toggle('active', currentTheme === 'dark');
+    const lightBtn = document.getElementById('lightThemeBtn');
+    const darkBtn = document.getElementById('darkThemeBtn');
+
+    if (lightBtn) {
+        lightBtn.classList.toggle('active', currentTheme === 'light');
+    }
+    if (darkBtn) {
+        darkBtn.classList.toggle('active', currentTheme === 'dark');
+    }
 }
 
 function initTheme() {
