@@ -1916,49 +1916,71 @@ function setupEventListeners() {
     });
 
     // Settings page event listeners
-    // Theme toggle
-    document.getElementById('lightThemeBtn').addEventListener('click', () => {
-        setTheme('light');
-    });
+    // Theme toggle (only if elements exist)
+    const lightThemeBtn = document.getElementById('lightThemeBtn');
+    const darkThemeBtn = document.getElementById('darkThemeBtn');
 
-    document.getElementById('darkThemeBtn').addEventListener('click', () => {
-        setTheme('dark');
-    });
+    if (lightThemeBtn) {
+        lightThemeBtn.addEventListener('click', () => {
+            setTheme('light');
+        });
+    }
+
+    if (darkThemeBtn) {
+        darkThemeBtn.addEventListener('click', () => {
+            setTheme('dark');
+        });
+    }
 
     // Copy snippet from settings
-    document.getElementById('copySettingsSnippetBtn').addEventListener('click', () => {
-        const snippet = document.getElementById('settingsTrackingSnippet').textContent;
-        navigator.clipboard.writeText(snippet);
-        alert('Code de suivi copié dans le presse-papiers !');
-    });
+    const copySettingsSnippetBtn = document.getElementById('copySettingsSnippetBtn');
+    if (copySettingsSnippetBtn) {
+        copySettingsSnippetBtn.addEventListener('click', () => {
+            const snippet = document.getElementById('settingsTrackingSnippet').textContent;
+            navigator.clipboard.writeText(snippet);
+            alert('Code de suivi copié dans le presse-papiers !');
+        });
+    }
 
     // Settings logout
-    document.getElementById('settingsLogoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/index.html';
-    });
+    const settingsLogoutBtn = document.getElementById('settingsLogoutBtn');
+    if (settingsLogoutBtn) {
+        settingsLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        });
+    }
 
     // Settings manage collaborators
-    document.getElementById('settingsManageCollaboratorsBtn').addEventListener('click', () => {
-        document.getElementById('collaboratorsModal').style.display = 'flex';
-        document.getElementById('collaboratorError').style.display = 'none';
-        document.getElementById('collaboratorSuccess').style.display = 'none';
-        document.getElementById('addCollaboratorForm').reset();
-        loadCollaborators();
-    });
+    const settingsManageCollaboratorsBtn = document.getElementById('settingsManageCollaboratorsBtn');
+    if (settingsManageCollaboratorsBtn) {
+        settingsManageCollaboratorsBtn.addEventListener('click', () => {
+            document.getElementById('collaboratorsModal').style.display = 'flex';
+            document.getElementById('collaboratorError').style.display = 'none';
+            document.getElementById('collaboratorSuccess').style.display = 'none';
+            document.getElementById('addCollaboratorForm').reset();
+            loadCollaborators();
+        });
+    }
 
     // Settings manage categories
-    document.getElementById('settingsManageCategoriesBtn').addEventListener('click', () => {
-        document.getElementById('categoriesModal').style.display = 'flex';
-        document.getElementById('categoryError').style.display = 'none';
-        document.getElementById('categorySuccess').style.display = 'none';
-        document.getElementById('addCategoryForm').reset();
-        loadCategories();
-    });
+    const settingsManageCategoriesBtn = document.getElementById('settingsManageCategoriesBtn');
+    if (settingsManageCategoriesBtn) {
+        settingsManageCategoriesBtn.addEventListener('click', () => {
+            document.getElementById('categoriesModal').style.display = 'flex';
+            document.getElementById('categoryError').style.display = 'none';
+            document.getElementById('categorySuccess').style.display = 'none';
+            document.getElementById('addCategoryForm').reset();
+            loadCategories();
+        });
+    }
 
     // Settings delete site
-    document.getElementById('settingsDeleteSiteBtn').addEventListener('click', handleDeleteSite);
+    const settingsDeleteSiteBtn = document.getElementById('settingsDeleteSiteBtn');
+    if (settingsDeleteSiteBtn) {
+        settingsDeleteSiteBtn.addEventListener('click', handleDeleteSite);
+    }
 }
 
 // Handle add site
