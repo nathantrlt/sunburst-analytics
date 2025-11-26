@@ -84,7 +84,7 @@ const initDatabase = async () => {
         id INT PRIMARY KEY AUTO_INCREMENT,
         client_id INT NOT NULL,
         user_id INT NOT NULL,
-        role ENUM('viewer', 'editor') DEFAULT 'viewer',
+        role ENUM('viewer', 'editor', 'admin') DEFAULT 'viewer',
         invited_by INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
