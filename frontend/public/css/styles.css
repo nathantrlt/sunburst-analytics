@@ -89,12 +89,18 @@ body {
 .project-select {
     width: 400px;
     margin-bottom: 0 !important;
+    position: relative;
+    z-index: 10001;
 }
 
 .project-select .custom-select-button {
     width: 100%;
     height: 50px;
     font-size: 16px;
+}
+
+.project-select .custom-select-dropdown {
+    z-index: 10002;
 }
 
 /* Dashboard main hidden by default */
