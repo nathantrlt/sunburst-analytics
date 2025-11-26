@@ -768,125 +768,96 @@
                 <div id="parametresSection" class="content-section" style="display: none;">
                     <h2>Paramètres</h2>
 
-                    <!-- User Information Card -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <h3>Informations du compte</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <div class="settings-item">
-                                <div class="settings-item-label">Nom</div>
-                                <div class="settings-item-value" id="settingsUserName">-</div>
+                    <div class="settings-grid">
+                        <!-- Colonne gauche -->
+                        <div class="settings-column-left">
+                            <!-- User Information Card -->
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <h3>Informations du compte</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <div class="settings-item">
+                                        <div class="settings-item-label">Nom</div>
+                                        <div class="settings-item-value" id="settingsUserName">-</div>
+                                    </div>
+                                    <div class="settings-item">
+                                        <div class="settings-item-label">Email</div>
+                                        <div class="settings-item-value" id="settingsUserEmail">-</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="settings-item">
-                                <div class="settings-item-label">Email</div>
-                                <div class="settings-item-value" id="settingsUserEmail">-</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Appearance Settings -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <h3>Apparence</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <div class="settings-item">
-                                <div class="settings-item-info">
-                                    <div class="settings-item-label">Thème</div>
-                                    <div class="settings-item-description">Choisir entre le thème clair et sombre</div>
+                            <!-- Site Settings (only for owners) -->
+                            <div class="settings-card" id="siteSettingsCard" style="display: none;">
+                                <div class="settings-card-header">
+                                    <h3>Gestion du site</h3>
                                 </div>
-                                <div class="theme-toggle">
-                                    <button id="lightThemeBtn" class="theme-btn active" data-theme="light">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="5"></circle>
-                                            <line x1="12" y1="1" x2="12" y2="3"></line>
-                                            <line x1="12" y1="21" x2="12" y2="23"></line>
-                                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                            <line x1="1" y1="12" x2="3" y2="12"></line>
-                                            <line x1="21" y1="12" x2="23" y2="12"></line>
-                                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                                        </svg>
-                                        Clair
-                                    </button>
-                                    <button id="darkThemeBtn" class="theme-btn" data-theme="dark">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                                        </svg>
-                                        Sombre
-                                    </button>
+                                <div class="settings-card-body">
+                                    <div class="settings-item">
+                                        <div class="settings-item-info">
+                                            <div class="settings-item-label">Collaborateurs</div>
+                                            <div class="settings-item-description">Gérer les personnes ayant accès à ce site</div>
+                                        </div>
+                                        <button id="settingsManageCollaboratorsBtn" class="btn btn-secondary btn-small">Gérer</button>
+                                    </div>
+                                    <div class="settings-item">
+                                        <div class="settings-item-info">
+                                            <div class="settings-item-label">Catégories de pages</div>
+                                            <div class="settings-item-description">Configurer les règles de catégorisation</div>
+                                        </div>
+                                        <button id="settingsManageCategoriesBtn" class="btn btn-secondary btn-small">Gérer</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Tracking Snippet -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <h3>Code de Suivi</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <p class="settings-description">Copiez et collez ce code dans votre site web, juste avant la balise &lt;/head&gt;</p>
-                            <div class="code-block">
-                                <pre id="settingsTrackingSnippet">Sélectionnez un site pour voir le code de suivi</pre>
-                                <button id="copySettingsSnippetBtn" class="btn btn-secondary btn-small" disabled>Copier</button>
+                            <!-- Account Actions -->
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <h3>Actions du compte</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <div class="settings-item">
+                                        <div class="settings-item-info">
+                                            <div class="settings-item-label">Déconnexion</div>
+                                            <div class="settings-item-description">Se déconnecter de votre compte</div>
+                                        </div>
+                                        <button id="settingsLogoutBtn" class="btn btn-secondary btn-small">Déconnexion</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Site Settings (only for owners) -->
-                    <div class="settings-card" id="siteSettingsCard" style="display: none;">
-                        <div class="settings-card-header">
-                            <h3>Gestion du site</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <div class="settings-item">
-                                <div class="settings-item-info">
-                                    <div class="settings-item-label">Collaborateurs</div>
-                                    <div class="settings-item-description">Gérer les personnes ayant accès à ce site</div>
+                        <!-- Colonne droite -->
+                        <div class="settings-column-right">
+                            <!-- Tracking Snippet -->
+                            <div class="settings-card settings-card-tracking">
+                                <div class="settings-card-header">
+                                    <h3>Code de Suivi</h3>
                                 </div>
-                                <button id="settingsManageCollaboratorsBtn" class="btn btn-secondary btn-small">Gérer</button>
-                            </div>
-                            <div class="settings-item">
-                                <div class="settings-item-info">
-                                    <div class="settings-item-label">Catégories de pages</div>
-                                    <div class="settings-item-description">Configurer les règles de catégorisation</div>
+                                <div class="settings-card-body">
+                                    <p class="settings-description">Copiez et collez ce code dans votre site web, juste avant la balise &lt;/head&gt;</p>
+                                    <div class="code-block">
+                                        <pre id="settingsTrackingSnippet">Sélectionnez un site pour voir le code de suivi</pre>
+                                        <button id="copySettingsSnippetBtn" class="btn btn-secondary btn-small" disabled>Copier</button>
+                                    </div>
                                 </div>
-                                <button id="settingsManageCategoriesBtn" class="btn btn-secondary btn-small">Gérer</button>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Danger Zone -->
-                    <div class="settings-card danger-zone" id="dangerZoneCard" style="display: none;">
-                        <div class="settings-card-header">
-                            <h3>Zone de danger</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <div class="settings-item">
-                                <div class="settings-item-info">
-                                    <div class="settings-item-label">Supprimer le site</div>
-                                    <div class="settings-item-description">Cette action est irréversible et supprimera toutes les données</div>
+                            <!-- Danger Zone -->
+                            <div class="settings-card danger-zone" id="dangerZoneCard" style="display: none;">
+                                <div class="settings-card-header">
+                                    <h3>Zone de danger</h3>
                                 </div>
-                                <button id="settingsDeleteSiteBtn" class="btn btn-danger btn-small">Supprimer</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Account Actions -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <h3>Actions du compte</h3>
-                        </div>
-                        <div class="settings-card-body">
-                            <div class="settings-item">
-                                <div class="settings-item-info">
-                                    <div class="settings-item-label">Déconnexion</div>
-                                    <div class="settings-item-description">Se déconnecter de votre compte</div>
+                                <div class="settings-card-body">
+                                    <div class="settings-item">
+                                        <div class="settings-item-info">
+                                            <div class="settings-item-label">Supprimer le site</div>
+                                            <div class="settings-item-description">Cette action est irréversible et supprimera toutes les données</div>
+                                        </div>
+                                        <button id="settingsDeleteSiteBtn" class="btn btn-danger btn-small">Supprimer</button>
+                                    </div>
                                 </div>
-                                <button id="settingsLogoutBtn" class="btn btn-secondary btn-small">Déconnexion</button>
                             </div>
                         </div>
                     </div>
