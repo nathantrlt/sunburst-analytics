@@ -37,29 +37,46 @@ function checkAuth() {
 // API Helper
 async function apiRequest(endpoint, options = {}) {
     const token = getToken();
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            ...options.headers
+
+    try {
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            console.error('🔒 Authentication failed for endpoint:', endpoint, 'Status:', response.status);
+            console.error('Token exists:', !!token);
+            console.error('Response:', await response.text());
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+
+            alert('Session expirée ou accès non autorisé. Vous allez être déconnecté.');
+
+            setTimeout(() => {
+                window.location.href = '/index.html';
+            }, 1000);
+
+            throw new Error('Unauthorized');
         }
-    });
 
-    if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/index.html';
-        throw new Error('Unauthorized');
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('❌ API Error:', endpoint, data);
+            throw new Error(data.error || 'Request failed');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('🚨 API Request failed:', endpoint, error);
+        throw error;
     }
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
-    }
-
-    return data;
 }
 
 // Show/Hide screens
