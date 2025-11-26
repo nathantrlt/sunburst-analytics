@@ -8,6 +8,12 @@
     box-sizing: border-box;
 }
 
+/* Force dark theme immediately */
+html, body {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+}
+
 :root {
     --primary-color: #FFD700;
     --primary-dark: #e6c200;
@@ -25,14 +31,21 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+html {
+    background-color: #0a0a0a;
+}
+
 body {
     font-family: 'Montserrat', sans-serif;
+    background-color: #0a0a0a;
     background-color: var(--bg-main);
+    color: #ffffff;
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
 }
 
 /* ==================== PROJECT SELECTION SCREEN ==================== */
