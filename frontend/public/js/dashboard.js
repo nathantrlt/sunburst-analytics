@@ -62,6 +62,17 @@ async function apiRequest(endpoint, options = {}) {
     return data;
 }
 
+// Show/Hide screens
+function showProjectSelectionScreen() {
+    document.getElementById('projectSelectionScreen').style.display = 'flex';
+    document.getElementById('dashboardMain').style.display = 'none';
+}
+
+function showDashboard() {
+    document.getElementById('projectSelectionScreen').style.display = 'none';
+    document.getElementById('dashboardMain').style.display = 'flex';
+}
+
 // Initialize Dashboard
 async function initDashboard() {
     if (!checkAuth()) return;
@@ -69,11 +80,17 @@ async function initDashboard() {
     // Load user info
     loadUserInfo();
 
-    // Load clients
+    // Load clients for project selection screen
+    await loadClientsForProjectSelection();
+
+    // Load clients for header dropdown
     await loadClients();
 
     // Setup event listeners
     setupEventListeners();
+
+    // Show project selection screen initially
+    showProjectSelectionScreen();
 }
 
 // Load user info
@@ -82,6 +99,61 @@ function loadUserInfo() {
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
         userNameElement.textContent = user.name || 'Utilisateur';
+    }
+}
+
+// Load clients for project selection screen
+async function loadClientsForProjectSelection() {
+    try {
+        const data = await apiRequest('/clients');
+        clients = data.clients;
+        renderProjectSelectionList();
+    } catch (error) {
+        console.error('Failed to load clients for project selection:', error);
+    }
+}
+
+// Render project selection list
+function renderProjectSelectionList() {
+    const buttonText = document.getElementById('selectedProjectText');
+    const dropdown = document.getElementById('projectSelectDropdown');
+    const optionsContainer = dropdown.querySelector('.custom-select-options');
+
+    buttonText.textContent = clients.length === 0 ? 'Aucun site disponible' : 'Sélectionner un site';
+
+    let optionsHTML = '';
+    if (clients.length === 0) {
+        optionsHTML = '<div class="custom-option disabled">Aucun site disponible</div>';
+    } else {
+        optionsHTML = clients.map(client =>
+            `<div class="custom-option" data-client-id="${client.id}">
+                <div class="option-name">${client.site_name}</div>
+                <div class="option-url">${client.site_url}</div>
+            </div>`
+        ).join('');
+    }
+
+    optionsContainer.innerHTML = optionsHTML;
+
+    // Add click handlers
+    optionsContainer.querySelectorAll('.custom-option').forEach(option => {
+        option.addEventListener('click', () => {
+            if (!option.classList.contains('disabled')) {
+                const clientId = parseInt(option.dataset.clientId);
+                selectClientFromProjectScreen(clientId);
+            }
+        });
+    });
+}
+
+// Select client from project selection screen
+function selectClientFromProjectScreen(clientId) {
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+        currentClient = client;
+        showDashboard();
+        loadDashboardData();
+        renderClientsList(); // Update header dropdown
     }
 }
 
@@ -149,6 +221,27 @@ function renderClientsList() {
 }
 
 // Toggle custom dropdown
+// Toggle project select dropdown
+function toggleProjectSelectDropdown() {
+    const dropdown = document.getElementById('projectSelectDropdown');
+    const button = document.getElementById('projectSelectButton');
+
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        dropdown.style.display = 'block';
+        button.classList.add('open');
+    } else {
+        closeProjectSelectDropdown();
+    }
+}
+
+// Close project select dropdown
+function closeProjectSelectDropdown() {
+    const dropdown = document.getElementById('projectSelectDropdown');
+    const button = document.getElementById('projectSelectButton');
+    dropdown.style.display = 'none';
+    button.classList.remove('open');
+}
+
 function toggleCustomDropdown() {
     const dropdown = document.getElementById('clientSelectDropdown');
     const button = document.getElementById('clientSelectButton');
@@ -1357,6 +1450,12 @@ function setupEventListeners() {
         window.location.href = '/index.html';
     });
 
+    // Project selection screen dropdown
+    document.getElementById('projectSelectButton').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleProjectSelectDropdown();
+    });
+
     // Custom select dropdown
     document.getElementById('clientSelectButton').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1365,9 +1464,15 @@ function setupEventListeners() {
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
-        const wrapper = document.querySelector('.custom-select-wrapper');
+        const wrapper = document.querySelector('.custom-select-wrapper.header-select');
+        const projectWrapper = document.querySelector('.custom-select-wrapper.project-select');
+
         if (wrapper && !wrapper.contains(e.target)) {
             closeCustomDropdown();
+        }
+
+        if (projectWrapper && !projectWrapper.contains(e.target)) {
+            closeProjectSelectDropdown();
         }
     });
 

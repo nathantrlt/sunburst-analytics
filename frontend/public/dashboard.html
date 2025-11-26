@@ -11,6 +11,35 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="dashboard-page">
+    <!-- Écran de sélection de projet (visible initialement) -->
+    <div id="projectSelectionScreen" class="project-selection-screen">
+        <div class="project-selection-container">
+            <div class="project-selection-logo">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FCD116" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+            </div>
+            <h1 class="project-selection-title">Sunburst Analytics</h1>
+            <p class="project-selection-subtitle">Sélectionnez un projet pour commencer</p>
+            <div class="custom-select-wrapper project-select">
+                <div id="projectSelectButton" class="custom-select-button">
+                    <span id="selectedProjectText">Sélectionner un site</span>
+                    <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12">
+                        <path fill="#FCD116" d="M6 9L1 4h10z"/>
+                    </svg>
+                </div>
+                <div id="projectSelectDropdown" class="custom-select-dropdown" style="display: none;">
+                    <div class="custom-select-options">
+                        <div class="custom-option loading">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard principal (caché initialement) -->
+    <div id="dashboardMain" class="dashboard-main" style="display: none;">
     <!-- Sidebar fixe à gauche -->
     <aside class="sidebar-left">
         <!-- Logo + Titre -->
@@ -1284,6 +1313,7 @@
             </div>
         </div>
     </div>
+    </div> <!-- Fin de dashboardMain -->
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
