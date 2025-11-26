@@ -49,18 +49,19 @@ async function apiRequest(endpoint, options = {}) {
         });
 
         if (response.status === 401 || response.status === 403) {
-            console.error('🔒 Authentication failed for endpoint:', endpoint, 'Status:', response.status);
-            console.error('Token exists:', !!token);
-            console.error('Response:', await response.text());
+            const responseText = await response.text();
+            console.error('🔒 ============================================');
+            console.error('🔒 AUTHENTICATION FAILED');
+            console.error('🔒 Endpoint:', endpoint);
+            console.error('🔒 Method:', options.method || 'GET');
+            console.error('🔒 Status:', response.status);
+            console.error('🔒 Token exists:', !!token);
+            console.error('🔒 Token (first 20 chars):', token ? token.substring(0, 20) + '...' : 'null');
+            console.error('🔒 Response:', responseText);
+            console.error('🔒 ============================================');
 
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-
-            alert('Session expirée ou accès non autorisé. Vous allez être déconnecté.');
-
-            setTimeout(() => {
-                window.location.href = '/index.html';
-            }, 1000);
+            // Don't auto-disconnect - let user see the error
+            alert('⚠️ ERREUR D\'AUTHENTIFICATION\n\nEndpoint: ' + endpoint + '\nStatus: ' + response.status + '\n\nOuvrez la console (F12) pour voir les détails.\n\nLa page ne va PAS se recharger automatiquement.');
 
             throw new Error('Unauthorized');
         }
