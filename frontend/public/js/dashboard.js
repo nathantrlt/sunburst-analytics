@@ -145,19 +145,45 @@ function renderProjectSelectionList() {
 
 // Select client from project selection screen
 async function selectClientFromProjectScreen(clientId) {
-    const client = clients.find(c => c.id === clientId);
-    if (client) {
-        currentClient = client;
+    currentClient = clients.find(c => c.id === clientId);
+    if (!currentClient) return;
 
-        // Update header dropdown to show selected client
-        renderClientsList();
+    // Update header dropdown to show selected client
+    renderClientsList();
 
-        // Show dashboard
-        showDashboard();
+    // Show dashboard
+    showDashboard();
 
-        // Load all dashboard data
-        await loadDashboardData();
+    // Update site info
+    document.getElementById('siteName').textContent = currentClient.site_name;
+    document.getElementById('siteUrl').textContent = currentClient.site_url;
+
+    // Show/hide management buttons based on access type
+    const isOwner = currentClient.access_type === 'owner';
+    const isEditor = currentClient.access_type === 'editor';
+    const canManageCategories = isOwner || isEditor;
+
+    document.getElementById('viewSnippetBtn').style.display = 'inline-block';
+    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+    if (manageCategoriesBtn) {
+        manageCategoriesBtn.style.display = canManageCategories ? 'inline-block' : 'none';
     }
+    document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
+
+    // Hide welcome message, show content
+    document.getElementById('welcomeMessage').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+
+    // Load cartographies
+    await window.cartographyModule.loadCartographies();
+
+    // Update tracking snippets everywhere
+    updateAllTrackingSnippets();
+
+    // Load category filter options and analytics data
+    await loadCategoryFilterOptions();
+    await loadAnalytics();
 }
 
 // Load clients list
