@@ -571,7 +571,7 @@
                             <h4>Rôles disponibles</h4>
                             <div class="role-cards">
                                 <div class="role-card">
-                                    <h5>👑 Propriétaire (Owner)</h5>
+                                    <h5>👑 Administrateur (Admin)</h5>
                                     <ul>
                                         <li>Tous les droits</li>
                                         <li>Gérer les collaborateurs</li>
@@ -619,7 +619,7 @@
                                 <div class="doc-step">
                                     <div class="step-number">3</div>
                                     <div class="step-content">
-                                        <p>Sélectionnez le rôle (Lecteur ou Éditeur)</p>
+                                        <p>Sélectionnez le rôle (Lecteur, Éditeur ou Administrateur)</p>
                                     </div>
                                 </div>
 
@@ -1029,6 +1029,7 @@
                             <select id="collaboratorRole">
                                 <option value="viewer">Lecteur</option>
                                 <option value="editor">Éditeur</option>
+                                <option value="admin">Administrateur</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary" id="addCollaboratorBtn">
@@ -1045,6 +1046,38 @@
                         <div class="loading-spinner">Chargement des collaborateurs...</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Collaborator Role Modal -->
+    <div id="editCollaboratorModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Modifier le Rôle</h2>
+                <button class="modal-close" id="closeEditCollaboratorModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="editCollaboratorError" class="error-message" style="display: none;"></div>
+                <div id="editCollaboratorSuccess" class="success-message" style="display: none;"></div>
+
+                <p>Sélectionnez le nouveau rôle pour <strong id="editCollaboratorName"></strong> :</p>
+
+                <form id="editCollaboratorForm">
+                    <div class="form-group">
+                        <label for="editCollaboratorRole">Rôle</label>
+                        <select id="editCollaboratorRole" required>
+                            <option value="viewer">👁️ Lecteur - Voir les analytics uniquement</option>
+                            <option value="editor">✏️ Éditeur - Gérer les catégories</option>
+                            <option value="admin">👑 Administrateur - Tous les droits</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="saveCollaboratorRoleBtn">
+                        <span class="btn-text">Enregistrer</span>
+                        <span class="btn-loader" style="display: none;">Enregistrement...</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>

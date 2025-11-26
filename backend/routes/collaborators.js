@@ -45,8 +45,8 @@ router.post('/:clientId', async (req, res) => {
     }
 
     // Validate role
-    if (role && !['viewer', 'editor'].includes(role)) {
-      return res.status(400).json({ error: 'Role must be viewer or editor' });
+    if (role && !['viewer', 'editor', 'admin'].includes(role)) {
+      return res.status(400).json({ error: 'Role must be viewer, editor, or admin' });
     }
 
     // Verify user is owner
@@ -98,8 +98,8 @@ router.put('/:clientId/:collaboratorId', async (req, res) => {
     }
 
     // Validate role
-    if (!role || !['viewer', 'editor'].includes(role)) {
-      return res.status(400).json({ error: 'Role must be viewer or editor' });
+    if (!role || !['viewer', 'editor', 'admin'].includes(role)) {
+      return res.status(400).json({ error: 'Role must be viewer, editor, or admin' });
     }
 
     // Verify user is owner

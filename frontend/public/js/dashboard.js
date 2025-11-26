@@ -181,16 +181,18 @@ async function selectClientFromProjectScreen(clientId) {
 
     // Show/hide management buttons based on access type
     const isOwner = currentClient.access_type === 'owner';
+    const isAdmin = currentClient.access_type === 'admin';
     const isEditor = currentClient.access_type === 'editor';
-    const canManageCategories = isOwner || isEditor;
+    const canManageCategories = isOwner || isAdmin || isEditor;
+    const hasFullAccess = isOwner || isAdmin; // Admin has same rights as owner
 
     document.getElementById('viewSnippetBtn').style.display = 'inline-block';
     const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
     if (manageCategoriesBtn) {
         manageCategoriesBtn.style.display = canManageCategories ? 'inline-block' : 'none';
     }
-    document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
-    document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
 
     // Hide welcome message, show content
     document.getElementById('welcomeMessage').style.display = 'none';
@@ -340,13 +342,15 @@ async function selectClient(clientId) {
 
     // Show/hide management buttons based on access type
     const isOwner = currentClient.access_type === 'owner';
+    const isAdmin = currentClient.access_type === 'admin';
     const isEditor = currentClient.access_type === 'editor';
-    const canManageCategories = isOwner || isEditor;
+    const canManageCategories = isOwner || isAdmin || isEditor;
+    const hasFullAccess = isOwner || isAdmin; // Admin has same rights as owner
 
     document.getElementById('viewSnippetBtn').style.display = 'inline-block'; // Always visible
     document.getElementById('manageCategoriesBtn').style.display = canManageCategories ? 'inline-block' : 'none';
-    document.getElementById('manageCollaboratorsBtn').style.display = isOwner ? 'inline-block' : 'none';
-    document.getElementById('deleteSiteBtn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
 
     // Load cartographies
     await window.cartographyModule.loadCartographies();
@@ -1296,31 +1300,38 @@ function renderCollaboratorsList(collaborators) {
         return;
     }
 
-    container.innerHTML = collaborators.map(collab => `
-        <div class="collaborator-item" data-collaborator-id="${collab.id}">
-            <div class="collaborator-info">
-                <strong>${collab.name || collab.email}</strong>
-                <span class="collaborator-email">${collab.email}</span>
-                <span class="collaborator-role badge">${collab.role === 'viewer' ? 'Lecteur' : collab.role === 'editor' ? 'Éditeur' : collab.role}</span>
+    container.innerHTML = collaborators.map(collab => {
+        let roleLabel = 'Lecteur';
+        if (collab.role === 'editor') roleLabel = 'Éditeur';
+        else if (collab.role === 'admin') roleLabel = 'Administrateur';
+
+        return `
+            <div class="collaborator-item" data-collaborator-id="${collab.id}">
+                <div class="collaborator-info">
+                    <strong>${collab.name || collab.email}</strong>
+                    <span class="collaborator-email">${collab.email}</span>
+                    <span class="collaborator-role badge">${roleLabel}</span>
+                </div>
+                <div class="collaborator-actions">
+                    <button class="btn btn-secondary btn-small edit-collaborator-btn" data-collaborator-id="${collab.id}" data-collaborator-role="${collab.role}" data-collaborator-name="${collab.name || collab.email}">
+                        Modifier
+                    </button>
+                    <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
+                        Retirer
+                    </button>
+                </div>
             </div>
-            <div class="collaborator-actions">
-                <button class="btn btn-secondary btn-small edit-collaborator-btn" data-collaborator-id="${collab.id}" data-collaborator-role="${collab.role}">
-                    Modifier
-                </button>
-                <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
-                    Retirer
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Add click handlers for edit buttons
     document.querySelectorAll('.edit-collaborator-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const collaboratorId = parseInt(btn.dataset.collaboratorId);
             const currentRole = btn.dataset.collaboratorRole;
-            await handleEditCollaborator(collaboratorId, currentRole);
+            const collaboratorName = btn.dataset.collaboratorName;
+            openEditCollaboratorModal(collaboratorId, currentRole, collaboratorName);
         });
     });
 
@@ -1378,49 +1389,65 @@ async function handleAddCollaborator(e) {
     }
 }
 
-// Handle remove collaborator
-// Handle edit collaborator
-async function handleEditCollaborator(collaboratorId, currentRole) {
-    if (!currentClient) return;
+// Open edit collaborator modal
+let editingCollaboratorId = null;
 
-    // Show a simple prompt to select new role
-    const newRole = prompt(`Modifier le rôle du collaborateur :\n\nEntrez "viewer" pour Lecteur ou "editor" pour Éditeur\n\nRôle actuel : ${currentRole === 'viewer' ? 'Lecteur' : 'Éditeur'}`, currentRole);
+function openEditCollaboratorModal(collaboratorId, currentRole, collaboratorName) {
+    editingCollaboratorId = collaboratorId;
 
-    if (!newRole) return; // User cancelled
+    document.getElementById('editCollaboratorName').textContent = collaboratorName;
+    document.getElementById('editCollaboratorRole').value = currentRole;
+    document.getElementById('editCollaboratorModal').style.display = 'flex';
+    document.getElementById('editCollaboratorError').style.display = 'none';
+    document.getElementById('editCollaboratorSuccess').style.display = 'none';
+}
 
-    if (newRole !== 'viewer' && newRole !== 'editor') {
-        alert('Rôle invalide. Veuillez entrer "viewer" ou "editor".');
-        return;
-    }
+// Handle edit collaborator form submission
+async function handleEditCollaboratorSubmit(e) {
+    e.preventDefault();
+    if (!currentClient || !editingCollaboratorId) return;
 
-    if (newRole === currentRole) {
-        alert('Le rôle n\'a pas changé.');
-        return;
-    }
+    const newRole = document.getElementById('editCollaboratorRole').value;
+
+    document.getElementById('editCollaboratorError').style.display = 'none';
+    document.getElementById('editCollaboratorSuccess').style.display = 'none';
 
     try {
-        await apiRequest(`/collaborators/${currentClient.id}/${collaboratorId}`, {
+        const btn = document.getElementById('saveCollaboratorRoleBtn');
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loader').style.display = 'inline';
+        btn.disabled = true;
+
+        await apiRequest(`/collaborators/${currentClient.id}/${editingCollaboratorId}`, {
             method: 'PUT',
             body: JSON.stringify({ role: newRole })
         });
 
-        const successDiv = document.getElementById('collaboratorSuccess');
+        const successDiv = document.getElementById('editCollaboratorSuccess');
         successDiv.textContent = 'Rôle du collaborateur mis à jour avec succès !';
         successDiv.style.display = 'block';
 
-        // Reload collaborators list
+        // Reload collaborators list in main modal
         await loadCollaborators();
 
-        // Hide success message after 3 seconds
+        // Close modal after short delay
         setTimeout(() => {
-            successDiv.style.display = 'none';
-        }, 3000);
+            document.getElementById('editCollaboratorModal').style.display = 'none';
+            editingCollaboratorId = null;
+        }, 1500);
     } catch (error) {
-        const errorDiv = document.getElementById('collaboratorError');
-        errorDiv.textContent = 'Échec de la modification du collaborateur : ' + error.message;
+        const errorDiv = document.getElementById('editCollaboratorError');
+        errorDiv.textContent = 'Échec de la modification : ' + error.message;
         errorDiv.style.display = 'block';
+    } finally {
+        const btn = document.getElementById('saveCollaboratorRoleBtn');
+        btn.querySelector('.btn-text').style.display = 'inline';
+        btn.querySelector('.btn-loader').style.display = 'none';
+        btn.disabled = false;
     }
 }
+
+// Handle remove collaborator
 
 async function handleRemoveCollaborator(collaboratorId) {
     if (!currentClient) return;
@@ -1700,8 +1727,17 @@ function setupEventListeners() {
         document.getElementById('collaboratorsModal').style.display = 'none';
     });
 
+    // Close edit collaborator modal
+    document.getElementById('closeEditCollaboratorModal').addEventListener('click', () => {
+        document.getElementById('editCollaboratorModal').style.display = 'none';
+        editingCollaboratorId = null;
+    });
+
     // Add collaborator form
     document.getElementById('addCollaboratorForm').addEventListener('submit', handleAddCollaborator);
+
+    // Edit collaborator form
+    document.getElementById('editCollaboratorForm').addEventListener('submit', handleEditCollaboratorSubmit);
 
     // Filter button handlers
     setupFilterButtons();
@@ -2416,8 +2452,10 @@ function loadSettingsPage() {
 
         // Show/hide management options based on access
         const isOwner = currentClient.access_type === 'owner';
-        document.getElementById('siteSettingsCard').style.display = isOwner ? 'block' : 'none';
-        document.getElementById('dangerZoneCard').style.display = isOwner ? 'block' : 'none';
+        const isAdmin = currentClient.access_type === 'admin';
+        const hasFullAccess = isOwner || isAdmin; // Admin has same rights as owner
+        document.getElementById('siteSettingsCard').style.display = hasFullAccess ? 'block' : 'none';
+        document.getElementById('dangerZoneCard').style.display = hasFullAccess ? 'block' : 'none';
     } else {
         document.getElementById('settingsTrackingSnippet').textContent = 'Sélectionnez un site pour voir le code de suivi';
         document.getElementById('copySettingsSnippetBtn').disabled = true;
