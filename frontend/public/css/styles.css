@@ -100,6 +100,12 @@ body {
 /* Dashboard main hidden by default */
 .dashboard-main {
     display: none;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.dashboard-main.active {
+    display: flex;
 }
 
 /* ==================== SIDEBAR FIXE ==================== */
@@ -223,6 +229,8 @@ body {
     margin-left: 235px;
     min-height: 100vh;
     background-color: var(--bg-main);
+    flex: 1;
+    width: calc(100% - 235px);
 }
 
 .main-header {

@@ -70,7 +70,9 @@ function showProjectSelectionScreen() {
 
 function showDashboard() {
     document.getElementById('projectSelectionScreen').style.display = 'none';
-    document.getElementById('dashboardMain').style.display = 'flex';
+    const dashboardMain = document.getElementById('dashboardMain');
+    dashboardMain.style.display = 'flex';
+    dashboardMain.classList.add('active');
 }
 
 // Initialize Dashboard
