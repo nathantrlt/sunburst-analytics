@@ -137,9 +137,12 @@ function renderProjectSelectionList() {
     // Add click handlers
     optionsContainer.querySelectorAll('.custom-option').forEach(option => {
         option.addEventListener('click', () => {
+            console.log('Project option clicked', option);
             if (!option.classList.contains('disabled')) {
                 const clientId = parseInt(option.dataset.clientId);
+                console.log('Selecting client ID:', clientId);
                 selectClientFromProjectScreen(clientId);
+                closeProjectSelectDropdown();
             }
         });
     });
@@ -257,11 +260,15 @@ function toggleProjectSelectDropdown() {
     const dropdown = document.getElementById('projectSelectDropdown');
     const button = document.getElementById('projectSelectButton');
 
+    console.log('Toggle project dropdown clicked', dropdown, button);
+
     if (dropdown.style.display === 'none' || dropdown.style.display === '') {
         dropdown.style.display = 'block';
         button.classList.add('open');
+        console.log('Dropdown opened');
     } else {
         closeProjectSelectDropdown();
+        console.log('Dropdown closed');
     }
 }
 
