@@ -7,6 +7,15 @@ const { authenticateToken } = require('../middleware/auth');
 // All routes require authentication
 router.use(authenticateToken);
 
+// Helper function to check if user is owner or admin
+async function isOwnerOrAdmin(clientId, userId) {
+  const isOwner = await Client.verifyOwnership(clientId, userId);
+  if (isOwner) return true;
+
+  const role = await Collaborator.getRole(clientId, userId);
+  return role === 'admin';
+}
+
 // GET /api/collaborators/:clientId - Get all collaborators for a client
 router.get('/:clientId', async (req, res) => {
   try {
@@ -16,10 +25,10 @@ router.get('/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid client ID' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can view collaborators' });
+    // Verify user is owner or admin
+    const canManage = await isOwnerOrAdmin(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and admins can view collaborators' });
     }
 
     const collaborators = await Collaborator.findByClientId(clientId);
@@ -49,10 +58,10 @@ router.post('/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Role must be viewer, editor, or admin' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can add collaborators' });
+    // Verify user is owner or admin
+    const canManage = await isOwnerOrAdmin(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and admins can add collaborators' });
     }
 
     // Check if trying to add themselves
@@ -102,10 +111,10 @@ router.put('/:clientId/:collaboratorId', async (req, res) => {
       return res.status(400).json({ error: 'Role must be viewer, editor, or admin' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can update collaborators' });
+    // Verify user is owner or admin
+    const canManage = await isOwnerOrAdmin(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and admins can update collaborators' });
     }
 
     const updated = await Collaborator.updateRole(collaboratorId, clientId, role);
@@ -131,10 +140,10 @@ router.delete('/:clientId/:collaboratorId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid IDs' });
     }
 
-    // Verify user is owner
-    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
-    if (!isOwner) {
-      return res.status(403).json({ error: 'Only owners can remove collaborators' });
+    // Verify user is owner or admin
+    const canManage = await isOwnerOrAdmin(clientId, req.user.userId);
+    if (!canManage) {
+      return res.status(403).json({ error: 'Only owners and admins can remove collaborators' });
     }
 
     const removed = await Collaborator.remove(collaboratorId, clientId);
