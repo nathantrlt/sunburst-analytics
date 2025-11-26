@@ -56,6 +56,8 @@ body {
     gap: 24px;
     max-width: 500px;
     padding: 40px;
+    position: relative;
+    z-index: 10001;
 }
 
 .project-selection-logo {
@@ -100,7 +102,7 @@ body {
 }
 
 .project-select .custom-select-dropdown {
-    z-index: 10002;
+    z-index: 99999 !important;
 }
 
 /* Dashboard main hidden by default */
