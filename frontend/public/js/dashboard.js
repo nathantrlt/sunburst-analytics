@@ -80,11 +80,8 @@ async function initDashboard() {
     // Load user info
     loadUserInfo();
 
-    // Load clients for project selection screen
+    // Load clients once for both screens
     await loadClientsForProjectSelection();
-
-    // Load clients for header dropdown
-    await loadClients();
 
     // Setup event listeners
     setupEventListeners();
@@ -147,13 +144,19 @@ function renderProjectSelectionList() {
 }
 
 // Select client from project selection screen
-function selectClientFromProjectScreen(clientId) {
+async function selectClientFromProjectScreen(clientId) {
     const client = clients.find(c => c.id === clientId);
     if (client) {
         currentClient = client;
+
+        // Update header dropdown to show selected client
+        renderClientsList();
+
+        // Show dashboard
         showDashboard();
-        loadDashboardData();
-        renderClientsList(); // Update header dropdown
+
+        // Load all dashboard data
+        await loadDashboardData();
     }
 }
 
