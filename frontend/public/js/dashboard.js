@@ -1303,11 +1303,26 @@ function renderCollaboratorsList(collaborators) {
                 <span class="collaborator-email">${collab.email}</span>
                 <span class="collaborator-role badge">${collab.role === 'viewer' ? 'Lecteur' : collab.role === 'editor' ? 'Éditeur' : collab.role}</span>
             </div>
-            <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
-                Retirer
-            </button>
+            <div class="collaborator-actions">
+                <button class="btn btn-secondary btn-small edit-collaborator-btn" data-collaborator-id="${collab.id}" data-collaborator-role="${collab.role}">
+                    Modifier
+                </button>
+                <button class="btn btn-danger btn-small remove-collaborator-btn" data-collaborator-id="${collab.id}">
+                    Retirer
+                </button>
+            </div>
         </div>
     `).join('');
+
+    // Add click handlers for edit buttons
+    document.querySelectorAll('.edit-collaborator-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const collaboratorId = parseInt(btn.dataset.collaboratorId);
+            const currentRole = btn.dataset.collaboratorRole;
+            await handleEditCollaborator(collaboratorId, currentRole);
+        });
+    });
 
     // Add click handlers for remove buttons
     document.querySelectorAll('.remove-collaborator-btn').forEach(btn => {
@@ -1364,6 +1379,49 @@ async function handleAddCollaborator(e) {
 }
 
 // Handle remove collaborator
+// Handle edit collaborator
+async function handleEditCollaborator(collaboratorId, currentRole) {
+    if (!currentClient) return;
+
+    // Show a simple prompt to select new role
+    const newRole = prompt(`Modifier le rôle du collaborateur :\n\nEntrez "viewer" pour Lecteur ou "editor" pour Éditeur\n\nRôle actuel : ${currentRole === 'viewer' ? 'Lecteur' : 'Éditeur'}`, currentRole);
+
+    if (!newRole) return; // User cancelled
+
+    if (newRole !== 'viewer' && newRole !== 'editor') {
+        alert('Rôle invalide. Veuillez entrer "viewer" ou "editor".');
+        return;
+    }
+
+    if (newRole === currentRole) {
+        alert('Le rôle n\'a pas changé.');
+        return;
+    }
+
+    try {
+        await apiRequest(`/collaborators/${currentClient.id}/${collaboratorId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ role: newRole })
+        });
+
+        const successDiv = document.getElementById('collaboratorSuccess');
+        successDiv.textContent = 'Rôle du collaborateur mis à jour avec succès !';
+        successDiv.style.display = 'block';
+
+        // Reload collaborators list
+        await loadCollaborators();
+
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+            successDiv.style.display = 'none';
+        }, 3000);
+    } catch (error) {
+        const errorDiv = document.getElementById('collaboratorError');
+        errorDiv.textContent = 'Échec de la modification du collaborateur : ' + error.message;
+        errorDiv.style.display = 'block';
+    }
+}
+
 async function handleRemoveCollaborator(collaboratorId) {
     if (!currentClient) return;
 

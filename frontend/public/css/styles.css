@@ -2133,6 +2133,12 @@ h2, h3 {
     gap: 5px;
 }
 
+.collaborator-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .collaborator-email {
     font-size: 13px;
     color: var(--text-secondary);

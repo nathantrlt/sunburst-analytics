@@ -104,6 +104,19 @@ class Collaborator {
     }
   }
 
+  // Update collaborator role
+  static async updateRole(collaboratorId, clientId, role) {
+    try {
+      const [result] = await pool.query(
+        'UPDATE collaborators SET role = ? WHERE id = ? AND client_id = ?',
+        [role, collaboratorId, clientId]
+      );
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Get user's role on a client
   static async getRole(clientId, userId) {
     try {

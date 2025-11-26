@@ -86,6 +86,41 @@ router.post('/:clientId', async (req, res) => {
   }
 });
 
+// PUT /api/collaborators/:clientId/:collaboratorId - Update collaborator role
+router.put('/:clientId/:collaboratorId', async (req, res) => {
+  try {
+    const clientId = parseInt(req.params.clientId);
+    const collaboratorId = parseInt(req.params.collaboratorId);
+    const { role } = req.body;
+
+    if (isNaN(clientId) || isNaN(collaboratorId)) {
+      return res.status(400).json({ error: 'Invalid IDs' });
+    }
+
+    // Validate role
+    if (!role || !['viewer', 'editor'].includes(role)) {
+      return res.status(400).json({ error: 'Role must be viewer or editor' });
+    }
+
+    // Verify user is owner
+    const isOwner = await Client.verifyOwnership(clientId, req.user.userId);
+    if (!isOwner) {
+      return res.status(403).json({ error: 'Only owners can update collaborators' });
+    }
+
+    const updated = await Collaborator.updateRole(collaboratorId, clientId, role);
+
+    if (updated) {
+      res.json({ message: 'Collaborator role updated successfully' });
+    } else {
+      res.status(404).json({ error: 'Collaborator not found' });
+    }
+  } catch (error) {
+    console.error('Update collaborator error:', error);
+    res.status(500).json({ error: 'Failed to update collaborator' });
+  }
+});
+
 // DELETE /api/collaborators/:clientId/:collaboratorId - Remove a collaborator
 router.delete('/:clientId/:collaboratorId', async (req, res) => {
   try {
