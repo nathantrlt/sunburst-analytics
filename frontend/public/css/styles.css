@@ -1886,7 +1886,7 @@ h2, h3 {
 
 .modal-content {
     background: var(--card-bg);
-    border: 2px solid var(--border-color);
+    border: 2px solid #2a2a2a !important;
     border-radius: 12px;
     box-shadow: var(--shadow-lg);
     max-width: 600px;
