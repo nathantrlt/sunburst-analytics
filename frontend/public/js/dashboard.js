@@ -202,9 +202,9 @@ function renderProjectSelectionList() {
             if (modal) {
                 // Force modal to be visible with high z-index
                 modal.style.display = 'flex';
-                modal.style.zIndex = '10010';
+                modal.style.zIndex = '3000';
                 modal.style.position = 'fixed';
-                console.log('Modal display set to flex with z-index 10010');
+                console.log('Modal display set to flex with z-index 3000');
                 console.log('Modal after update:', modal.style.display, modal.style.zIndex);
             } else {
                 console.error('Add site modal not found!');
