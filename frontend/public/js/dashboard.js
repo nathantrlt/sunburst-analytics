@@ -169,18 +169,14 @@ function renderProjectSelectionList() {
     console.log('Found options:', options.length);
 
     options.forEach((option, index) => {
+        // Skip if it's the "add-new" option - handle it separately
+        if (option.classList.contains('add-new')) {
+            return;
+        }
+
         option.addEventListener('click', (e) => {
             console.log(`Project option ${index} clicked:`, option, e);
             e.stopPropagation();
-
-            // Handle "Create new project" option
-            if (option.id === 'createProjectOption') {
-                console.log('Create new project option clicked');
-                closeProjectSelectDropdown();
-                // Open the add site modal
-                document.getElementById('addSiteModal').style.display = 'flex';
-                return;
-            }
 
             if (!option.classList.contains('disabled')) {
                 const clientId = parseInt(option.dataset.clientId);
@@ -190,6 +186,29 @@ function renderProjectSelectionList() {
             }
         });
     });
+
+    // Handle "Create new project" option separately
+    const createProjectOption = optionsContainer.querySelector('#createProjectOption');
+    if (createProjectOption) {
+        console.log('Setting up create project option handler');
+        createProjectOption.addEventListener('click', (e) => {
+            console.log('Create new project option clicked!');
+            e.stopPropagation();
+            e.preventDefault();
+            closeProjectSelectDropdown();
+
+            // Open the add site modal
+            const modal = document.getElementById('addSiteModal');
+            console.log('Opening modal:', modal);
+            if (modal) {
+                modal.style.display = 'flex';
+            } else {
+                console.error('Add site modal not found!');
+            }
+        });
+    } else {
+        console.error('Create project option not found in DOM!');
+    }
 
     console.log('Project selection list rendered successfully');
 }
