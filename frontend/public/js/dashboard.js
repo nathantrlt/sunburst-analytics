@@ -2503,8 +2503,9 @@ function updateThemeButtons() {
 }
 
 function initTheme() {
-    const savedTheme = getTheme();
-    setTheme(savedTheme);
+    // Force dark theme for all users (reset any previous light theme preference)
+    localStorage.removeItem('theme');
+    setTheme('dark');
 }
 
 // Initialize on page load
