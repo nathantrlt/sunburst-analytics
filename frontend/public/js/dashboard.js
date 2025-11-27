@@ -153,7 +153,7 @@ function renderProjectSelectionList() {
     }
 
     // Add "Create new project" option at the end
-    optionsHTML += `<div class="custom-option add-new" id="createProjectOption" onclick="window.openAddSiteModalFromProjectScreen(); event.stopPropagation();">
+    optionsHTML += `<div class="custom-option add-new" id="createProjectOption" data-action="create-project">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -164,16 +164,11 @@ function renderProjectSelectionList() {
     optionsContainer.innerHTML = optionsHTML;
     console.log('Options HTML set, adding click handlers...');
 
-    // Add click handlers
-    const options = optionsContainer.querySelectorAll('.custom-option');
-    console.log('Found options:', options.length);
+    // Add click handlers for project options
+    const projectOptions = optionsContainer.querySelectorAll('.custom-option[data-client-id]');
+    console.log('Found project options:', projectOptions.length);
 
-    options.forEach((option, index) => {
-        // Skip if it's the "add-new" option - handle it separately
-        if (option.classList.contains('add-new')) {
-            return;
-        }
-
+    projectOptions.forEach((option, index) => {
         option.addEventListener('click', (e) => {
             console.log(`Project option ${index} clicked:`, option, e);
             e.stopPropagation();
@@ -187,23 +182,34 @@ function renderProjectSelectionList() {
         });
     });
 
-    console.log('Project selection list rendered successfully');
-}
+    // Add click handler for "Create new project" option
+    const createProjectBtn = optionsContainer.querySelector('[data-action="create-project"]');
+    console.log('Create project button found:', createProjectBtn);
 
-// Global function to open add site modal from project screen
-window.openAddSiteModalFromProjectScreen = function() {
-    console.log('openAddSiteModalFromProjectScreen called!');
-    closeProjectSelectDropdown();
+    if (createProjectBtn) {
+        createProjectBtn.addEventListener('click', (e) => {
+            console.log('Create new project button clicked!');
+            e.stopPropagation();
+            e.preventDefault();
 
-    const modal = document.getElementById('addSiteModal');
-    console.log('Modal element:', modal);
+            closeProjectSelectDropdown();
 
-    if (modal) {
-        modal.style.display = 'flex';
-        console.log('Modal display set to flex');
+            const modal = document.getElementById('addSiteModal');
+            console.log('Opening modal:', modal);
+
+            if (modal) {
+                modal.style.display = 'flex';
+                console.log('Modal display set to flex');
+            } else {
+                console.error('Add site modal not found!');
+            }
+        });
+        console.log('Create project button handler attached');
     } else {
-        console.error('Add site modal not found!');
+        console.error('Create project button not found in DOM!');
     }
+
+    console.log('Project selection list rendered successfully');
 }
 
 // Select client from project selection screen
