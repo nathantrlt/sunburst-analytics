@@ -153,7 +153,7 @@ function renderProjectSelectionList() {
     }
 
     // Add "Create new project" option at the end
-    optionsHTML += `<div class="custom-option add-new" id="createProjectOption">
+    optionsHTML += `<div class="custom-option add-new" id="createProjectOption" onclick="window.openAddSiteModalFromProjectScreen(); event.stopPropagation();">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -187,30 +187,23 @@ function renderProjectSelectionList() {
         });
     });
 
-    // Handle "Create new project" option separately
-    const createProjectOption = optionsContainer.querySelector('#createProjectOption');
-    if (createProjectOption) {
-        console.log('Setting up create project option handler');
-        createProjectOption.addEventListener('click', (e) => {
-            console.log('Create new project option clicked!');
-            e.stopPropagation();
-            e.preventDefault();
-            closeProjectSelectDropdown();
-
-            // Open the add site modal
-            const modal = document.getElementById('addSiteModal');
-            console.log('Opening modal:', modal);
-            if (modal) {
-                modal.style.display = 'flex';
-            } else {
-                console.error('Add site modal not found!');
-            }
-        });
-    } else {
-        console.error('Create project option not found in DOM!');
-    }
-
     console.log('Project selection list rendered successfully');
+}
+
+// Global function to open add site modal from project screen
+window.openAddSiteModalFromProjectScreen = function() {
+    console.log('openAddSiteModalFromProjectScreen called!');
+    closeProjectSelectDropdown();
+
+    const modal = document.getElementById('addSiteModal');
+    console.log('Modal element:', modal);
+
+    if (modal) {
+        modal.style.display = 'flex';
+        console.log('Modal display set to flex');
+    } else {
+        console.error('Add site modal not found!');
+    }
 }
 
 // Select client from project selection screen
