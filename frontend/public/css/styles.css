@@ -130,6 +130,29 @@ body {
     width: 100%;
 }
 
+.project-selection-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    margin-top: 20px;
+    background: transparent;
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.project-selection-logout-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    background: rgba(255, 215, 0, 0.1);
+}
+
 /* Dashboard main hidden by default */
 .dashboard-main {
     display: none;

@@ -152,6 +152,15 @@ function renderProjectSelectionList() {
         ).join('');
     }
 
+    // Add "Create new project" option at the end
+    optionsHTML += `<div class="custom-option add-new" id="createProjectOption">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Créer un nouveau projet
+    </div>`;
+
     optionsContainer.innerHTML = optionsHTML;
     console.log('Options HTML set, adding click handlers...');
 
@@ -163,6 +172,16 @@ function renderProjectSelectionList() {
         option.addEventListener('click', (e) => {
             console.log(`Project option ${index} clicked:`, option, e);
             e.stopPropagation();
+
+            // Handle "Create new project" option
+            if (option.id === 'createProjectOption') {
+                console.log('Create new project option clicked');
+                closeProjectSelectDropdown();
+                // Open the add site modal
+                document.getElementById('addSiteModal').style.display = 'flex';
+                return;
+            }
+
             if (!option.classList.contains('disabled')) {
                 const clientId = parseInt(option.dataset.clientId);
                 console.log('Selecting client ID:', clientId);
@@ -1608,6 +1627,16 @@ function setupEventListeners() {
         window.location.href = '/index.html';
     });
 
+    // Project selection screen logout button
+    const projectSelectionLogoutBtn = document.getElementById('projectSelectionLogoutBtn');
+    if (projectSelectionLogoutBtn) {
+        projectSelectionLogoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        });
+    }
+
     // Project selection screen dropdown
     const projectSelectButton = document.getElementById('projectSelectButton');
     console.log('Setting up project select button:', projectSelectButton);
@@ -1653,8 +1682,16 @@ function setupEventListeners() {
     document.getElementById('addSiteForm').addEventListener('submit', handleAddSite);
 
     // Done with snippet
-    document.getElementById('doneSnippetBtn').addEventListener('click', () => {
+    document.getElementById('doneSnippetBtn').addEventListener('click', async () => {
         document.getElementById('addSiteModal').style.display = 'none';
+
+        // Reset form for next time
+        document.getElementById('addSiteForm').style.display = 'block';
+        document.getElementById('snippetDisplay').style.display = 'none';
+        document.getElementById('addSiteForm').reset();
+
+        // Reload clients list for both project selection screen and dropdown
+        await loadClientsForProjectSelection();
         loadClients();
     });
 
