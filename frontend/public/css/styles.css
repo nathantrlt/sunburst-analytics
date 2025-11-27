@@ -1893,6 +1893,8 @@ h2, h3 {
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    position: relative;
+    z-index: 10006;
 }
 
 .modal-header {

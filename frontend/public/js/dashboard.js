@@ -196,10 +196,16 @@ function renderProjectSelectionList() {
 
             const modal = document.getElementById('addSiteModal');
             console.log('Opening modal:', modal);
+            console.log('Modal current display:', modal ? modal.style.display : 'not found');
+            console.log('Modal computed style:', modal ? window.getComputedStyle(modal).display : 'not found');
 
             if (modal) {
+                // Force modal to be visible with high z-index
                 modal.style.display = 'flex';
-                console.log('Modal display set to flex');
+                modal.style.zIndex = '10010';
+                modal.style.position = 'fixed';
+                console.log('Modal display set to flex with z-index 10010');
+                console.log('Modal after update:', modal.style.display, modal.style.zIndex);
             } else {
                 console.error('Add site modal not found!');
             }
