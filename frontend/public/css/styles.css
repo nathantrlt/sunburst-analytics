@@ -1404,6 +1404,31 @@ h2, h3 {
     position: relative;
 }
 
+/* Fixed widths for each filter button to prevent resizing */
+#dateRangeBtn {
+    min-width: 180px;
+}
+
+#deviceFilterBtn {
+    min-width: 160px;
+}
+
+#trafficSourceFilterBtn {
+    min-width: 180px;
+}
+
+#categoryFilterBtn {
+    min-width: 180px;
+}
+
+#depthFilterBtn {
+    min-width: 100px;
+}
+
+#resetFiltersBtn {
+    min-width: 120px;
+}
+
 .filter-dropdown-menu {
     display: none;
     position: absolute;
