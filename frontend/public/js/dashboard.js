@@ -1619,6 +1619,9 @@ function setupFilterButtons() {
                 // Close dropdown
                 menu.classList.remove('show');
                 btn.classList.remove('open');
+
+                // Auto-apply filters
+                loadAnalytics();
             });
         });
     }
@@ -1815,11 +1818,8 @@ function setupEventListeners() {
     setupFilterButtons();
 
     // Apply filters
-    document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-        // Filters are already updated in currentFilters by the dropdown selections
-        // Just load analytics with current filters
-        loadAnalytics();
-    });
+    // Auto-apply filters is now handled in setupDropdown function
+    // No need for manual apply button anymore
 
     // Reset filters
     document.getElementById('resetFiltersBtn').addEventListener('click', () => {
