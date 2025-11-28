@@ -63,6 +63,7 @@
   var heartbeatInterval = null;
   var retryQueue = [];
   var maxRetries = 3;
+  var sessionReferrer = getOrCreateSessionReferrer();
 
   /**
    * Generate or retrieve session ID from sessionStorage
@@ -75,6 +76,22 @@
     var newId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     sessionStorage.setItem('sunburst_session_id', newId);
     return newId;
+  }
+
+  /**
+   * Get or create session referrer (the external referrer for the first page of the session)
+   * This ensures all pages in a session have the same traffic source
+   */
+  function getOrCreateSessionReferrer() {
+    var stored = sessionStorage.getItem('sunburst_session_referrer');
+    if (stored !== null) {
+      // Return stored value (can be empty string for direct traffic)
+      return stored;
+    }
+    // First page of session - capture the actual external referrer
+    var actualReferrer = getActualReferrer() || '';
+    sessionStorage.setItem('sunburst_session_referrer', actualReferrer);
+    return actualReferrer;
   }
 
   /**
@@ -238,9 +255,9 @@
     sequenceNumber++;
     saveSequenceNumber(sequenceNumber);
 
-    // For first pageview, use actual external referrer
-    // For subsequent pageviews in the journey, use the previous page URL
-    var referrerToSend = sequenceNumber === 1 ? getActualReferrer() : lastUrl;
+    // Use session referrer for all pages in the session
+    // This ensures consistent traffic source attribution across the entire journey
+    var referrerToSend = sessionReferrer || null;
 
     // Send tracking data
     sendTrackingData({
