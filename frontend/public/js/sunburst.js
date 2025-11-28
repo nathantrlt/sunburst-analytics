@@ -89,7 +89,7 @@ function createSunburst(data) {
         })
         .attr('fill-opacity', 0.95)
         .attr('stroke', '#fff')
-        .attr('stroke-width', 1)
+        .attr('stroke-width', 0.5)
         .style('cursor', 'pointer')
         .on('mouseover', handleMouseOver)
         .on('mouseout', handleMouseOut)
