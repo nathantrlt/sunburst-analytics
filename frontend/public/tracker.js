@@ -238,13 +238,17 @@
     sequenceNumber++;
     saveSequenceNumber(sequenceNumber);
 
+    // For first pageview, use actual external referrer
+    // For subsequent pageviews in the journey, use the previous page URL
+    var referrerToSend = sequenceNumber === 1 ? getActualReferrer() : lastUrl;
+
     // Send tracking data
     sendTrackingData({
       pageUrl: url,
       pageTitle: title,
       sequenceNumber: sequenceNumber,
       timeSpent: 0,
-      referrer: lastUrl,
+      referrer: referrerToSend,
       retryCount: 0
     });
 
