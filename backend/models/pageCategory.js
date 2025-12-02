@@ -323,9 +323,13 @@ class PageCategory {
         rules = await this.findByClientId(clientId);
       }
 
-      // Then get all pageviews
+      // Then get all pageviews with additional stats
       let query = `
-        SELECT page_url, COUNT(*) as count
+        SELECT
+          page_url,
+          COUNT(*) as count,
+          AVG(sequence_number) as avgDepth,
+          AVG(time_spent) as avgTimeSpent
         FROM pageviews
         WHERE client_id = ?
       `;
@@ -368,18 +372,33 @@ class PageCategory {
         }
 
         if (!categoryStats[categoryName]) {
-          categoryStats[categoryName] = 0;
+          categoryStats[categoryName] = {
+            count: 0,
+            totalDepth: 0,
+            totalTime: 0,
+            uniquePages: new Set(),
+            viewsCount: 0
+          };
           categoryIdMap[categoryName] = matchingRule ? matchingRule.id : null;
         }
-        categoryStats[categoryName] += parseInt(pv.count);
+
+        const count = parseInt(pv.count);
+        categoryStats[categoryName].count += count;
+        categoryStats[categoryName].totalDepth += (pv.avgDepth || 0) * count;
+        categoryStats[categoryName].totalTime += (pv.avgTimeSpent || 0) * count;
+        categoryStats[categoryName].uniquePages.add(pv.page_url);
+        categoryStats[categoryName].viewsCount += count;
       }
 
       // Convert to array and sort by count
       return Object.entries(categoryStats)
-        .map(([category, count]) => ({
+        .map(([category, stats]) => ({
           id: categoryIdMap[category],
           category,
-          count
+          count: stats.count,
+          uniquePages: stats.uniquePages.size,
+          avgDepth: stats.viewsCount > 0 ? stats.totalDepth / stats.viewsCount : 0,
+          avgTimeSpent: stats.viewsCount > 0 ? stats.totalTime / stats.viewsCount : 0
         }))
         .sort((a, b) => b.count - a.count);
     } catch (error) {
