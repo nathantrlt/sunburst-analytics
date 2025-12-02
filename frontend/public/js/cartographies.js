@@ -151,6 +151,9 @@ async function selectCartography(cartoId) {
     if (typeof loadCategoryDistribution === 'function') {
         await loadCategoryDistribution();
     }
+    if (typeof loadCategoryPerformanceTable === 'function') {
+        await loadCategoryPerformanceTable();
+    }
 }
 
 // Toggle cartography dropdown

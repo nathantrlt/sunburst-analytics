@@ -759,8 +759,8 @@ async function toggleCategoryDetails(row, categoryId, categoryName) {
         }
 
         const url = categoryId === 'uncategorized'
-            ? `/analytics/category-pages/${currentClient.id}/uncategorized?${params}`
-            : `/analytics/category-pages/${currentClient.id}/${categoryId}?${params}`;
+            ? `/analytics/category-details/${currentClient.id}/uncategorized?${params}`
+            : `/analytics/category-details/${currentClient.id}/${categoryId}?${params}`;
 
         const data = await apiRequest(url);
 
