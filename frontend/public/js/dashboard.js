@@ -775,7 +775,6 @@ async function toggleCategoryDetails(row, categoryId, categoryName) {
                         <thead>
                             <tr>
                                 <th>URL</th>
-                                <th>Titre</th>
                                 <th>Vues</th>
                                 <th>Profondeur Moy.</th>
                                 <th>Temps Moy. (s)</th>
@@ -785,7 +784,6 @@ async function toggleCategoryDetails(row, categoryId, categoryName) {
                             ${data.pages.map(page => `
                                 <tr>
                                     <td>${page.url}</td>
-                                    <td>${page.title || '-'}</td>
                                     <td>${page.views.toLocaleString()}</td>
                                     <td>${page.avgDepth ? page.avgDepth.toFixed(2) : '0.00'}</td>
                                     <td>${page.avgTimeSpent ? page.avgTimeSpent.toFixed(0) : '0'}</td>

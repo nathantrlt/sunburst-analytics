@@ -2044,15 +2044,13 @@ h2, h3 {
 
 /* Align details table columns with main table */
 .details-table th:nth-child(1),
-.details-table td:nth-child(1) { width: 30%; } /* URL - aligned with Catégorie */
+.details-table td:nth-child(1) { width: 44%; } /* URL - spans Catégorie + Vues Totales */
 .details-table th:nth-child(2),
-.details-table td:nth-child(2) { width: 28%; } /* Titre - spans Vues Totales + Pages Uniques */
+.details-table td:nth-child(2) { width: 14%; } /* Vues - aligned with Pages Uniques */
 .details-table th:nth-child(3),
-.details-table td:nth-child(3) { width: 14%; } /* Vues - aligned with Profondeur Moy. */
+.details-table td:nth-child(3) { width: 14%; } /* Profondeur Moy. - aligned with Profondeur Moy. */
 .details-table th:nth-child(4),
-.details-table td:nth-child(4) { width: 14%; } /* Profondeur Moy. - aligned with Temps Moy. */
-.details-table th:nth-child(5),
-.details-table td:nth-child(5) { width: 14%; } /* Temps Moy. - aligned with Bouton expand */
+.details-table td:nth-child(4) { width: 28%; } /* Temps Moy. - spans Temps Moy. + Bouton expand */
 
 .details-table thead th {
     background: var(--card-bg);
