@@ -59,9 +59,13 @@ function createSunburst(data) {
         .sum(d => d.value || 0)
         .sort((a, b) => b.value - a.value);
 
+    // Calculate center hole size (35% of radius) and thinner rings
+    const centerHoleRadius = radius * 0.35;
+    const ringThickness = (radius - centerHoleRadius) / 5; // Thinner rings
+
     // Create partition layout
     const partition = d3.partition()
-        .size([2 * Math.PI, radius]);
+        .size([2 * Math.PI, radius - centerHoleRadius]);
 
     partition(root);
 
@@ -69,12 +73,12 @@ function createSunburst(data) {
     let focusedNode = root;
     let previousFocusedNode = root;
 
-    // Arc generator
+    // Arc generator with adjusted radii for center hole and thinner rings
     const arc = d3.arc()
         .startAngle(d => d.x0)
         .endAngle(d => d.x1)
-        .innerRadius(d => d.y0)
-        .outerRadius(d => d.y1);
+        .innerRadius(d => centerHoleRadius + d.y0)
+        .outerRadius(d => centerHoleRadius + d.y1);
 
     // Create path elements
     const paths = svg.selectAll('path')
@@ -95,10 +99,15 @@ function createSunburst(data) {
         .on('mouseout', handleMouseOut)
         .on('click', handleClick);
 
+    // Add black center circle
+    svg.append('circle')
+        .attr('r', centerHoleRadius)
+        .attr('fill', '#0a0a0a')
+        .style('cursor', 'pointer')
+        .on('click', resetZoom);
+
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
-
-    // Center circle removed - click on empty space (SVG background) now resets zoom
 
     // Mouse over handler
     function handleMouseOver(event, d) {
