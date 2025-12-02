@@ -741,9 +741,15 @@ function renderCategoryPerformanceTable(categories) {
 async function toggleCategoryDetails(row, categoryId, categoryName) {
     const nextRow = row.nextElementSibling;
 
-    // If already expanded, collapse
+    // If already expanded, collapse all detail rows
     if (nextRow && nextRow.classList.contains('category-details-row')) {
-        nextRow.remove();
+        // Remove all consecutive detail rows
+        let currentRow = row.nextElementSibling;
+        while (currentRow && currentRow.classList.contains('category-details-row')) {
+            const toRemove = currentRow;
+            currentRow = currentRow.nextElementSibling;
+            toRemove.remove();
+        }
         row.querySelector('.btn-expand svg').style.transform = 'rotate(0deg)';
         return;
     }
