@@ -2007,19 +2007,16 @@ h2, h3 {
 }
 
 .category-details-row {
-    background: var(--bg-main) !important;
+    background: rgba(255, 215, 0, 0.02) !important;
+    border-left: 3px solid var(--primary-color);
 }
 
-.category-details-container {
-    padding: 20px;
-    border-top: 1px solid var(--card-border);
-    border-bottom: 1px solid var(--card-border);
+.category-details-row:hover {
+    background: rgba(255, 215, 0, 0.08) !important;
 }
 
-.category-details-container h4 {
-    margin: 0 0 15px 0;
-    color: var(--primary-color);
-    font-size: 16px;
+.category-details-row td {
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
 }
 
 /* Fixed table layout for column alignment */
@@ -2028,42 +2025,12 @@ h2, h3 {
     width: 100%;
 }
 
-#categoryPerformanceTable th:nth-child(1) { width: 44%; } /* Catégorie - aligned with URL */
+#categoryPerformanceTable th:nth-child(1) { width: 44%; } /* Catégorie/URL */
 #categoryPerformanceTable th:nth-child(2) { width: 11.2%; } /* Vues Totales */
 #categoryPerformanceTable th:nth-child(3) { width: 11.2%; } /* Pages Uniques */
 #categoryPerformanceTable th:nth-child(4) { width: 11.2%; } /* Profondeur Moy. */
 #categoryPerformanceTable th:nth-child(5) { width: 11.2%; } /* Temps Moy. */
 #categoryPerformanceTable th:nth-child(6) { width: 11.2%; } /* Bouton expand */
-
-.details-table {
-    margin: 0;
-    background: var(--card-bg);
-    table-layout: fixed;
-    width: 100%;
-}
-
-/* Align details table columns with main table */
-.details-table th:nth-child(1),
-.details-table td:nth-child(1) { width: 44%; } /* URL - aligned with Catégorie */
-.details-table th:nth-child(2),
-.details-table td:nth-child(2) { width: 22.4%; } /* Vues - spans Vues Totales + Pages Uniques */
-.details-table th:nth-child(3),
-.details-table td:nth-child(3) { width: 11.2%; } /* Profondeur Moy. - aligned with Profondeur Moy. */
-.details-table th:nth-child(4),
-.details-table td:nth-child(4) { width: 22.4%; } /* Temps Moy. - spans Temps Moy. + Bouton expand */
-
-.details-table thead th {
-    background: var(--card-bg);
-    font-size: 13px;
-}
-
-.details-table tbody tr {
-    background: var(--card-bg);
-}
-
-.details-table tbody tr:hover {
-    background: rgba(255, 215, 0, 0.05);
-}
 
 /* Responsive Design */
 

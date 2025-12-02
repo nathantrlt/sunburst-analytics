@@ -764,38 +764,29 @@ async function toggleCategoryDetails(row, categoryId, categoryName) {
 
         const data = await apiRequest(url);
 
-        // Create details row
-        const detailsRow = document.createElement('tr');
-        detailsRow.classList.add('category-details-row');
-        detailsRow.innerHTML = `
-            <td colspan="6" style="padding: 0; background: var(--bg-main);">
-                <div class="category-details-container">
-                    <h4>Pages de la catégorie "${categoryName}"</h4>
-                    <table class="data-table details-table">
-                        <thead>
-                            <tr>
-                                <th>URL</th>
-                                <th>Vues</th>
-                                <th>Profondeur Moy.</th>
-                                <th>Temps Moy. (s)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.pages.map(page => `
-                                <tr>
-                                    <td>${page.url}</td>
-                                    <td>${page.views.toLocaleString()}</td>
-                                    <td>${page.avgDepth ? page.avgDepth.toFixed(2) : '0.00'}</td>
-                                    <td>${page.avgTimeSpent ? page.avgTimeSpent.toFixed(0) : '0'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </td>
-        `;
+        // Create detail rows directly in the main table
+        const fragment = document.createDocumentFragment();
 
-        row.after(detailsRow);
+        data.pages.forEach((page, index) => {
+            const detailRow = document.createElement('tr');
+            detailRow.classList.add('category-details-row');
+            detailRow.innerHTML = `
+                <td style="padding-left: 40px; font-size: 13px; color: var(--text-secondary);">${page.url}</td>
+                <td style="font-size: 13px;">${page.views.toLocaleString()}</td>
+                <td style="font-size: 13px;">-</td>
+                <td style="font-size: 13px;">${page.avgDepth ? page.avgDepth.toFixed(2) : '0.00'}</td>
+                <td style="font-size: 13px;">${page.avgTimeSpent ? page.avgTimeSpent.toFixed(0) : '0'}</td>
+                <td></td>
+            `;
+            fragment.appendChild(detailRow);
+        });
+
+        // Insert all detail rows after the category row
+        let currentRow = row;
+        Array.from(fragment.children).forEach(detailRow => {
+            currentRow.after(detailRow);
+            currentRow = detailRow;
+        });
     } catch (error) {
         console.error('Failed to load category details:', error);
         alert('Échec du chargement des détails de la catégorie');
