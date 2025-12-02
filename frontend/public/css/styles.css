@@ -2028,12 +2028,12 @@ h2, h3 {
     width: 100%;
 }
 
-#categoryPerformanceTable th:nth-child(1) { width: 30%; } /* Catégorie - aligned with URL */
-#categoryPerformanceTable th:nth-child(2) { width: 14%; } /* Vues Totales */
-#categoryPerformanceTable th:nth-child(3) { width: 14%; } /* Pages Uniques */
-#categoryPerformanceTable th:nth-child(4) { width: 14%; } /* Profondeur Moy. */
-#categoryPerformanceTable th:nth-child(5) { width: 14%; } /* Temps Moy. */
-#categoryPerformanceTable th:nth-child(6) { width: 14%; } /* Bouton expand */
+#categoryPerformanceTable th:nth-child(1) { width: 44%; } /* Catégorie - aligned with URL */
+#categoryPerformanceTable th:nth-child(2) { width: 11.2%; } /* Vues Totales */
+#categoryPerformanceTable th:nth-child(3) { width: 11.2%; } /* Pages Uniques */
+#categoryPerformanceTable th:nth-child(4) { width: 11.2%; } /* Profondeur Moy. */
+#categoryPerformanceTable th:nth-child(5) { width: 11.2%; } /* Temps Moy. */
+#categoryPerformanceTable th:nth-child(6) { width: 11.2%; } /* Bouton expand */
 
 .details-table {
     margin: 0;
@@ -2044,13 +2044,13 @@ h2, h3 {
 
 /* Align details table columns with main table */
 .details-table th:nth-child(1),
-.details-table td:nth-child(1) { width: 44%; } /* URL - spans Catégorie + Vues Totales */
+.details-table td:nth-child(1) { width: 44%; } /* URL - aligned with Catégorie */
 .details-table th:nth-child(2),
-.details-table td:nth-child(2) { width: 14%; } /* Vues - aligned with Pages Uniques */
+.details-table td:nth-child(2) { width: 22.4%; } /* Vues - spans Vues Totales + Pages Uniques */
 .details-table th:nth-child(3),
-.details-table td:nth-child(3) { width: 14%; } /* Profondeur Moy. - aligned with Profondeur Moy. */
+.details-table td:nth-child(3) { width: 11.2%; } /* Profondeur Moy. - aligned with Profondeur Moy. */
 .details-table th:nth-child(4),
-.details-table td:nth-child(4) { width: 28%; } /* Temps Moy. - spans Temps Moy. + Bouton expand */
+.details-table td:nth-child(4) { width: 22.4%; } /* Temps Moy. - spans Temps Moy. + Bouton expand */
 
 .details-table thead th {
     background: var(--card-bg);
