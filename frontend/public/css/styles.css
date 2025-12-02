@@ -2028,12 +2028,12 @@ h2, h3 {
     width: 100%;
 }
 
-#categoryPerformanceTable th:nth-child(1) { width: 25%; } /* Catégorie */
-#categoryPerformanceTable th:nth-child(2) { width: 15%; } /* Vues Totales */
-#categoryPerformanceTable th:nth-child(3) { width: 15%; } /* Pages Uniques */
-#categoryPerformanceTable th:nth-child(4) { width: 15%; } /* Profondeur Moy. */
-#categoryPerformanceTable th:nth-child(5) { width: 15%; } /* Temps Moy. */
-#categoryPerformanceTable th:nth-child(6) { width: 15%; } /* Bouton expand */
+#categoryPerformanceTable th:nth-child(1) { width: 30%; } /* Catégorie - aligned with URL */
+#categoryPerformanceTable th:nth-child(2) { width: 14%; } /* Vues Totales */
+#categoryPerformanceTable th:nth-child(3) { width: 14%; } /* Pages Uniques */
+#categoryPerformanceTable th:nth-child(4) { width: 14%; } /* Profondeur Moy. */
+#categoryPerformanceTable th:nth-child(5) { width: 14%; } /* Temps Moy. */
+#categoryPerformanceTable th:nth-child(6) { width: 14%; } /* Bouton expand */
 
 .details-table {
     margin: 0;
@@ -2042,17 +2042,17 @@ h2, h3 {
     width: 100%;
 }
 
-/* Align details table columns with main table (skip first column which is Catégorie) */
+/* Align details table columns with main table */
 .details-table th:nth-child(1),
-.details-table td:nth-child(1) { width: 30%; } /* URL (maps to Catégorie) */
+.details-table td:nth-child(1) { width: 30%; } /* URL - aligned with Catégorie */
 .details-table th:nth-child(2),
-.details-table td:nth-child(2) { width: 25%; } /* Titre (spans across Vues + Pages Uniques space) */
+.details-table td:nth-child(2) { width: 28%; } /* Titre - spans Vues Totales + Pages Uniques */
 .details-table th:nth-child(3),
-.details-table td:nth-child(3) { width: 15%; } /* Vues */
+.details-table td:nth-child(3) { width: 14%; } /* Vues - aligned with Profondeur Moy. */
 .details-table th:nth-child(4),
-.details-table td:nth-child(4) { width: 15%; } /* Profondeur Moy. */
+.details-table td:nth-child(4) { width: 14%; } /* Profondeur Moy. - aligned with Temps Moy. */
 .details-table th:nth-child(5),
-.details-table td:nth-child(5) { width: 15%; } /* Temps Moy. */
+.details-table td:nth-child(5) { width: 14%; } /* Temps Moy. - aligned with Bouton expand */
 
 .details-table thead th {
     background: var(--card-bg);
