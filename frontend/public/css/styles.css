@@ -2022,10 +2022,37 @@ h2, h3 {
     font-size: 16px;
 }
 
+/* Fixed table layout for column alignment */
+#categoryPerformanceTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#categoryPerformanceTable th:nth-child(1) { width: 25%; } /* Catégorie */
+#categoryPerformanceTable th:nth-child(2) { width: 15%; } /* Vues Totales */
+#categoryPerformanceTable th:nth-child(3) { width: 15%; } /* Pages Uniques */
+#categoryPerformanceTable th:nth-child(4) { width: 15%; } /* Profondeur Moy. */
+#categoryPerformanceTable th:nth-child(5) { width: 15%; } /* Temps Moy. */
+#categoryPerformanceTable th:nth-child(6) { width: 15%; } /* Bouton expand */
+
 .details-table {
     margin: 0;
     background: var(--card-bg);
+    table-layout: fixed;
+    width: 100%;
 }
+
+/* Align details table columns with main table (skip first column which is Catégorie) */
+.details-table th:nth-child(1),
+.details-table td:nth-child(1) { width: 30%; } /* URL (maps to Catégorie) */
+.details-table th:nth-child(2),
+.details-table td:nth-child(2) { width: 25%; } /* Titre (spans across Vues + Pages Uniques space) */
+.details-table th:nth-child(3),
+.details-table td:nth-child(3) { width: 15%; } /* Vues */
+.details-table th:nth-child(4),
+.details-table td:nth-child(4) { width: 15%; } /* Profondeur Moy. */
+.details-table th:nth-child(5),
+.details-table td:nth-child(5) { width: 15%; } /* Temps Moy. */
 
 .details-table thead th {
     background: var(--card-bg);
