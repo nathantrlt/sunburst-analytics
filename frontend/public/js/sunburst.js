@@ -80,12 +80,6 @@ function createSunburst(data) {
         .innerRadius(d => centerHoleRadius + d.y0)
         .outerRadius(d => centerHoleRadius + d.y1);
 
-    // Add black center circle BEFORE paths so it's drawn underneath
-    svg.append('circle')
-        .attr('r', centerHoleRadius)
-        .attr('fill', '#0a0a0a')
-        .style('pointer-events', 'none'); // Make it non-interactive so clicks go through
-
     // Create path elements
     const paths = svg.selectAll('path')
         .data(root.descendants().filter(d => d.depth > 0))
@@ -104,6 +98,22 @@ function createSunburst(data) {
         .on('mouseover', handleMouseOver)
         .on('mouseout', handleMouseOut)
         .on('click', handleClick);
+
+    // Add black center circle (background)
+    svg.append('circle')
+        .attr('r', centerHoleRadius)
+        .attr('fill', '#0a0a0a')
+        .style('pointer-events', 'none'); // Non-interactive background
+
+    // Add transparent clickable circle on top for reset zoom
+    svg.append('circle')
+        .attr('r', centerHoleRadius)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function(event) {
+            event.stopPropagation();
+            resetZoom();
+        });
 
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
