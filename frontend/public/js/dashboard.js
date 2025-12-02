@@ -426,7 +426,8 @@ async function loadAnalytics() {
         loadSunburstData(),
         loadPagesData(),
         loadCategoryStats(),
-        loadCategoryDistribution()
+        loadCategoryDistribution(),
+        loadCategoryPerformanceTable()
     ]);
 }
 
@@ -674,6 +675,134 @@ function renderCategoryStats(categories) {
             showCategoryDetails(categoryId);
         });
     });
+}
+
+// Load category performance table
+async function loadCategoryPerformanceTable() {
+    if (!currentClient) return;
+
+    try {
+        const params = buildFilterParams();
+        // Add cartographyId if available
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            params.append('cartographyId', currentCartography.id);
+        }
+
+        const data = await apiRequest(`/analytics/category-stats/${currentClient.id}?${params}`);
+        renderCategoryPerformanceTable(data.categories);
+    } catch (error) {
+        console.error('Failed to load category performance:', error);
+        document.getElementById('categoryPerformanceTableBody').innerHTML = '<tr><td colspan="6" class="table-loading">Échec du chargement des catégories</td></tr>';
+    }
+}
+
+// Render category performance table
+function renderCategoryPerformanceTable(categories) {
+    const tbody = document.getElementById('categoryPerformanceTableBody');
+
+    if (categories.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="table-loading">Aucune catégorie configurée</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = categories.map(cat => {
+        const categoryId = cat.id !== null ? cat.id : 'uncategorized';
+        return `
+            <tr class="category-row" data-category-id="${categoryId}" data-category-name="${cat.category}">
+                <td><strong>${cat.category}</strong></td>
+                <td>${cat.count.toLocaleString()}</td>
+                <td>${cat.uniquePages || 0}</td>
+                <td>${cat.avgDepth ? cat.avgDepth.toFixed(2) : '0.00'}</td>
+                <td>${cat.avgTimeSpent ? cat.avgTimeSpent.toFixed(0) : '0'}</td>
+                <td>
+                    <button class="btn-expand" title="Voir les détails">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // Add click handlers for expand buttons
+    tbody.querySelectorAll('.category-row').forEach(row => {
+        const expandBtn = row.querySelector('.btn-expand');
+        expandBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const categoryId = row.dataset.categoryId;
+            const categoryName = row.dataset.categoryName;
+            toggleCategoryDetails(row, categoryId, categoryName);
+        });
+    });
+}
+
+// Toggle category details (expand/collapse)
+async function toggleCategoryDetails(row, categoryId, categoryName) {
+    const nextRow = row.nextElementSibling;
+
+    // If already expanded, collapse
+    if (nextRow && nextRow.classList.contains('category-details-row')) {
+        nextRow.remove();
+        row.querySelector('.btn-expand svg').style.transform = 'rotate(0deg)';
+        return;
+    }
+
+    // Expand: load and show details
+    row.querySelector('.btn-expand svg').style.transform = 'rotate(180deg)';
+
+    try {
+        const params = buildFilterParams();
+        // Add cartographyId if available
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            params.append('cartographyId', currentCartography.id);
+        }
+
+        const url = categoryId === 'uncategorized'
+            ? `/analytics/category-pages/${currentClient.id}/uncategorized?${params}`
+            : `/analytics/category-pages/${currentClient.id}/${categoryId}?${params}`;
+
+        const data = await apiRequest(url);
+
+        // Create details row
+        const detailsRow = document.createElement('tr');
+        detailsRow.classList.add('category-details-row');
+        detailsRow.innerHTML = `
+            <td colspan="6" style="padding: 0; background: var(--bg-main);">
+                <div class="category-details-container">
+                    <h4>Pages de la catégorie "${categoryName}"</h4>
+                    <table class="data-table details-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Titre</th>
+                                <th>Vues</th>
+                                <th>Profondeur Moy.</th>
+                                <th>Temps Moy. (s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.pages.map(page => `
+                                <tr>
+                                    <td>${page.url}</td>
+                                    <td>${page.title || '-'}</td>
+                                    <td>${page.views.toLocaleString()}</td>
+                                    <td>${page.avgDepth ? page.avgDepth.toFixed(2) : '0.00'}</td>
+                                    <td>${page.avgTimeSpent ? page.avgTimeSpent.toFixed(0) : '0'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        `;
+
+        row.after(detailsRow);
+    } catch (error) {
+        console.error('Failed to load category details:', error);
+        alert('Échec du chargement des détails de la catégorie');
+        row.querySelector('.btn-expand svg').style.transform = 'rotate(0deg)';
+    }
 }
 
 // Load category distribution bars

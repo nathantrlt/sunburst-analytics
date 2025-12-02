@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="/css/styles.css?v=1764318046">
+    <link rel="stylesheet" href="/css/styles.css?v=1764671153">
 </head>
 <body class="dashboard-page">
     <!-- Écran de sélection de projet (visible initialement) -->
@@ -380,6 +380,30 @@
                                 </div>
                             </div>
                             <div id="viewsCategoryLegend" class="category-legend"></div>
+                        </div>
+                    </div>
+
+                    <!-- Category Performance Table -->
+                    <div class="table-section">
+                        <h3>Performance des Catégories</h3>
+                        <div class="table-container">
+                            <table id="categoryPerformanceTable" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="category">Catégorie</th>
+                                        <th class="sortable" data-sort="views">Vues Totales</th>
+                                        <th class="sortable" data-sort="pages">Pages Uniques</th>
+                                        <th class="sortable" data-sort="avgDepth">Profondeur Moy.</th>
+                                        <th class="sortable" data-sort="avgTime">Temps Moy. (s)</th>
+                                        <th style="width: 50px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryPerformanceTableBody">
+                                    <tr>
+                                        <td colspan="6" class="table-loading">Chargement des catégories...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1317,7 +1341,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
     <script src="/js/cartographies.js?v=1764236508"></script>
-    <script src="/js/dashboard.js?v=1764317697"></script>
+    <script src="/js/dashboard.js?v=1764671153"></script>
     <script src="/js/sunburst.js?v=1764324617"></script>
 </body>
 </html>

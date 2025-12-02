@@ -1976,6 +1976,70 @@ h2, h3 {
     word-wrap: break-word;
 }
 
+/* Category Performance Table - Expandable Rows */
+.btn-expand {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.btn-expand:hover {
+    color: var(--primary-color);
+}
+
+.btn-expand svg {
+    transition: transform 0.3s ease;
+}
+
+.category-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.category-row:hover {
+    background-color: rgba(255, 215, 0, 0.05);
+}
+
+.category-details-row {
+    background: var(--bg-main) !important;
+}
+
+.category-details-container {
+    padding: 20px;
+    border-top: 1px solid var(--card-border);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.category-details-container h4 {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.details-table {
+    margin: 0;
+    background: var(--card-bg);
+}
+
+.details-table thead th {
+    background: var(--card-bg);
+    font-size: 13px;
+}
+
+.details-table tbody tr {
+    background: var(--card-bg);
+}
+
+.details-table tbody tr:hover {
+    background: rgba(255, 215, 0, 0.05);
+}
+
 /* Responsive Design */
 
 /* Tablets and small screens */
