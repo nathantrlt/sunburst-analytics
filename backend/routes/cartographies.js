@@ -57,21 +57,29 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
         const userId = req.user.userId;
         const { name, description, filters } = req.body;
 
+        console.log('[Cartography Create] User:', userId, 'Client:', clientId, 'Name:', name);
+
         // Validate input
         if (!name || !name.trim()) {
+            console.log('[Cartography Create] Validation failed: name missing');
             return res.status(400).json({ error: 'Cartography name is required' });
         }
 
         if (!filters || typeof filters !== 'object') {
+            console.log('[Cartography Create] Validation failed: invalid filters', filters);
             return res.status(400).json({ error: 'Filters must be a valid object' });
         }
 
         // Check if user has access (must be owner, admin, or editor)
         const accessType = await Client.getUserAccessType(userId, clientId);
+        console.log('[Cartography Create] User access type:', accessType);
+
         if (!accessType || (accessType !== 'owner' && accessType !== 'admin' && accessType !== 'editor')) {
+            console.log('[Cartography Create] Access denied for user type:', accessType);
             return res.status(403).json({ error: 'Only owners, admins, and editors can create cartographies' });
         }
 
+        console.log('[Cartography Create] Creating cartography with filters:', JSON.stringify(filters));
         const cartographyId = await Cartography.create(
             clientId,
             name.trim(),
@@ -79,6 +87,7 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
             filters
         );
 
+        console.log('[Cartography Create] Created cartography ID:', cartographyId);
         const cartography = await Cartography.getById(cartographyId, clientId);
 
         res.status(201).json({
@@ -86,8 +95,9 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
             cartography
         });
     } catch (error) {
-        console.error('Error creating cartography:', error);
-        res.status(500).json({ error: 'Failed to create cartography' });
+        console.error('[Cartography Create] Error:', error);
+        console.error('[Cartography Create] Stack:', error.stack);
+        res.status(500).json({ error: 'Failed to create cartography', details: error.message });
     }
 });
 
