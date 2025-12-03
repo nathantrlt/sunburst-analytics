@@ -66,8 +66,8 @@ function createSunburst(data) {
         .sum(d => d.value || 0)
         .sort((a, b) => b.value - a.value);
 
-    // Calculate center hole size (35% of radius) and thinner rings
-    const centerHoleRadius = radius * 0.35;
+    // Calculate center hole size (25% of radius) and thinner rings
+    const centerHoleRadius = radius * 0.25;
     const ringThickness = (radius - centerHoleRadius) / 5; // Thinner rings
 
     // Create partition layout
