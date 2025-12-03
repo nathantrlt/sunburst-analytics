@@ -190,12 +190,12 @@ function createSunburst(data) {
             path.transition(t)
                 .attrTween('d', function() {
                     // Calculate start position
-                    // For first zoom from root, use actual original arc coordinates
+                    // For first zoom from root, use actual original arc coordinates WITH center hole
                     const startPos = previousFocusedNode === root ? {
                         startAngle: node.x0,
                         endAngle: node.x1,
-                        innerRadius: node.y0,
-                        outerRadius: node.y1
+                        innerRadius: centerHoleRadius + node.y0,
+                        outerRadius: centerHoleRadius + node.y1
                     } : arcPosition(node, previousFocusedNode);
 
                     // Calculate end position (to new focus) - always calculated
