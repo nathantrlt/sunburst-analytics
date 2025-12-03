@@ -52,7 +52,14 @@ function createSunburst(data) {
         });
 
     const svg = svgElement.append('g')
-        .attr('transform', `translate(${width / 2},${height / 2})`);
+        .attr('transform', `translate(${width / 2},${height / 2})`)
+        .on('click', function(event) {
+            // If clicking on the group background (not on a path), reset zoom
+            if (event.target.tagName === 'g') {
+                event.stopPropagation();
+                resetZoom();
+            }
+        });
 
     // Create hierarchy
     const root = d3.hierarchy(data)
@@ -98,22 +105,6 @@ function createSunburst(data) {
         .on('mouseover', handleMouseOver)
         .on('mouseout', handleMouseOut)
         .on('click', handleClick);
-
-    // Add black center circle (background)
-    svg.append('circle')
-        .attr('r', centerHoleRadius)
-        .attr('fill', '#0a0a0a')
-        .style('pointer-events', 'none'); // Non-interactive background
-
-    // Add transparent clickable circle on top for reset zoom
-    svg.append('circle')
-        .attr('r', centerHoleRadius)
-        .attr('fill', 'transparent')
-        .style('cursor', 'pointer')
-        .on('click', function(event) {
-            event.stopPropagation();
-            resetZoom();
-        });
 
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
