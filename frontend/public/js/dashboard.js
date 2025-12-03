@@ -2586,6 +2586,18 @@ function initNavigation() {
                 }
             }
 
+            // Show/hide depth filter based on section
+            const depthFilterWrapper = document.querySelector('#depthFilterBtn')?.parentElement;
+            if (depthFilterWrapper) {
+                if (section === 'dashboard') {
+                    // Hide depth filter on Accueil page
+                    depthFilterWrapper.style.display = 'none';
+                } else if (section === 'cartographie') {
+                    // Show depth filter on Mes Scores page
+                    depthFilterWrapper.style.display = 'block';
+                }
+            }
+
             // Show/hide stats metrics based on section
             if (statsGrid) {
                 if (section === 'documentation' || section === 'parametres') {
@@ -2699,4 +2711,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
     initNavigation();
     window.cartographyModule.setupCartographyEventListeners();
+
+    // Hide depth filter on initial load (Accueil page is default)
+    const depthFilterWrapper = document.querySelector('#depthFilterBtn')?.parentElement;
+    if (depthFilterWrapper) {
+        depthFilterWrapper.style.display = 'none';
+    }
 });
