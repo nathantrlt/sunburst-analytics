@@ -293,6 +293,7 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
   try {
     const filters = extractFilters(req.query);
     const categoryIdParam = req.params.categoryId;
+    const cartographyId = req.query.cartographyId ? parseInt(req.query.cartographyId) : null;
 
     // Get all pageviews
     const pageviews = await Pageview.getAllPageviews(
@@ -312,8 +313,10 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
         condition_value: null
       };
 
-      // Get all rules to check against
-      const rules = await PageCategory.findByClientId(req.clientId);
+      // Get all rules to check against - use cartography-specific rules if available
+      const rules = cartographyId
+        ? await PageCategory.findByCartographyId(cartographyId)
+        : await PageCategory.findByClientId(req.clientId);
 
       // Find pages that don't match ANY category
       for (const pv of pageviews) {
