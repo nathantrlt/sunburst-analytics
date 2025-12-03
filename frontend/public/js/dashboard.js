@@ -906,7 +906,7 @@ function renderDistributionBar(barId, legendId, distribution, colors, unit) {
             <div class="category-bar-segment"
                  data-segment-index="${index}"
                  style="width: ${percentage}%; background-color: ${color};">
-                <span>${percentage >= 5 ? `${percentage}%` : ''}</span>
+                <span>${percentage >= 5 ? item.count : ''}</span>
             </div>
         `;
     }).join('');
@@ -937,7 +937,7 @@ function renderDistributionBar(barId, legendId, distribution, colors, unit) {
             <div class="category-legend-item">
                 <div class="category-legend-color" style="background-color: ${color};"></div>
                 <span class="category-legend-label">${item.category}:</span>
-                <span class="category-legend-value">${item.count} ${unit} (${item.percentage}%)</span>
+                <span class="category-legend-value">${item.count} ${unit}</span>
             </div>
         `;
     }).join('');
