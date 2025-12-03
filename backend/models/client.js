@@ -122,10 +122,10 @@ class Client {
 
       // Check if user is collaborator
       const [collabRows] = await pool.query(
-        'SELECT access_type FROM collaborators WHERE client_id = ? AND user_id = ?',
+        'SELECT role FROM collaborators WHERE client_id = ? AND user_id = ?',
         [clientId, userId]
       );
-      if (collabRows.length > 0) return collabRows[0].access_type;
+      if (collabRows.length > 0) return collabRows[0].role;
 
       return null;
     } catch (error) {
