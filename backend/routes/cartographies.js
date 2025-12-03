@@ -66,10 +66,10 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Filters must be a valid object' });
         }
 
-        // Check if user has access (must be owner or editor)
+        // Check if user has access (must be owner, admin, or editor)
         const accessType = await Client.getUserAccessType(userId, clientId);
-        if (!accessType || (accessType !== 'owner' && accessType !== 'editor')) {
-            return res.status(403).json({ error: 'Only owners and editors can create cartographies' });
+        if (!accessType || (accessType !== 'owner' && accessType !== 'admin' && accessType !== 'editor')) {
+            return res.status(403).json({ error: 'Only owners, admins, and editors can create cartographies' });
         }
 
         const cartographyId = await Cartography.create(
@@ -107,10 +107,10 @@ router.put('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Filters must be a valid object' });
         }
 
-        // Check if user has access (must be owner or editor)
+        // Check if user has access (must be owner, admin, or editor)
         const accessType = await Client.getUserAccessType(userId, clientId);
-        if (!accessType || (accessType !== 'owner' && accessType !== 'editor')) {
-            return res.status(403).json({ error: 'Only owners and editors can update cartographies' });
+        if (!accessType || (accessType !== 'owner' && accessType !== 'admin' && accessType !== 'editor')) {
+            return res.status(403).json({ error: 'Only owners, admins, and editors can update cartographies' });
         }
 
         const success = await Cartography.update(
@@ -143,10 +143,10 @@ router.delete('/:clientId/:cartographyId', authenticateToken, async (req, res) =
         const { clientId, cartographyId } = req.params;
         const userId = req.user.userId;
 
-        // Check if user has access (must be owner or editor)
+        // Check if user has access (must be owner, admin, or editor)
         const accessType = await Client.getUserAccessType(userId, clientId);
-        if (!accessType || (accessType !== 'owner' && accessType !== 'editor')) {
-            return res.status(403).json({ error: 'Only owners and editors can delete cartographies' });
+        if (!accessType || (accessType !== 'owner' && accessType !== 'admin' && accessType !== 'editor')) {
+            return res.status(403).json({ error: 'Only owners, admins, and editors can delete cartographies' });
         }
 
         const success = await Cartography.delete(cartographyId, clientId);
