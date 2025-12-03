@@ -1656,13 +1656,6 @@ function showAddClientModal() {
 
 // Update filter UI with current filter values
 function updateFilterUI() {
-    // Update depth label and selected state
-    const depthValue = currentFilters.depth || 5;
-    document.getElementById('depthFilterLabel').textContent = depthValue + ' pages';
-    document.querySelectorAll('#depthFilterMenu .filter-dropdown-item').forEach(item => {
-        item.classList.toggle('selected', item.dataset.value == depthValue);
-    });
-
     // Update device label and selected state
     const deviceValue = currentFilters.deviceType || '';
     const deviceLabels = { '': 'Tous les appareils', 'desktop': 'Desktop', 'mobile': 'Mobile', 'tablet': 'Tablet' };
@@ -1754,7 +1747,6 @@ function setupFilterButtons() {
     setupDropdown('deviceFilterBtn', 'deviceFilterMenu', 'deviceFilterLabel', 'deviceType');
     setupDropdown('trafficSourceFilterBtn', 'trafficSourceFilterMenu', 'trafficSourceFilterLabel', 'trafficSource');
     setupDropdown('categoryFilterBtn', 'categoryFilterMenu', 'categoryFilterLabel', 'category');
-    setupDropdown('depthFilterBtn', 'depthFilterMenu', 'depthFilterLabel', 'depth');
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
@@ -1958,7 +1950,6 @@ function setupEventListeners() {
         updateDateRangeLabel();
 
         // Update button labels
-        document.getElementById('depthFilterLabel').textContent = '5 pages';
         document.getElementById('deviceFilterLabel').textContent = 'Tous les appareils';
         document.getElementById('trafficSourceFilterLabel').textContent = 'Toutes les sources';
         document.getElementById('categoryFilterLabel').textContent = 'Toutes les catégories';
@@ -1968,7 +1959,6 @@ function setupEventListeners() {
         document.querySelector('#deviceFilterMenu [data-value=""]').classList.add('selected');
         document.querySelector('#trafficSourceFilterMenu [data-value=""]').classList.add('selected');
         document.querySelector('#categoryFilterMenu [data-value=""]').classList.add('selected');
-        document.querySelector('#depthFilterMenu [data-value="5"]').classList.add('selected');
 
         loadAnalytics();
     });
