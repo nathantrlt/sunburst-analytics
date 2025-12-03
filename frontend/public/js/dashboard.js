@@ -937,7 +937,7 @@ function renderDistributionBar(barId, legendId, distribution, colors, unit) {
             <div class="category-legend-item">
                 <div class="category-legend-color" style="background-color: ${color};"></div>
                 <span class="category-legend-label">${item.category}:</span>
-                <span class="category-legend-value">${item.count} ${unit}</span>
+                <span class="category-legend-value">${item.count} ${unit} (${item.percentage}%)</span>
             </div>
         `;
     }).join('');
