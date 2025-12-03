@@ -1769,8 +1769,8 @@ h2, h3 {
 
 .sunburst-container {
     position: relative;
-    min-height: 620px;
-    height: 620px;
+    min-height: 480px;
+    height: 480px;
     display: flex;
     align-items: center;
     justify-content: center;
