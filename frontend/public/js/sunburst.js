@@ -154,14 +154,16 @@ function createSunburst(data) {
         const endAngle = Math.max(0, Math.min(2 * Math.PI, (node.x1 - focus.x0) / xScale * 2 * Math.PI));
 
         // For radius: apply zoom scale to reduce overall size
-        const baseInnerRadius = (node.y0 - focus.y0) / yScale * radius;
-        const baseOuterRadius = (node.y1 - focus.y0) / yScale * radius;
+        // Use the effective radius (total radius - center hole)
+        const effectiveRadius = radius - centerHoleRadius;
+        const baseInnerRadius = (node.y0 - focus.y0) / yScale * effectiveRadius;
+        const baseOuterRadius = (node.y1 - focus.y0) / yScale * effectiveRadius;
 
         return {
             startAngle: startAngle,
             endAngle: endAngle,
-            innerRadius: Math.max(0, baseInnerRadius * ZOOM_SCALE),
-            outerRadius: Math.max(0, baseOuterRadius * ZOOM_SCALE)
+            innerRadius: Math.max(centerHoleRadius, baseInnerRadius * ZOOM_SCALE + centerHoleRadius),
+            outerRadius: Math.max(centerHoleRadius, baseOuterRadius * ZOOM_SCALE + centerHoleRadius)
         };
     }
 
@@ -255,12 +257,12 @@ function createSunburst(data) {
                     // Calculate start position (from previous focus)
                     const startPos = arcPosition(node, previousFocusedNode);
 
-                    // Calculate end position (back to root = original arc)
+                    // Calculate end position (back to root = original arc with center hole)
                     const endPos = {
                         startAngle: node.x0,
                         endAngle: node.x1,
-                        innerRadius: node.y0,
-                        outerRadius: node.y1
+                        innerRadius: centerHoleRadius + node.y0,
+                        outerRadius: centerHoleRadius + node.y1
                     };
 
                     // Create interpolators
