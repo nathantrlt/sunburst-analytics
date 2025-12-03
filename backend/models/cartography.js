@@ -3,19 +3,39 @@ const { pool } = require('../config/database');
 const Cartography = {
     // Create a new cartography
     async create(clientId, name, description, filters) {
-        const query = `
-            INSERT INTO cartographies (client_id, name, description, filters, created_at)
-            VALUES (?, ?, ?, ?, NOW())
-        `;
+        try {
+            console.log('[Cartography.create] Parameters:', {
+                clientId,
+                name,
+                description,
+                filters: JSON.stringify(filters)
+            });
 
-        const [result] = await pool.execute(query, [
-            clientId,
-            name,
-            description || null,
-            JSON.stringify(filters)
-        ]);
+            const query = `
+                INSERT INTO cartographies (client_id, name, description, filters, created_at)
+                VALUES (?, ?, ?, ?, NOW())
+            `;
 
-        return result.insertId;
+            const params = [
+                clientId,
+                name,
+                description || null,
+                JSON.stringify(filters)
+            ];
+
+            console.log('[Cartography.create] Executing query with params:', params);
+
+            const [result] = await pool.execute(query, params);
+
+            console.log('[Cartography.create] Success! Insert ID:', result.insertId);
+
+            return result.insertId;
+        } catch (error) {
+            console.error('[Cartography.create] Database error:', error);
+            console.error('[Cartography.create] Error code:', error.code);
+            console.error('[Cartography.create] Error message:', error.message);
+            throw error;
+        }
     },
 
     // Get all cartographies for a client
