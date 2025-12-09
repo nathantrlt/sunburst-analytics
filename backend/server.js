@@ -10,6 +10,7 @@ const { migrate: migrateMultiConditions } = require('./migrations/add_multi_cond
 const { migrate: migrateAllowNullConditions } = require('./migrations/allow_null_legacy_conditions');
 const { migrate: migrateCartographies } = require('./migrations/add_cartographies_table');
 const { migrate: migrateCartographyCategories } = require('./migrations/add_cartography_to_categories');
+const { migrate: migrateDefaultCartography } = require('./migrations/add_default_cartography');
 const { checkAndMigrate: migrateAdminRole } = require('./scripts/auto-migrate');
 const authRoutes = require('./routes/auth');
 const clientRoutes = require('./routes/clients');
@@ -113,6 +114,7 @@ const startServer = async () => {
     await migrateAllowNullConditions();
     await migrateCartographies();
     await migrateCartographyCategories();
+    await migrateDefaultCartography();
     await migrateAdminRole(); // Auto-migrate admin role
 
     // Start listening

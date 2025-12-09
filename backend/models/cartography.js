@@ -2,25 +2,35 @@ const { pool } = require('../config/database');
 
 const Cartography = {
     // Create a new cartography
-    async create(clientId, name, description, filters) {
+    async create(clientId, name, description, filters, isDefault = false) {
         try {
             console.log('[Cartography.create] Parameters:', {
                 clientId,
                 name,
                 description,
-                filters: JSON.stringify(filters)
+                filters: JSON.stringify(filters),
+                isDefault
             });
 
+            // If setting as default, unset all other defaults for this client
+            if (isDefault) {
+                await pool.execute(
+                    'UPDATE cartographies SET is_default = FALSE WHERE client_id = ?',
+                    [clientId]
+                );
+            }
+
             const query = `
-                INSERT INTO cartographies (client_id, name, description, filters, created_at)
-                VALUES (?, ?, ?, ?, NOW())
+                INSERT INTO cartographies (client_id, name, description, filters, is_default, created_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
             `;
 
             const params = [
                 clientId,
                 name,
                 description || null,
-                JSON.stringify(filters)
+                JSON.stringify(filters),
+                isDefault
             ];
 
             console.log('[Cartography.create] Executing query with params:', params);
@@ -72,10 +82,18 @@ const Cartography = {
     },
 
     // Update a cartography
-    async update(id, clientId, name, description, filters) {
+    async update(id, clientId, name, description, filters, isDefault = false) {
+        // If setting as default, unset all other defaults for this client
+        if (isDefault) {
+            await pool.execute(
+                'UPDATE cartographies SET is_default = FALSE WHERE client_id = ? AND id != ?',
+                [clientId, id]
+            );
+        }
+
         const query = `
             UPDATE cartographies
-            SET name = ?, description = ?, filters = ?, updated_at = NOW()
+            SET name = ?, description = ?, filters = ?, is_default = ?, updated_at = NOW()
             WHERE id = ? AND client_id = ?
         `;
 
@@ -83,6 +101,7 @@ const Cartography = {
             name,
             description || null,
             JSON.stringify(filters),
+            isDefault,
             id,
             clientId
         ]);

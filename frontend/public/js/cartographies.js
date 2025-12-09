@@ -215,6 +215,7 @@ async function openEditCartographyModal(cartoId) {
     // Fill form with cartography data
     document.getElementById('cartographyName').value = carto.name;
     document.getElementById('cartographyDescription').value = carto.description || '';
+    document.getElementById('cartoIsDefault').checked = carto.is_default || false;
     document.getElementById('cartoStartDate').value = carto.filters.startDate || '';
     document.getElementById('cartoEndDate').value = carto.filters.endDate || '';
     document.getElementById('cartoDeviceFilter').value = carto.filters.deviceType || '';
@@ -269,6 +270,7 @@ async function handleCartographySubmit(e) {
 
     const name = document.getElementById('cartographyName').value.trim();
     const description = document.getElementById('cartographyDescription').value.trim();
+    const isDefault = document.getElementById('cartoIsDefault').checked;
 
     const filters = {
         startDate: document.getElementById('cartoStartDate').value || null,
@@ -293,7 +295,7 @@ async function handleCartographySubmit(e) {
             // Update existing cartography
             await apiRequest(`/cartographies/${currentClient.id}/${editingCartographyId}`, {
                 method: 'PUT',
-                body: JSON.stringify({ name, description, filters })
+                body: JSON.stringify({ name, description, filters, isDefault })
             });
 
             const successDiv = document.getElementById('cartographySuccess');
@@ -303,7 +305,7 @@ async function handleCartographySubmit(e) {
             // Create new cartography
             await apiRequest(`/cartographies/${currentClient.id}`, {
                 method: 'POST',
-                body: JSON.stringify({ name, description, filters })
+                body: JSON.stringify({ name, description, filters, isDefault })
             });
 
             const successDiv = document.getElementById('cartographySuccess');

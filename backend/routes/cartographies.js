@@ -55,7 +55,7 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
     try {
         const { clientId } = req.params;
         const userId = req.user.userId;
-        const { name, description, filters } = req.body;
+        const { name, description, filters, isDefault } = req.body;
 
         console.log('[Cartography Create] User:', userId, 'Client:', clientId, 'Name:', name);
 
@@ -84,7 +84,8 @@ router.post('/:clientId', authenticateToken, async (req, res) => {
             clientId,
             name.trim(),
             description ? description.trim() : null,
-            filters
+            filters,
+            isDefault || false
         );
 
         console.log('[Cartography Create] Created cartography ID:', cartographyId);
@@ -106,7 +107,7 @@ router.put('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
     try {
         const { clientId, cartographyId } = req.params;
         const userId = req.user.userId;
-        const { name, description, filters } = req.body;
+        const { name, description, filters, isDefault } = req.body;
 
         // Validate input
         if (!name || !name.trim()) {
@@ -128,7 +129,8 @@ router.put('/:clientId/:cartographyId', authenticateToken, async (req, res) => {
             clientId,
             name.trim(),
             description ? description.trim() : null,
-            filters
+            filters,
+            isDefault || false
         );
 
         if (!success) {
