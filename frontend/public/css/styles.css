@@ -1924,6 +1924,25 @@ h2, h3 {
     z-index: 2001;
 }
 
+/* Scrollbar styling for modals */
+.modal-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
 .modal-header {
     padding: 20px 24px;
     border-bottom: 1px solid var(--border-color);
