@@ -2717,4 +2717,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (depthFilterWrapper) {
         depthFilterWrapper.style.display = 'none';
     }
+
+    // Close modals when clicking outside (on the modal backdrop)
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
 });
