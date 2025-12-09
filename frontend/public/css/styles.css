@@ -634,7 +634,8 @@ h2, h3 {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 10px 12px;
     border: 2px solid var(--text-secondary);
@@ -647,7 +648,8 @@ h2, h3 {
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
 }
