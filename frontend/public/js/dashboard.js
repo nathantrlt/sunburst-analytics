@@ -725,11 +725,10 @@ function renderCategoryPerformanceTable(categories) {
         `;
     }).join('');
 
-    // Add click handlers for expand buttons
+    // Add click handlers for entire row
     tbody.querySelectorAll('.category-row').forEach(row => {
-        const expandBtn = row.querySelector('.btn-expand');
-        expandBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', () => {
             const categoryId = row.dataset.categoryId;
             const categoryName = row.dataset.categoryName;
             toggleCategoryDetails(row, categoryId, categoryName);
