@@ -51,10 +51,10 @@ const Cartography = {
     // Get all cartographies for a client
     async getByClientId(clientId) {
         const query = `
-            SELECT id, client_id, name, description, filters, created_at, updated_at
+            SELECT id, client_id, name, description, filters, is_default, created_at, updated_at
             FROM cartographies
             WHERE client_id = ?
-            ORDER BY created_at DESC
+            ORDER BY is_default DESC, created_at DESC
         `;
 
         const [rows] = await pool.execute(query, [clientId]);
@@ -66,7 +66,7 @@ const Cartography = {
     // Get a specific cartography
     async getById(id, clientId) {
         const query = `
-            SELECT id, client_id, name, description, filters, created_at, updated_at
+            SELECT id, client_id, name, description, filters, is_default, created_at, updated_at
             FROM cartographies
             WHERE id = ? AND client_id = ?
         `;
