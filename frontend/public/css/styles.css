@@ -1925,6 +1925,11 @@ h2, h3 {
 }
 
 /* Scrollbar styling for modals */
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: #666 #1a1a1a;
+}
+
 .modal-content::-webkit-scrollbar {
     width: 12px;
 }
