@@ -65,12 +65,14 @@ function renderCartographiesList() {
     const dropdown = document.getElementById('cartographySelectDropdown');
     const optionsContainer = dropdown.querySelector('.custom-select-options');
 
-    // Update button text - select first cartography by default if exists
+    // Update button text - select default or first cartography if exists
     if (currentCartography) {
         buttonText.textContent = currentCartography.name;
     } else if (cartographies.length > 0) {
-        // Auto-select first cartography
-        selectCartography(cartographies[0].id);
+        // Auto-select default cartography if exists, otherwise first one
+        const defaultCarto = cartographies.find(c => c.is_default);
+        const cartoToSelect = defaultCarto || cartographies[0];
+        selectCartography(cartoToSelect.id);
         return; // Exit and let the selection re-render
     } else {
         buttonText.textContent = 'Aucune cartographie';
