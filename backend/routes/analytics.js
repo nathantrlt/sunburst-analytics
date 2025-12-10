@@ -295,11 +295,19 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
     const categoryIdParam = req.params.categoryId;
     const cartographyId = req.query.cartographyId ? parseInt(req.query.cartographyId) : null;
 
+    console.log('[Category Details] Request:', {
+      categoryId: categoryIdParam,
+      cartographyId,
+      clientId: req.clientId
+    });
+
     // Get all pageviews
     const pageviews = await Pageview.getAllPageviews(
       req.clientId,
       filters
     );
+
+    console.log('[Category Details] Total pageviews:', pageviews.length);
 
     let category;
     let categoryPages = [];
@@ -337,12 +345,24 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
 
       // Get category info
       category = await PageCategory.findById(categoryId);
+      console.log('[Category Details] Category loaded:', {
+        id: category?.id,
+        name: category?.name,
+        cartography_id: category?.cartography_id,
+        client_id: category?.client_id
+      });
+
       if (!category || category.client_id !== req.clientId) {
+        console.log('[Category Details] Category not found or wrong client');
         return res.status(404).json({ error: 'Category not found' });
       }
 
       // If cartographyId is specified, verify the category belongs to it
       if (cartographyId && category.cartography_id !== cartographyId) {
+        console.log('[Category Details] Category does not belong to cartography', {
+          categoryCartographyId: category.cartography_id,
+          requestedCartographyId: cartographyId
+        });
         return res.status(404).json({ error: 'Category not found in this cartography' });
       }
 
@@ -352,6 +372,8 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
           categoryPages.push(pv);
         }
       }
+
+      console.log('[Category Details] Matching pages found:', categoryPages.length);
     }
 
     // Calculate global stats
