@@ -2513,7 +2513,7 @@ function renderCategoryPagesTable() {
 
     tbody.innerHTML = sortedData.map(page => `
         <tr>
-            <td><a href="${page.url}" target="_blank">${page.url}</a></td>
+            <td>${page.url}</td>
             <td>${page.title}</td>
             <td>${page.views.toLocaleString()}</td>
             <td>${page.avgDepth}</td>

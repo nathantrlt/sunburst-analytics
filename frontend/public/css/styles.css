@@ -1857,6 +1857,16 @@ h2, h3 {
     color: var(--text-secondary);
 }
 
+/* Force white color for URLs in category details modal */
+#categoryPagesTableBody td {
+    color: var(--text-secondary) !important;
+}
+
+#categoryPagesTableBody td a {
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
+}
+
 .data-table th.sortable {
     cursor: pointer;
     user-select: none;
