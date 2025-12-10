@@ -1867,6 +1867,14 @@ h2, h3 {
     text-decoration: none !important;
 }
 
+/* Limit URL column width and truncate long URLs */
+#categoryPagesTableBody td:first-child {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .data-table th.sortable {
     cursor: pointer;
     user-select: none;
