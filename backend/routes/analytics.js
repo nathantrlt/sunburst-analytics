@@ -341,6 +341,11 @@ router.get('/category-details/:clientId/:categoryId', verifyClientAccess, async 
         return res.status(404).json({ error: 'Category not found' });
       }
 
+      // If cartographyId is specified, verify the category belongs to it
+      if (cartographyId && category.cartography_id !== cartographyId) {
+        return res.status(404).json({ error: 'Category not found in this cartography' });
+      }
+
       // Filter pages that match this category
       for (const pv of pageviews) {
         if (await PageCategory.matchesRule(req.clientId, pv.page_url, category)) {
