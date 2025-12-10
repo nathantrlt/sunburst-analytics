@@ -293,8 +293,7 @@ function renderClientsList() {
     if (clients.length === 0) {
         optionsHTML = '<div class="custom-option disabled">Aucun site disponible</div>';
     } else {
-        optionsHTML = '<div class="custom-option placeholder">-- Sélectionner un site --</div>';
-        optionsHTML += clients.map(client =>
+        optionsHTML = clients.map(client =>
             `<div class="custom-option ${currentClient && currentClient.id === client.id ? 'selected' : ''}" data-client-id="${client.id}">
                 <div class="option-name">${client.site_name}</div>
                 <div class="option-url">${new URL(client.site_url).hostname}</div>
