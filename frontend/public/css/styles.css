@@ -236,7 +236,7 @@ body {
 }
 
 .sidebar-icon {
-    flex-shrink: 0;
+    display: none;
 }
 
 .sidebar-item span {
@@ -857,7 +857,7 @@ h2, h3 {
 }
 
 .nav-item.active {
-    background: rgba(252, 209, 22, 0.15);
+    background: transparent;
     color: var(--primary-color);
     border-left-color: var(--primary-color);
 }
@@ -2510,7 +2510,7 @@ body[data-theme="light"] .nav-item:hover {
 }
 
 body[data-theme="light"] .nav-item.active {
-    background: rgba(252, 209, 22, 0.2);
+    background: transparent;
 }
 
 body[data-theme="light"] h1,
