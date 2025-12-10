@@ -320,7 +320,14 @@ body {
 
 /* Hide site management buttons by default (Accueil section is default) */
 .site-header > div:last-child {
-    display: none;
+    display: none !important;
+}
+
+/* Force hide site management buttons */
+#viewSnippetBtn,
+#manageCollaboratorsBtn,
+#deleteSiteBtn {
+    display: none !important;
 }
 
 /* === HEADER DE PAGE === */
