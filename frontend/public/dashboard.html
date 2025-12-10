@@ -145,6 +145,19 @@
 
             <!-- Dashboard Content (shown when site selected) -->
             <div id="dashboardContent" style="display: none;">
+                <!-- Site Info -->
+                <div class="site-header">
+                    <div>
+                        <h2 id="siteName">Site Name</h2>
+                        <p id="siteUrl">https://example.com</p>
+                    </div>
+                    <div>
+                        <button id="viewSnippetBtn" class="btn btn-primary btn-small" style="margin-right: 10px;">Voir le Code de Suivi</button>
+                        <button id="manageCollaboratorsBtn" class="btn btn-secondary btn-small" style="margin-right: 10px;">Gérer les Collaborateurs</button>
+                        <button id="deleteSiteBtn" class="btn btn-danger btn-small">Supprimer le Site</button>
+                    </div>
+                </div>
+
                 <!-- Statistics Cards (before filters) -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -1336,7 +1349,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
     <script src="/js/cartographies.js?v=1765277303"></script>
-    <script src="/js/dashboard.js?v=1765364710"></script>
+    <script src="/js/dashboard.js?v=1765363636"></script>
     <script src="/js/sunburst.js?v=1764780959"></script>
 </body>
 </html>

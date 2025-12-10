@@ -240,14 +240,13 @@ async function selectClientFromProjectScreen(clientId) {
     const canManageCategories = isOwner || isAdmin || isEditor;
     const hasFullAccess = isOwner || isAdmin; // Admin has same rights as owner
 
-    // Site header buttons removed from Accueil section
-    // document.getElementById('viewSnippetBtn').style.display = 'inline-block';
+    document.getElementById('viewSnippetBtn').style.display = 'inline-block';
     const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
     if (manageCategoriesBtn) {
         manageCategoriesBtn.style.display = canManageCategories ? 'inline-block' : 'none';
     }
-    // document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
-    // document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
 
     // Hide welcome message, show content
     document.getElementById('welcomeMessage').style.display = 'none';
@@ -401,11 +400,10 @@ async function selectClient(clientId) {
     const canManageCategories = isOwner || isAdmin || isEditor;
     const hasFullAccess = isOwner || isAdmin; // Admin has same rights as owner
 
-    // Site header buttons removed from Accueil section
-    // document.getElementById('viewSnippetBtn').style.display = 'inline-block'; // Always visible
+    document.getElementById('viewSnippetBtn').style.display = 'inline-block'; // Always visible
     document.getElementById('manageCategoriesBtn').style.display = canManageCategories ? 'inline-block' : 'none';
-    // document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
-    // document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('manageCollaboratorsBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
+    document.getElementById('deleteSiteBtn').style.display = hasFullAccess ? 'inline-block' : 'none';
 
     // Load cartographies
     await window.cartographyModule.loadCartographies();
@@ -1853,16 +1851,16 @@ function setupEventListeners() {
         alert('Code de suivi copié dans le presse-papiers !');
     });
 
-    // Delete site - removed from Accueil section
-    // document.getElementById('deleteSiteBtn').addEventListener('click', handleDeleteSite);
+    // Delete site
+    document.getElementById('deleteSiteBtn').addEventListener('click', handleDeleteSite);
 
-    // View snippet - removed from Accueil section
-    // document.getElementById('viewSnippetBtn').addEventListener('click', () => {
-    //     if (!currentClient) return;
-    //     const snippet = generateSnippet(currentClient.api_key);
-    //     document.getElementById('viewTrackingSnippet').textContent = snippet;
-    //     document.getElementById('viewSnippetModal').style.display = 'flex';
-    // });
+    // View snippet
+    document.getElementById('viewSnippetBtn').addEventListener('click', () => {
+        if (!currentClient) return;
+        const snippet = generateSnippet(currentClient.api_key);
+        document.getElementById('viewTrackingSnippet').textContent = snippet;
+        document.getElementById('viewSnippetModal').style.display = 'flex';
+    });
 
     // Close view snippet modal
     document.getElementById('closeViewSnippetModal').addEventListener('click', () => {
@@ -1913,14 +1911,13 @@ function setupEventListeners() {
     });
 
     // Manage collaborators
-    // Manage collaborators button - removed from Accueil section
-    // document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {
-    //     document.getElementById('collaboratorsModal').style.display = 'flex';
-    //     document.getElementById('collaboratorError').style.display = 'none';
-    //     document.getElementById('collaboratorSuccess').style.display = 'none';
-    //     document.getElementById('addCollaboratorForm').reset();
-    //     loadCollaborators();
-    // });
+    document.getElementById('manageCollaboratorsBtn').addEventListener('click', () => {
+        document.getElementById('collaboratorsModal').style.display = 'flex';
+        document.getElementById('collaboratorError').style.display = 'none';
+        document.getElementById('collaboratorSuccess').style.display = 'none';
+        document.getElementById('addCollaboratorForm').reset();
+        loadCollaborators();
+    });
 
     // Close collaborators modal
     document.getElementById('closeCollaboratorsModal').addEventListener('click', () => {
