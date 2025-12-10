@@ -2458,6 +2458,11 @@ async function showCategoryDetails(categoryId) {
     try {
         const params = buildFilterParams();
 
+        // Add cartographyId if available
+        if (typeof currentCartography !== 'undefined' && currentCartography && currentCartography.id) {
+            params.append('cartographyId', currentCartography.id);
+        }
+
         const data = await apiRequest(`/analytics/category-details/${currentClient.id}/${categoryId}?${params}`);
 
         // Update title
