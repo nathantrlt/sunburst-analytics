@@ -922,7 +922,7 @@ h2, h3 {
 
 .custom-select-wrapper.header-select {
     position: relative;
-    width: 250px;
+    width: 300px;
     margin-bottom: 0;
     z-index: 9998;
 }
