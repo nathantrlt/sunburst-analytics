@@ -119,8 +119,7 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
             return getColor(d.data.name);
         })
         .attr('fill-opacity', 0.95)
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 0.5)
+        .attr('stroke', 'none')
         .style('cursor', 'pointer')
         .on('mouseover', handleMouseOver)
         .on('mouseout', handleMouseOut)
@@ -136,8 +135,7 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     function handleMouseOver(event, d) {
         // Highlight path
         d3.select(event.currentTarget)
-            .attr('fill-opacity', 1)
-            .attr('stroke-width', 2);
+            .attr('fill-opacity', 1);
 
         // Show tooltip
         showTooltip(event, d);
@@ -149,8 +147,7 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Mouse out handler
     function handleMouseOut(event, d) {
         d3.select(event.currentTarget)
-            .attr('fill-opacity', 0.95)
-            .attr('stroke-width', 1);
+            .attr('fill-opacity', 0.95);
 
         hideTooltip();
         centerText.text('Parcours Utilisateurs');
