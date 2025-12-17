@@ -571,8 +571,10 @@ async function loadSunburstData() {
         if (window.createSunburst) {
             // Render first sunburst
             window.createSunburst(data.data, 'sunburstChart', 'sunburstTooltip');
-            // Render second sunburst (duplicate)
-            window.createSunburst(data.data, 'sunburstChart2', 'sunburstTooltip2');
+            // Render second sunburst (duplicate) - add small delay to ensure DOM is ready
+            setTimeout(() => {
+                window.createSunburst(data.data, 'sunburstChart2', 'sunburstTooltip2');
+            }, 100);
         }
     } catch (error) {
         console.error('Failed to load sunburst data:', error);
