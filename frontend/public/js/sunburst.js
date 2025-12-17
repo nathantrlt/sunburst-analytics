@@ -4,13 +4,19 @@
  */
 
 let currentSunburstData = null;
+let currentSunburstData2 = null;
 
-function createSunburst(data) {
+function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTooltip') {
     // Store data globally for zoom/reset functionality
-    currentSunburstData = data;
+    if (chartId === 'sunburstChart') {
+        currentSunburstData = data;
+    } else if (chartId === 'sunburstChart2') {
+        currentSunburstData2 = data;
+    }
 
     // Clear existing chart
-    const container = document.getElementById('sunburstChart');
+    const container = document.getElementById(chartId);
+    if (!container) return;
     container.innerHTML = '';
 
     // Dimensions - use square aspect ratio for proper sunburst display
@@ -31,7 +37,7 @@ function createSunburst(data) {
     };
 
     // Create SVG
-    const svgElement = d3.select('#sunburstChart')
+    const svgElement = d3.select('#' + chartId)
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -298,7 +304,7 @@ function createSunburst(data) {
 
     // Show tooltip
     function showTooltip(event, d) {
-        const tooltip = document.getElementById('sunburstTooltip');
+        const tooltip = document.getElementById(tooltipId);
 
         const total = root.value;
         const percentage = ((d.value / total) * 100).toFixed(1);
@@ -347,7 +353,7 @@ function createSunburst(data) {
 
     // Hide tooltip
     function hideTooltip() {
-        const tooltip = document.getElementById('sunburstTooltip');
+        const tooltip = document.getElementById(tooltipId);
         tooltip.style.display = 'none';
     }
 
@@ -358,13 +364,18 @@ function createSunburst(data) {
         return text.substring(0, maxLength) + '...';
     }
 
-    // Make it responsive
-    window.addEventListener('resize', debounce(() => {
-        if (currentSunburstData) {
-            createSunburst(currentSunburstData);
-        }
-    }, 250));
+    // Make it responsive - handled globally below
 }
+
+// Global resize handler for all sunbursts
+window.addEventListener('resize', debounce(() => {
+    if (currentSunburstData) {
+        createSunburst(currentSunburstData, 'sunburstChart', 'sunburstTooltip');
+    }
+    if (currentSunburstData2) {
+        createSunburst(currentSunburstData2, 'sunburstChart2', 'sunburstTooltip2');
+    }
+}, 250));
 
 // Debounce helper
 function debounce(func, wait) {

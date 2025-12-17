@@ -544,29 +544,42 @@ async function loadStats() {
 // Load sunburst data
 async function loadSunburstData() {
     try {
+        // Load first sunburst
         document.getElementById('sunburstLoading').style.display = 'block';
         document.getElementById('sunburstChart').innerHTML = '';
         document.getElementById('sunburstEmpty').style.display = 'none';
+
+        // Load second sunburst
+        document.getElementById('sunburstLoading2').style.display = 'block';
+        document.getElementById('sunburstChart2').innerHTML = '';
+        document.getElementById('sunburstEmpty2').style.display = 'none';
 
         const params = buildSunburstParams();
 
         const data = await apiRequest(`/analytics/sunburst/${currentClient.id}?${params}`);
 
         document.getElementById('sunburstLoading').style.display = 'none';
+        document.getElementById('sunburstLoading2').style.display = 'none';
 
         if (!data.data || !data.data.children || data.data.children.length === 0) {
             document.getElementById('sunburstEmpty').style.display = 'block';
+            document.getElementById('sunburstEmpty2').style.display = 'block';
             return;
         }
 
         // Render sunburst (function from sunburst.js)
         if (window.createSunburst) {
-            window.createSunburst(data.data);
+            // Render first sunburst
+            window.createSunburst(data.data, 'sunburstChart', 'sunburstTooltip');
+            // Render second sunburst (duplicate)
+            window.createSunburst(data.data, 'sunburstChart2', 'sunburstTooltip2');
         }
     } catch (error) {
         console.error('Failed to load sunburst data:', error);
         document.getElementById('sunburstLoading').style.display = 'none';
+        document.getElementById('sunburstLoading2').style.display = 'none';
         document.getElementById('sunburstEmpty').style.display = 'block';
+        document.getElementById('sunburstEmpty2').style.display = 'block';
     }
 }
 
@@ -1971,7 +1984,7 @@ function setupEventListeners() {
         loadAnalytics();
     });
 
-    // Sunburst View Mode Toggle
+    // Sunburst View Mode Toggle (First Sunburst)
     document.getElementById('viewByUrlBtn').addEventListener('click', () => {
         if (currentFilters.viewMode !== 'url') {
             currentFilters.viewMode = 'url';
@@ -1986,6 +1999,25 @@ function setupEventListeners() {
             currentFilters.viewMode = 'category';
             document.getElementById('viewByCategoryBtn').classList.add('active');
             document.getElementById('viewByUrlBtn').classList.remove('active');
+            loadSunburstData();
+        }
+    });
+
+    // Sunburst View Mode Toggle (Second Sunburst)
+    document.getElementById('viewByUrlBtn2').addEventListener('click', () => {
+        if (currentFilters.viewMode !== 'url') {
+            currentFilters.viewMode = 'url';
+            document.getElementById('viewByUrlBtn2').classList.add('active');
+            document.getElementById('viewByCategoryBtn2').classList.remove('active');
+            loadSunburstData();
+        }
+    });
+
+    document.getElementById('viewByCategoryBtn2').addEventListener('click', () => {
+        if (currentFilters.viewMode !== 'category') {
+            currentFilters.viewMode = 'category';
+            document.getElementById('viewByCategoryBtn2').classList.add('active');
+            document.getElementById('viewByUrlBtn2').classList.remove('active');
             loadSunburstData();
         }
     });
