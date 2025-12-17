@@ -151,23 +151,31 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Helper: calculate arc coordinates for a node given a focus
     function arcPosition(node, focus) {
         const xScale = (focus.x1 - focus.x0) || 0.01; // Avoid division by zero
-        const yScale = (focus.y1 - focus.y0) || 0.01;
 
         // For angles: full circle transformation (no scaling - must close the circle)
         const startAngle = Math.max(0, Math.min(2 * Math.PI, (node.x0 - focus.x0) / xScale * 2 * Math.PI));
         const endAngle = Math.max(0, Math.min(2 * Math.PI, (node.x1 - focus.x0) / xScale * 2 * Math.PI));
 
-        // For radius: calculate to maintain constant ring thickness
+        // For radius: keep the same ring thickness as the original sunburst
+        // Calculate the depth difference relative to the focused node
+        const depthDiff = node.depth - focus.depth;
+        const maxDepth = root.height; // Maximum depth of the tree
+
         // Use the effective radius (total radius - center hole)
         const effectiveRadius = radius - centerHoleRadius;
-        const baseInnerRadius = (node.y0 - focus.y0) / yScale * effectiveRadius;
-        const baseOuterRadius = (node.y1 - focus.y0) / yScale * effectiveRadius;
+
+        // Calculate ring thickness based on max depth to keep consistent dimensions
+        const ringThickness = effectiveRadius / maxDepth;
+
+        // Position based on relative depth from focused node
+        const innerRadius = centerHoleRadius + (depthDiff * ringThickness);
+        const outerRadius = centerHoleRadius + ((depthDiff + 1) * ringThickness);
 
         return {
             startAngle: startAngle,
             endAngle: endAngle,
-            innerRadius: Math.max(centerHoleRadius, baseInnerRadius + centerHoleRadius),
-            outerRadius: Math.max(centerHoleRadius, baseOuterRadius + centerHoleRadius)
+            innerRadius: Math.max(centerHoleRadius, innerRadius),
+            outerRadius: Math.max(centerHoleRadius, outerRadius)
         };
     }
 
