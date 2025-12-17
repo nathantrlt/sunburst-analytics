@@ -19,6 +19,9 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     if (!container) return;
     container.innerHTML = '';
 
+    // Determine breadcrumb ID based on chart ID
+    const breadcrumbId = chartId === 'sunburstChart' ? 'sunburstBreadcrumb' : 'sunburstBreadcrumb2';
+
     // Dimensions - use square aspect ratio for proper sunburst display
     // Width 600px, Height 400px
     const width = 600;
@@ -114,6 +117,9 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
 
+    // Initialize breadcrumb
+    updateBreadcrumb(root);
+
     // Mouse over handler
     function handleMouseOver(event, d) {
         // Highlight path
@@ -189,6 +195,9 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
         // Update focused node
         focusedNode = d;
 
+        // Update breadcrumb
+        updateBreadcrumb(d);
+
         // Transition for zoom animation
         const t = svg.transition()
             .duration(750)
@@ -254,6 +263,9 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
 
         // Reset to root
         focusedNode = root;
+
+        // Update breadcrumb
+        updateBreadcrumb(root);
 
         // Transition with same duration and easing as zoom
         const t = svg.transition()
@@ -362,6 +374,58 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     function hideTooltip() {
         const tooltip = document.getElementById(tooltipId);
         tooltip.style.display = 'none';
+    }
+
+    // Update breadcrumb trail
+    function updateBreadcrumb(node) {
+        const breadcrumb = document.getElementById(breadcrumbId);
+        if (!breadcrumb) return;
+
+        // Build path from root to current node
+        const pathParts = [];
+        let current = node;
+        while (current.parent) {
+            pathParts.unshift(current.data.name);
+            current = current.parent;
+        }
+
+        // If at root, show "Accueil"
+        if (pathParts.length === 0) {
+            breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
+            return;
+        }
+
+        // Build breadcrumb HTML
+        let breadcrumbHTML = '<span class="breadcrumb-home breadcrumb-clickable" data-depth="0">Accueil</span>';
+
+        pathParts.forEach((part, index) => {
+            const truncated = truncateText(part, 25);
+            breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> <span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
+        });
+
+        breadcrumb.innerHTML = breadcrumbHTML;
+
+        // Add click handlers to breadcrumb items
+        breadcrumb.querySelectorAll('.breadcrumb-clickable').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                // Navigate to that level
+                let targetNode = node;
+                const targetDepth = parseInt(item.getAttribute('data-depth'));
+
+                // Go up the tree to reach the target depth
+                while (targetNode && targetNode.depth > targetDepth) {
+                    targetNode = targetNode.parent;
+                }
+
+                if (targetNode) {
+                    if (targetNode === root || !targetNode.parent) {
+                        resetZoom();
+                    } else {
+                        handleClick({stopPropagation: () => {}}, targetNode);
+                    }
+                }
+            });
+        });
     }
 
     // Truncate text helper
