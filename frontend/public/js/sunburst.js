@@ -17,10 +17,22 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Clear existing chart
     const container = document.getElementById(chartId);
     if (!container) return;
-    container.innerHTML = '';
 
     // Determine breadcrumb ID based on chart ID
     const breadcrumbId = chartId === 'sunburstChart' ? 'sunburstBreadcrumb' : 'sunburstBreadcrumb2';
+
+    // Save breadcrumb element before clearing
+    const breadcrumbElement = document.getElementById(breadcrumbId);
+    const breadcrumbParent = breadcrumbElement ? breadcrumbElement.parentNode : null;
+    const breadcrumbHTML = breadcrumbElement ? breadcrumbElement.outerHTML : '';
+
+    // Clear only the chart, not the entire container
+    container.innerHTML = '';
+
+    // Restore breadcrumb if it existed
+    if (breadcrumbHTML && breadcrumbParent === container) {
+        container.insertAdjacentHTML('afterbegin', breadcrumbHTML);
+    }
 
     // Dimensions - use square aspect ratio for proper sunburst display
     // Width 600px, Height 400px
