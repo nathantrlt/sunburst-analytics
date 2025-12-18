@@ -475,9 +475,9 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         container.insertAdjacentHTML('afterbegin', breadcrumbHTML);
     }
 
-    // Dimensions - Larger for second sunburst
-    const width = 800;
-    const height = 800;
+    // Dimensions - Moderate size for second sunburst
+    const width = 600;
+    const height = 600;
     const radius = Math.min(width, height) / 2;
     const centerHoleRadius = radius * 0.25;
 
