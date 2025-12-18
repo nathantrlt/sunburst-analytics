@@ -475,9 +475,9 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         container.insertAdjacentHTML('afterbegin', breadcrumbHTML);
     }
 
-    // Dimensions
-    const width = 600;
-    const height = 400;
+    // Dimensions - Larger for second sunburst
+    const width = 800;
+    const height = 800;
     const radius = Math.min(width, height) / 2;
     const centerHoleRadius = radius * 0.25;
 
@@ -500,12 +500,23 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         .style('margin', '0 auto');
 
     const svg = svgElement.append('g')
-        .attr('transform', `translate(${width / 2},${height / 2})`);
+        .attr('transform', `translate(${width / 2},${height / 2})`)
+        .on('click', function(event) {
+            // If clicking on the group background (not on a path), reset zoom
+            if (event.target.tagName === 'g') {
+                event.stopPropagation();
+                resetZoom();
+            }
+        });
 
     // Create hierarchy
     const root = d3.hierarchy(data)
         .sum(d => d.value || 0)
         .sort((a, b) => b.value - a.value);
+
+    // Track currently focused node for zoom state
+    let focusedNode = root;
+    let previousFocusedNode = root;
 
     // Calculate angles where children fill parent's arc completely
     function calculateAngles(node, startAngle, endAngle) {
@@ -555,17 +566,178 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         .attr('fill-opacity', 0.95)
         .attr('stroke', 'none')
         .style('cursor', 'pointer')
-        .on('mouseover', function(event, d) {
-            d3.select(this).attr('fill-opacity', 1);
-            showTooltip(event, d);
-        })
-        .on('mouseout', function(event, d) {
-            d3.select(this).attr('fill-opacity', 0.95);
-            hideTooltip();
-        })
-        .on('click', function(event, d) {
-            console.log('Clicked:', d.data.name);
+        .on('mouseover', handleMouseOver)
+        .on('mouseout', handleMouseOut)
+        .on('click', handleClick);
+
+    // Mouse over handler
+    function handleMouseOver(event, d) {
+        d3.select(event.currentTarget).attr('fill-opacity', 1);
+        showTooltip(event, d);
+    }
+
+    // Mouse out handler
+    function handleMouseOut(event, d) {
+        d3.select(event.currentTarget).attr('fill-opacity', 0.95);
+        hideTooltip();
+    }
+
+    // Helper: check if target is a descendant of source (or equal)
+    function isVisible(target, source) {
+        let current = target;
+        while (current) {
+            if (current === source) return true;
+            current = current.parent;
+        }
+        return false;
+    }
+
+    // Helper: calculate arc coordinates for a node given a focus
+    function arcPosition(node, focus) {
+        const xScale = (focus.x1 - focus.x0) || 0.01;
+
+        // For angles: relative to focused node
+        const startAngle = Math.max(0, Math.min(2 * Math.PI, (node.x0 - focus.x0) / xScale * 2 * Math.PI));
+        const endAngle = Math.max(0, Math.min(2 * Math.PI, (node.x1 - focus.x0) / xScale * 2 * Math.PI));
+
+        // For radius: maintain constant ring thickness
+        const depthDiff = node.depth - focus.depth;
+        const maxDepth = root.height;
+        const effectiveRadius = radius - centerHoleRadius;
+        const ringThickness = effectiveRadius / maxDepth;
+
+        const innerRadius = centerHoleRadius + (depthDiff * ringThickness);
+        const outerRadius = centerHoleRadius + ((depthDiff + 1) * ringThickness);
+
+        return {
+            startAngle: startAngle,
+            endAngle: endAngle,
+            innerRadius: Math.max(centerHoleRadius, innerRadius),
+            outerRadius: Math.max(centerHoleRadius, outerRadius)
+        };
+    }
+
+    // Click handler for zooming
+    function handleClick(event, d) {
+        event.stopPropagation();
+
+        // Store previous focus for interpolation
+        previousFocusedNode = focusedNode;
+
+        // Update focused node
+        focusedNode = d;
+
+        // Update breadcrumb
+        updateBreadcrumb(d);
+
+        // Transition for zoom animation
+        const t = svg.transition()
+            .duration(750)
+            .ease(d3.easeCubicInOut);
+
+        // Update each path with smooth zoom effect
+        paths.each(function(node) {
+            const path = d3.select(this);
+            const willBeVisible = isVisible(node, d);
+
+            path.transition(t)
+                .attrTween('d', function() {
+                    // Calculate start position
+                    const startPos = previousFocusedNode === root ? {
+                        startAngle: node.x0,
+                        endAngle: node.x1,
+                        innerRadius: centerHoleRadius + node.y0,
+                        outerRadius: centerHoleRadius + node.y1
+                    } : arcPosition(node, previousFocusedNode);
+
+                    // Calculate end position (to new focus)
+                    const endPos = arcPosition(node, focusedNode);
+
+                    // Create interpolators for each coordinate
+                    const interpolateStartAngle = d3.interpolate(startPos.startAngle, endPos.startAngle);
+                    const interpolateEndAngle = d3.interpolate(startPos.endAngle, endPos.endAngle);
+                    const interpolateInnerRadius = d3.interpolate(startPos.innerRadius, endPos.innerRadius);
+                    const interpolateOuterRadius = d3.interpolate(startPos.outerRadius, endPos.outerRadius);
+
+                    return function(t) {
+                        const currentArc = d3.arc()
+                            .startAngle(interpolateStartAngle(t))
+                            .endAngle(interpolateEndAngle(t))
+                            .innerRadius(interpolateInnerRadius(t))
+                            .outerRadius(interpolateOuterRadius(t));
+
+                        return currentArc(node);
+                    };
+                })
+                .styleTween('opacity', function() {
+                    const currentOpacity = parseFloat(d3.select(this).style('opacity')) || 0.95;
+                    const targetOpacity = willBeVisible ? 0.95 : 0;
+                    return d3.interpolate(currentOpacity, targetOpacity);
+                })
+                .on('end', function() {
+                    d3.select(this).style('pointer-events', willBeVisible ? 'auto' : 'none');
+                });
         });
+    }
+
+    // Reset zoom
+    function resetZoom() {
+        // Store previous focus for interpolation
+        previousFocusedNode = focusedNode;
+
+        // Reset to root
+        focusedNode = root;
+
+        // Update breadcrumb
+        updateBreadcrumb(root);
+
+        // Transition with same duration and easing as zoom
+        const t = svg.transition()
+            .duration(750)
+            .ease(d3.easeCubicInOut);
+
+        // Restore all paths with smooth zoom-out animation
+        paths.each(function(node) {
+            const path = d3.select(this);
+
+            path.transition(t)
+                .attrTween('d', function() {
+                    // Calculate start position (from previous focus)
+                    const startPos = arcPosition(node, previousFocusedNode);
+
+                    // Calculate end position (back to root = original arc)
+                    const endPos = {
+                        startAngle: node.x0,
+                        endAngle: node.x1,
+                        innerRadius: centerHoleRadius + node.y0,
+                        outerRadius: centerHoleRadius + node.y1
+                    };
+
+                    // Create interpolators
+                    const interpolateStartAngle = d3.interpolate(startPos.startAngle, endPos.startAngle);
+                    const interpolateEndAngle = d3.interpolate(startPos.endAngle, endPos.endAngle);
+                    const interpolateInnerRadius = d3.interpolate(startPos.innerRadius, endPos.innerRadius);
+                    const interpolateOuterRadius = d3.interpolate(startPos.outerRadius, endPos.outerRadius);
+
+                    return function(t) {
+                        const currentArc = d3.arc()
+                            .startAngle(interpolateStartAngle(t))
+                            .endAngle(interpolateEndAngle(t))
+                            .innerRadius(interpolateInnerRadius(t))
+                            .outerRadius(interpolateOuterRadius(t));
+
+                        return currentArc(node);
+                    };
+                })
+                .styleTween('opacity', function() {
+                    const currentOpacity = parseFloat(d3.select(this).style('opacity')) || 0;
+                    return d3.interpolate(currentOpacity, 0.95);
+                })
+                .on('end', function() {
+                    d3.select(this).style('pointer-events', 'auto');
+                });
+        });
+    }
 
     // Show tooltip
     function showTooltip(event, d) {
@@ -622,11 +794,60 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         return text.substring(0, maxLength) + '...';
     }
 
-    // Update breadcrumb
-    const breadcrumb = document.getElementById(breadcrumbId);
-    if (breadcrumb) {
-        breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
+    // Update breadcrumb trail
+    function updateBreadcrumb(node) {
+        const breadcrumb = document.getElementById(breadcrumbId);
+        if (!breadcrumb) return;
+
+        // Build path from root to current node
+        const pathParts = [];
+        let current = node;
+        while (current.parent) {
+            pathParts.unshift(current.data.name);
+            current = current.parent;
+        }
+
+        // If at root, show "Accueil"
+        if (pathParts.length === 0) {
+            breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
+            return;
+        }
+
+        // Build breadcrumb HTML
+        let breadcrumbHTML = '<span class="breadcrumb-home breadcrumb-clickable" data-depth="0">Accueil</span>';
+
+        pathParts.forEach((part, index) => {
+            const truncated = truncateText(part, 25);
+            breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> <span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
+        });
+
+        breadcrumb.innerHTML = breadcrumbHTML;
+
+        // Add click handlers to breadcrumb items
+        breadcrumb.querySelectorAll('.breadcrumb-clickable').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                // Navigate to that level
+                let targetNode = node;
+                const targetDepth = parseInt(item.getAttribute('data-depth'));
+
+                // Go up the tree to reach the target depth
+                while (targetNode && targetNode.depth > targetDepth) {
+                    targetNode = targetNode.parent;
+                }
+
+                if (targetNode) {
+                    if (targetNode === root || !targetNode.parent) {
+                        resetZoom();
+                    } else {
+                        handleClick({stopPropagation: () => {}}, targetNode);
+                    }
+                }
+            });
+        });
     }
+
+    // Initialize breadcrumb
+    updateBreadcrumb(root);
 }
 
 // Global resize handler for all sunbursts

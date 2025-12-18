@@ -1786,6 +1786,11 @@ h2, h3 {
     overflow: hidden;
 }
 
+#sunburstContainer2 {
+    min-height: 800px;
+    height: 800px;
+}
+
 .sunburst-breadcrumb {
     position: absolute;
     top: 10px;
