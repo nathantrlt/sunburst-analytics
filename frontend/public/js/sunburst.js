@@ -448,8 +448,8 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
 }
 
 /**
- * Concentric Sunburst - Each depth level fills the entire circle (360°)
- * Used for journey visualization where each ring represents a step position
+ * Hierarchical Sunburst - Children fill their parent's arc completely
+ * Like the ContentSquare style where each child subdivides the parent's space
  */
 function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 'sunburstTooltip2') {
     // Store data globally
@@ -502,66 +502,52 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
     const svg = svgElement.append('g')
         .attr('transform', `translate(${width / 2},${height / 2})`);
 
-    // Transform hierarchical data to depth-based data
+    // Create hierarchy
     const root = d3.hierarchy(data)
         .sum(d => d.value || 0)
         .sort((a, b) => b.value - a.value);
 
-    // Get max depth
-    const maxDepth = root.height;
+    // Calculate angles where children fill parent's arc completely
+    function calculateAngles(node, startAngle, endAngle) {
+        node.x0 = startAngle;
+        node.x1 = endAngle;
 
-    // Group nodes by depth
-    const nodesByDepth = {};
-    root.each(node => {
-        if (node.depth > 0) {
-            if (!nodesByDepth[node.depth]) {
-                nodesByDepth[node.depth] = [];
-            }
-            nodesByDepth[node.depth].push(node);
+        if (node.children && node.children.length > 0) {
+            const totalValue = d3.sum(node.children, d => d.value);
+            let currentAngle = startAngle;
+
+            node.children.forEach(child => {
+                const proportion = child.value / totalValue;
+                const childAngleSize = (endAngle - startAngle) * proportion;
+                calculateAngles(child, currentAngle, currentAngle + childAngleSize);
+                currentAngle += childAngleSize;
+            });
         }
-    });
+    }
 
-    // Calculate ring thickness
+    // Initialize angles starting from full circle
+    calculateAngles(root, 0, 2 * Math.PI);
+
+    // Calculate radii
+    const maxDepth = root.height;
     const effectiveRadius = radius - centerHoleRadius;
     const ringThickness = effectiveRadius / maxDepth;
 
-    // Create arcs for each depth level
-    const allArcs = [];
-
-    Object.keys(nodesByDepth).forEach(depth => {
-        const nodes = nodesByDepth[depth];
-        const totalValue = d3.sum(nodes, d => d.value);
-
-        let currentAngle = 0;
-        nodes.forEach(node => {
-            const proportion = node.value / totalValue;
-            const angleSize = proportion * 2 * Math.PI;
-
-            allArcs.push({
-                node: node,
-                depth: parseInt(depth),
-                startAngle: currentAngle,
-                endAngle: currentAngle + angleSize,
-                innerRadius: centerHoleRadius + (parseInt(depth) - 1) * ringThickness,
-                outerRadius: centerHoleRadius + parseInt(depth) * ringThickness,
-                value: node.value,
-                data: node.data
-            });
-
-            currentAngle += angleSize;
-        });
+    root.each(node => {
+        node.y0 = node.depth * ringThickness;
+        node.y1 = (node.depth + 1) * ringThickness;
     });
 
     // Arc generator
     const arc = d3.arc()
-        .startAngle(d => d.startAngle)
-        .endAngle(d => d.endAngle)
-        .innerRadius(d => d.innerRadius)
-        .outerRadius(d => d.outerRadius);
+        .startAngle(d => d.x0)
+        .endAngle(d => d.x1)
+        .innerRadius(d => centerHoleRadius + d.y0)
+        .outerRadius(d => centerHoleRadius + d.y1);
 
     // Create paths
     const paths = svg.selectAll('path')
-        .data(allArcs)
+        .data(root.descendants().filter(d => d.depth > 0))
         .enter()
         .append('path')
         .attr('d', arc)
@@ -578,7 +564,6 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
             hideTooltip();
         })
         .on('click', function(event, d) {
-            // Could add drill-down functionality later
             console.log('Clicked:', d.data.name);
         });
 
@@ -589,7 +574,7 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
 
         // Build path
         const pathParts = [];
-        let current = d.node;
+        let current = d;
         while (current.parent) {
             pathParts.unshift(current.data.name);
             current = current.parent;
@@ -637,10 +622,10 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         return text.substring(0, maxLength) + '...';
     }
 
-    // Update breadcrumb to show "Vue en anneaux concentriques"
+    // Update breadcrumb
     const breadcrumb = document.getElementById(breadcrumbId);
     if (breadcrumb) {
-        breadcrumb.innerHTML = '<span class="breadcrumb-home">Vue par profondeur de parcours</span>';
+        breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
     }
 }
 
