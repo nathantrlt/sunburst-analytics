@@ -569,11 +569,13 @@ async function loadSunburstData() {
 
         // Render sunburst (function from sunburst.js)
         if (window.createSunburst) {
-            // Render first sunburst
+            // Render first sunburst (hierarchical)
             window.createSunburst(data.data, 'sunburstChart', 'sunburstTooltip');
-            // Render second sunburst (duplicate) - add small delay to ensure DOM is ready
+            // Render second sunburst (concentric rings) - add small delay to ensure DOM is ready
             setTimeout(() => {
-                window.createSunburst(data.data, 'sunburstChart2', 'sunburstTooltip2');
+                if (window.createConcentricSunburst) {
+                    window.createConcentricSunburst(data.data, 'sunburstChart2', 'sunburstTooltip2');
+                }
             }, 100);
         }
     } catch (error) {

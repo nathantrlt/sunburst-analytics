@@ -447,13 +447,210 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Make it responsive - handled globally below
 }
 
+/**
+ * Concentric Sunburst - Each depth level fills the entire circle (360°)
+ * Used for journey visualization where each ring represents a step position
+ */
+function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 'sunburstTooltip2') {
+    // Store data globally
+    currentSunburstData2 = data;
+
+    // Clear existing chart
+    const container = document.getElementById(chartId);
+    if (!container) return;
+
+    // Determine breadcrumb ID
+    const breadcrumbId = 'sunburstBreadcrumb2';
+
+    // Save breadcrumb element before clearing
+    const breadcrumbElement = document.getElementById(breadcrumbId);
+    const breadcrumbParent = breadcrumbElement ? breadcrumbElement.parentNode : null;
+    const breadcrumbHTML = breadcrumbElement ? breadcrumbElement.outerHTML : '';
+
+    // Clear container
+    container.innerHTML = '';
+
+    // Restore breadcrumb
+    if (breadcrumbHTML && breadcrumbParent === container) {
+        container.insertAdjacentHTML('afterbegin', breadcrumbHTML);
+    }
+
+    // Dimensions
+    const width = 600;
+    const height = 400;
+    const radius = Math.min(width, height) / 2;
+    const centerHoleRadius = radius * 0.25;
+
+    // Color function
+    const getColor = (name) => {
+        if (window.getCategoryColor) {
+            return window.getCategoryColor(name);
+        }
+        const fallbackColor = d3.scaleOrdinal(d3.schemeCategory10);
+        return fallbackColor(name);
+    };
+
+    // Create SVG
+    const svgElement = d3.select('#' + chartId)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .style('display', 'block')
+        .style('margin', '0 auto');
+
+    const svg = svgElement.append('g')
+        .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    // Transform hierarchical data to depth-based data
+    const root = d3.hierarchy(data)
+        .sum(d => d.value || 0)
+        .sort((a, b) => b.value - a.value);
+
+    // Get max depth
+    const maxDepth = root.height;
+
+    // Group nodes by depth
+    const nodesByDepth = {};
+    root.each(node => {
+        if (node.depth > 0) {
+            if (!nodesByDepth[node.depth]) {
+                nodesByDepth[node.depth] = [];
+            }
+            nodesByDepth[node.depth].push(node);
+        }
+    });
+
+    // Calculate ring thickness
+    const effectiveRadius = radius - centerHoleRadius;
+    const ringThickness = effectiveRadius / maxDepth;
+
+    // Create arcs for each depth level
+    const allArcs = [];
+
+    Object.keys(nodesByDepth).forEach(depth => {
+        const nodes = nodesByDepth[depth];
+        const totalValue = d3.sum(nodes, d => d.value);
+
+        let currentAngle = 0;
+        nodes.forEach(node => {
+            const proportion = node.value / totalValue;
+            const angleSize = proportion * 2 * Math.PI;
+
+            allArcs.push({
+                node: node,
+                depth: parseInt(depth),
+                startAngle: currentAngle,
+                endAngle: currentAngle + angleSize,
+                innerRadius: centerHoleRadius + (parseInt(depth) - 1) * ringThickness,
+                outerRadius: centerHoleRadius + parseInt(depth) * ringThickness,
+                value: node.value,
+                data: node.data
+            });
+
+            currentAngle += angleSize;
+        });
+    });
+
+    // Arc generator
+    const arc = d3.arc()
+        .startAngle(d => d.startAngle)
+        .endAngle(d => d.endAngle)
+        .innerRadius(d => d.innerRadius)
+        .outerRadius(d => d.outerRadius);
+
+    // Create paths
+    const paths = svg.selectAll('path')
+        .data(allArcs)
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', d => getColor(d.data.name))
+        .attr('fill-opacity', 0.95)
+        .attr('stroke', 'none')
+        .style('cursor', 'pointer')
+        .on('mouseover', function(event, d) {
+            d3.select(this).attr('fill-opacity', 1);
+            showTooltip(event, d);
+        })
+        .on('mouseout', function(event, d) {
+            d3.select(this).attr('fill-opacity', 0.95);
+            hideTooltip();
+        })
+        .on('click', function(event, d) {
+            // Could add drill-down functionality later
+            console.log('Clicked:', d.data.name);
+        });
+
+    // Show tooltip
+    function showTooltip(event, d) {
+        const tooltip = document.getElementById(tooltipId);
+        const percentage = ((d.value / root.value) * 100).toFixed(1);
+
+        // Build path
+        const pathParts = [];
+        let current = d.node;
+        while (current.parent) {
+            pathParts.unshift(current.data.name);
+            current = current.parent;
+        }
+
+        tooltip.innerHTML = `
+            <div class="tooltip-title">${d.data.name}</div>
+            <div class="tooltip-content">
+                <div><strong>Vues :</strong> ${d.value.toLocaleString()}</div>
+                <div><strong>Pourcentage :</strong> ${percentage}%</div>
+                <div><strong>Profondeur :</strong> ${d.depth}</div>
+                ${d.data.url ? `<div><strong>URL :</strong> ${truncateText(d.data.url, 40)}</div>` : ''}
+            </div>
+            <div class="tooltip-path">
+                <strong>Chemin :</strong> ${pathParts.join(' → ')}
+            </div>
+        `;
+
+        tooltip.style.display = 'block';
+
+        const tooltipWidth = 300;
+        const tooltipHeight = 150;
+        let left = event.clientX + 15;
+        let top = event.clientY + 15;
+
+        if (left + tooltipWidth > window.innerWidth) {
+            left = event.clientX - tooltipWidth - 15;
+        }
+        if (top + tooltipHeight > window.innerHeight) {
+            top = event.clientY - tooltipHeight - 15;
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function hideTooltip() {
+        const tooltip = document.getElementById(tooltipId);
+        tooltip.style.display = 'none';
+    }
+
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    // Update breadcrumb to show "Vue en anneaux concentriques"
+    const breadcrumb = document.getElementById(breadcrumbId);
+    if (breadcrumb) {
+        breadcrumb.innerHTML = '<span class="breadcrumb-home">Vue par profondeur de parcours</span>';
+    }
+}
+
 // Global resize handler for all sunbursts
 window.addEventListener('resize', debounce(() => {
     if (currentSunburstData) {
         createSunburst(currentSunburstData, 'sunburstChart', 'sunburstTooltip');
     }
     if (currentSunburstData2) {
-        createSunburst(currentSunburstData2, 'sunburstChart2', 'sunburstTooltip2');
+        createConcentricSunburst(currentSunburstData2, 'sunburstChart2', 'sunburstTooltip2');
     }
 }, 250));
 
@@ -472,3 +669,4 @@ function debounce(func, wait) {
 
 // Export for global access
 window.createSunburst = createSunburst;
+window.createConcentricSunburst = createConcentricSunburst;
