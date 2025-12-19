@@ -129,8 +129,11 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
     // Center text removed - keeping variable for compatibility
     const centerText = { text: () => {} };
 
-    // Initialize breadcrumb
-    updateBreadcrumb(root);
+    // Initialize breadcrumb - hide it initially
+    const breadcrumb = document.getElementById(breadcrumbId);
+    if (breadcrumb) {
+        breadcrumb.style.display = 'none';
+    }
 
     // Mouse over handler
     function handleMouseOver(event, d) {
@@ -399,18 +402,24 @@ function createSunburst(data, chartId = 'sunburstChart', tooltipId = 'sunburstTo
             current = current.parent;
         }
 
-        // If at root, show "Accueil"
+        // If at root, hide the breadcrumb
         if (pathParts.length === 0) {
-            breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
+            breadcrumb.style.display = 'none';
             return;
         }
 
-        // Build breadcrumb HTML
-        let breadcrumbHTML = '<span class="breadcrumb-home breadcrumb-clickable" data-depth="0">Accueil</span>';
+        // Show breadcrumb when there's a path
+        breadcrumb.style.display = 'block';
+
+        // Build breadcrumb HTML - start directly with the first segment
+        let breadcrumbHTML = '';
 
         pathParts.forEach((part, index) => {
             const truncated = truncateText(part, 25);
-            breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> <span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
+            if (index > 0) {
+                breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> `;
+            }
+            breadcrumbHTML += `<span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
         });
 
         breadcrumb.innerHTML = breadcrumbHTML;
@@ -809,18 +818,24 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
             current = current.parent;
         }
 
-        // If at root, show "Accueil"
+        // If at root, hide the breadcrumb
         if (pathParts.length === 0) {
-            breadcrumb.innerHTML = '<span class="breadcrumb-home">Accueil</span>';
+            breadcrumb.style.display = 'none';
             return;
         }
 
-        // Build breadcrumb HTML
-        let breadcrumbHTML = '<span class="breadcrumb-home breadcrumb-clickable" data-depth="0">Accueil</span>';
+        // Show breadcrumb when there's a path
+        breadcrumb.style.display = 'block';
+
+        // Build breadcrumb HTML - start directly with the first segment
+        let breadcrumbHTML = '';
 
         pathParts.forEach((part, index) => {
             const truncated = truncateText(part, 25);
-            breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> <span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
+            if (index > 0) {
+                breadcrumbHTML += ` <span class="breadcrumb-separator">›</span> `;
+            }
+            breadcrumbHTML += `<span class="breadcrumb-item breadcrumb-clickable" data-depth="${index + 1}">${truncated}</span>`;
         });
 
         breadcrumb.innerHTML = breadcrumbHTML;
