@@ -485,14 +485,12 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         container.insertAdjacentHTML('afterbegin', breadcrumbHTML);
     }
 
-    // Dimensions - Small compact size for second sunburst
-    const width = 300;
-    const height = 300;
-    const radius = Math.min(width, height) / 2;
+    // Dimensions - Small compact size for second sunburst with padding
+    const padding = 10;
+    const width = 300 + padding * 2;  // 320px total
+    const height = 300 + padding * 2; // 320px total
+    const radius = Math.min(width - padding * 2, height - padding * 2) / 2; // 150px radius
     const centerHoleRadius = radius * 0.25;
-
-    // Add padding to viewBox to prevent clipping
-    const padding = 5;
 
     // Color function
     const getColor = (name) => {
@@ -503,12 +501,12 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         return fallbackColor(name);
     };
 
-    // Create SVG with padding in viewBox
+    // Create SVG with padding
     const svgElement = d3.select('#' + chartId)
         .append('svg')
         .attr('width', width)
         .attr('height', height)
-        .attr('viewBox', `${-padding} ${-padding} ${width + padding * 2} ${height + padding * 2}`)
+        .attr('viewBox', `0 0 ${width} ${height}`)
         .style('display', 'block')
         .style('margin', '0 auto');
 
