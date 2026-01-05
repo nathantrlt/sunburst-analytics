@@ -491,6 +491,9 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
     const radius = Math.min(width, height) / 2;
     const centerHoleRadius = radius * 0.25;
 
+    // Add padding to viewBox to prevent clipping
+    const padding = 5;
+
     // Color function
     const getColor = (name) => {
         if (window.getCategoryColor) {
@@ -500,12 +503,12 @@ function createConcentricSunburst(data, chartId = 'sunburstChart2', tooltipId = 
         return fallbackColor(name);
     };
 
-    // Create SVG
+    // Create SVG with padding in viewBox
     const svgElement = d3.select('#' + chartId)
         .append('svg')
         .attr('width', width)
         .attr('height', height)
-        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('viewBox', `${-padding} ${-padding} ${width + padding * 2} ${height + padding * 2}`)
         .style('display', 'block')
         .style('margin', '0 auto');
 
